@@ -4,43 +4,48 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Indian Telecom | Mobile Accessories Wholesale & Retail</title>
-    <!-- FontAwesome for clean icons -->
+    <!-- FontAwesome Vector Library for High-Utility UI Icons -->
     <link rel="stylesheet" href="https://cloudflare.com">
     
     <style>
-        /* Base Reset Elements */
+        /* Base Reset Layout Elements */
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f9fafb; color: #1f2937; line-height: 1.5; }
         .container { max-width: 1140px; margin: 0 auto; padding: 0 16px; width: 100%; }
         
-        /* Top Alert Banner */
+        /* Top Informational Notification Alert Banner */
         .announcement-bar { background-color: #2563eb; color: white; font-size: 13px; font-weight: 600; padding: 10px 16px; text-align: center; text-transform: uppercase; letter-spacing: 0.5px; }
         
-        /* App Header Layout */
+        /* Main Layout Sticky Configuration Header */
         header { background-color: white; border-bottom: 1px solid #e5e7eb; position: sticky; top: 0; z-index: 50; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
         .header-flex { display: flex; align-items: center; justify-content: space-between; padding: 16px 0; }
         .logo-title { font-size: 24px; font-weight: 900; color: #2563eb; letter-spacing: -0.5px; text-transform: uppercase; }
         .logo-sub { font-size: 12px; color: #6b7280; font-weight: 500; margin-top: 2px; }
         
-        /* Header Action Button */
+        /* HEADER UPPER RIGHT UPPER CART NODE CONFIGURATION */
+        .header-actions-group { display: flex; align-items: center; gap: 14px; }
+        .upper-right-cart-btn { background-color: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; padding: 10px 18px; border-radius: 12px; font-size: 14px; font-weight: 700; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; position: relative; transition: all 0.2s ease; }
+        .upper-right-cart-btn:hover { background-color: #2563eb; color: white; border-color: #2563eb; }
+        .cart-badge-counter { position: absolute; top: -6px; right: -6px; background-color: #ef4444; color: white; font-size: 11px; font-weight: 800; min-width: 20px; height: 20px; padding: 0 5px; border-radius: 50px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(239,68,68,0.3); border: 2px solid white; }
+        
+        /* Header Action WhatsApp Button */
         .whatsapp-btn { background-color: #22c55e; color: white; padding: 10px 20px; text-decoration: none; font-size: 14px; font-weight: 700; display: inline-flex; align-items: center; gap: 8px; border-radius: 50px; box-shadow: 0 2px 4px rgba(34,197,94,0.2); transition: all 0.2s ease; }
         .whatsapp-btn:hover { background-color: #16a34a; transform: translateY(-1px); }
-        
-        /* Hero Banner Component */
+        /* Brand Hero Showcase Section */
         .hero { background: linear-gradient(135deg, #1d4ed8, #4338ca); color: white; padding: 56px 16px; text-align: center; }
         .hero-tag { background-color: rgba(255, 255, 255, 0.15); color: #fff; font-size: 11px; font-weight: 700; padding: 6px 14px; border-radius: 9999px; display: inline-block; text-transform: uppercase; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.1); letter-spacing: 0.5px; }
         .hero h2 { font-size: 38px; font-weight: 800; margin-bottom: 16px; line-height: 1.2; letter-spacing: -0.5px; }
         .hero p { font-size: 15px; color: #e0e7ff; max-w: 640px; margin: 0 auto 28px auto; line-height: 1.6; }
         .hero-features { display: flex; justify-content: center; flex-wrap: wrap; gap: 12px; font-size: 13px; font-weight: 600; }
         .hero-features div { background-color: rgba(255,255,255,0.08); padding: 8px 18px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.15); display: flex; align-items: center; }
-        
-        /* Control Tabs Layout */
+
+        /* Interface Mode Selection Switcher Nav Bar */
         .tabs-nav { background-color: white; border-bottom: 1px solid #e5e7eb; position: sticky; top: 73px; z-index: 40; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
         .tabs-flex { display: flex; justify-content: center; }
         .tab-btn { width: 50%; max-width: 260px; padding: 18px 16px; background: none; border: none; border-bottom: 4px solid transparent; font-weight: 700; font-size: 14px; color: #6b7280; cursor: pointer; text-align: center; transition: all 0.2s ease; letter-spacing: 0.5px; }
         .tab-btn:hover { color: #2563eb; background-color: #fcfdfe; }
         
-        /* Layout Blocks & Grids */
+        /* Application View Visibility Core Management */
         main { padding: 32px 0; }
         .view-section { display: none; }
         .view-active { display: block !important; }
@@ -50,25 +55,28 @@
         .section-header h3 { font-size: 20px; font-weight: 800; color: #111827; letter-spacing: -0.3px; }
         .section-header span { font-size: 12px; color: #6b7280; font-weight: 500; }
         
+        /* Responsive Framework Media Query System Matrices */
         .products-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
         @media (min-width: 768px) { .products-grid { grid-template-columns: repeat(4, 1fr); gap: 24px; } }
-        /* Showcase Product Card Styles */
+        
+        /* Consumer Product Display Panel Blueprints */
         .product-card { background-color: white; border-radius: 14px; border: 1px solid #e5e7eb; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.02); transition: all 0.2s ease; display: flex; flex-direction: column; }
         .product-card:hover { box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); transform: translateY(-2px); }
-        .card-media { aspect-ratio: 1; background-color: #ffffff; display: flex; align-items: center; justify-content: center; position: relative; border-bottom: 1px solid #f3f4f6; overflow: hidden; height: 220px; }
-        .card-media img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s ease; }
-        .product-card:hover .card-media img { transform: scale(1.04); }
+        .card-media { aspect-ratio: 1; background-color: #f8fafc; display: flex; align-items: center; justify-content: center; position: relative; border-bottom: 1px solid #f1f5f9; overflow: hidden; height: 220px; padding: 20px; }
+        .card-media svg { width: 100%; height: 100%; max-height: 140px; transition: transform 0.3s ease; }
+        .product-card:hover .card-media svg { transform: scale(1.06); }
         .card-badge { position: absolute; top: 12px; left: 12px; background-color: #ef4444; color: white; font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 6px; letter-spacing: 0.5px; z-index: 10; }
+        
         .card-content { padding: 16px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
         .card-tag { font-size: 10px; font-weight: 700; color: #2563eb; text-transform: uppercase; letter-spacing: 0.5px; }
         .card-title { font-size: 14px; font-weight: 700; color: #111827; margin: 4px 0 12px 0; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 40px; }
         .card-pricing { display: flex; align-items: baseline; gap: 8px; margin-bottom: 14px; }
         .price-current { font-size: 20px; font-weight: 800; color: #111827; }
         .price-strike { font-size: 13px; color: #9ca3af; text-decoration: line-through; }
-        .buy-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; background-color: #eff6ff; color: #2563eb; padding: 10px; border-radius: 10px; text-decoration: none; font-size: 13px; font-weight: 700; transition: all 0.2s ease; border: 1px solid transparent; }
+        .buy-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; background-color: #eff6ff; color: #2563eb; padding: 10px; border-radius: 10px; text-decoration: none; font-size: 13px; font-weight: 700; transition: all 0.2s ease; border: 1px solid transparent; cursor: pointer; }
         .buy-btn:hover { background-color: #2563eb; color: white; }
         
-        /* Wholesale Matrix Table Layout */
+        /* Wholesale Matrix Table Layout Blueprint */
         .alert-box { background-color: #fffbeb; border: 1px solid #fef3c7; color: #92400e; padding: 16px; border-radius: 12px; font-size: 13px; margin-bottom: 24px; display: flex; gap: 12px; line-height: 1.5; }
         .table-container { background-color: white; border-radius: 14px; border: 1px solid #e5e7eb; overflow-x: auto; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
         .bulk-table { width: 100%; border-collapse: collapse; text-align: left; min-width: 600px; }
@@ -85,7 +93,7 @@
         @media (min-width: 768px) { .summary-sticky { flex-direction: row; padding: 24px; } }
         .total-meta { font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase; tracking-wide: 0.5px; }
         .total-val { font-size: 28px; font-weight: 900; color: #111827; margin-top: 2px; }
-        .submit-btn { background-color: #22c55e; color: white; padding: 14px 28px; border: none; border-radius: 12px; font-weight: 700; font-size: 14px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 6px rgba(34,197,94,0.15); width: 100%; transition: all 0.2s ease; }
+        .submit-btn { background-color: #22c55e; color: white; padding: 14px 28px; border: none; border-radius: 12px; font-weight: 700; font-size: 14px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 6px rgba(34,197,94,0.15); width: 100%; transition: all 0.2s ease; text-decoration: none; }
         @media (min-width: 768px) { .submit-btn { width: auto; } }
         .submit-btn:hover { background-color: #16a34a; transform: translateY(-1px); box-shadow: 0 6px 12px rgba(34,197,94,0.2); }
         
@@ -95,32 +103,53 @@
         footer h5 { color: white; font-size: 16px; font-weight: 700; margin-bottom: 16px; letter-spacing: -0.2px; }
         footer p { line-height: 1.6; }
         .footer-bottom { text-align: center; font-size: 12px; margin-top: 48px; padding-top: 24px; border-top: 1px solid #111827; color: #4b5563; font-weight: 500; }
+
+        /* UPPER RIGHT SIDE SLIDE CART OVERLAY PANEL */
+        .cart-overlay-drawer { position: fixed; top: 0; right: -400px; width: 100%; max-width: 400px; height: 100%; background-color: white; z-index: 100; box-shadow: -4px 0 24px rgba(0,0,0,0.15); display: flex; flex-direction: column; transition: right 0.3s ease; border-left: 1px solid #e5e7eb; }
+        .cart-overlay-active { right: 0; }
+        .drawer-header { padding: 20px; border-bottom: 1px solid #f3f4f6; display: flex; align-items: center; justify-content: space-between; background-color: #f8fafc; }
+        .drawer-header h4 { font-size: 16px; font-weight: 800; color: #111827; display: flex; align-items: center; gap: 8px; }
+        .drawer-close-btn { background: none; border: none; font-size: 20px; color: #9ca3af; cursor: pointer; transition: color 0.2s; }
+        .drawer-close-btn:hover { color: #ef4444; }
+        .drawer-body { padding: 20px; flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; }
+        .drawer-backdrop { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(3,7,18,0.4); z-index: 90; display: none; }
+        .backdrop-active { display: block; }
     </style>
 </head>
 <body>
+    <!-- BACKDROP FOR RIGHT DRAWER CLOSURE -->
+    <div id="cart-backdrop" class="drawer-backdrop" onclick="closeCartDrawer()"></div>
 
     <!-- TOP ANNOUNCEMENT BAR -->
     <div class="announcement-bar">
         🚀 Wholesale & Retail | Pan-India Shipping Available | Contact: +91 97184 39786
     </div>
 
-    <!-- MAIN HEADER -->
+    <!-- MAIN HEADER WITH UPPER RIGHT CORNER CART OPTION -->
     <header>
         <div class="container header-flex">
             <div>
                 <h1 class="logo-title">INDIAN TELECOM</h1>
                 <p class="logo-sub">Premium Mobile Accessories Hub</p>
             </div>
-            <a href="https://wa.me." 
-               target="_blank" 
-               class="whatsapp-btn">
-                <i class="fab fa-whatsapp" style="font-size: 16px;"></i>
-                <span>Chat / Order</span>
-            </a>
+            <div class="header-actions-group">
+                <!-- FLOATING UPPER RIGHT END SHOPPING CART TRIGGER NODE -->
+                <button onclick="openCartDrawer()" class="upper-right-cart-btn" title="Open Local Shopping Cart">
+                    <i class="fas fa-shopping-bag"></i>
+                    <span class="hidden-sm">Cart</span>
+                    <div id="global-badge-counter" class="cart-badge-counter" style="display: none;">0</div>
+                </button>
+                <a href="https://wa.me." 
+                   target="_blank" 
+                   class="whatsapp-btn">
+                    <i class="fab fa-whatsapp" style="font-size: 16px;"></i>
+                    <span class="hidden-sm">Chat Now</span>
+                </a>
+            </div>
         </div>
     </header>
 
-    <!-- HERO SECTION -->
+    <!-- HERO PROFILE PANEL -->
     <section class="hero">
         <div class="container">
             <span class="hero-tag">Direct Importer & Distributor</span>
@@ -133,7 +162,7 @@
         </div>
     </section>
 
-    <!-- MODE SWITCHER TABS -->
+    <!-- OPERATIONS TAB LAYOUT LINK SWITCHER -->
     <div class="tabs-nav">
         <div class="tabs-flex">
             <button onclick="switchMode('retail')" id="tab-retail" class="tab-btn tab-active">
@@ -144,21 +173,26 @@
             </button>
         </div>
     </div>
-    <!-- MAIN CONTENT CONTAINER -->
+
+    <!-- MAIN APP WRAPPER LAYOUT NODES -->
     <main class="container">
-        <!-- 1. RETAIL VIEW BLOCK -->
+        <!-- 1. RETAIL CONSUMER VIEW VIEWPORT -->
         <div id="view-retail" class="view-section view-active">
             <div class="section-header">
                 <h3>Trending Accessories</h3>
-                <span>Showing retail consumer pricing</span>
+                <span>Click add to cart to collect items in upper-right corner bag</span>
             </div>
             
             <div class="products-grid">
-                <!-- Card 1 (Tempered Glass Photo Data) -->
+                <!-- Product Element Card 1 -->
                 <div class="product-card">
                     <div class="card-media">
                         <span class="card-badge">HOT</span>
-                        <img src="data:image/svg+xml;utf8,<svg xmlns='http://w3.org' width='400' height='400' viewBox='0 0 400 400'><rect width='100%' height='100%' fill='%23f1f5f9'/><rect x='130' y='60' width='140' height='280' rx='20' fill='%23ffffff' stroke='%23cbd5e1' stroke-width='6'/><rect x='136' y='66' width='128' height='268' rx='14' fill='%23e2e8f0'/><rect x='145' y='75' width='110' height='250' rx='8' fill='%231e293b'/><rect x='145' y='75' width='110' height='250' rx='8' fill='none' stroke='%2338bdf8' stroke-width='3'/><path d='M130 180 C 130 180, 200 120, 270 200' stroke='%23ffffff' stroke-width='4' fill='none' opacity='0.4'/></svg>" alt="Tempered Glass">
+                        <svg viewBox="0 0 100 100" fill="none" xmlns="http://w3.org">
+                            <rect x="25" y="10" width="50" height="80" rx="8" fill="#3b82f6" fill-opacity="0.1" stroke="#2563eb" stroke-width="3"/>
+                            <rect x="28" y="13" width="44" height="74" rx="5" fill="none" stroke="#60a5fa" stroke-width="1.5" stroke-dasharray="4 2"/>
+                            <circle cx="50" cy="84" r="3" fill="#2563eb"/>
+                        </svg>
                     </div>
                     <div class="card-content">
                         <div>
@@ -170,17 +204,20 @@
                                 <span class="price-current">₹149</span>
                                 <span class="price-strike">₹299</span>
                             </div>
-                            <a href="https://wa.me" target="_blank" class="buy-btn">
-                                <i class="fab fa-whatsapp"></i> Buy Now
-                            </a>
+                            <button onclick="addToCart('9D Curved Tempered Glass', 149)" class="buy-btn">
+                                <i class="fas fa-cart-plus"></i> Add to Cart
+                            </button>
                         </div>
                     </div>
                 </div>
 
-                <!-- Card 2 (Premium Case Photo Data) -->
+                <!-- Product Element Card 2 -->
                 <div class="product-card">
                     <div class="card-media">
-                        <img src="data:image/svg+xml;utf8,<svg xmlns='http://w3.org' width='400' height='400' viewBox='0 0 400 400'><rect width='100%' height='100%' fill='%23f8fafc'/><rect x='120' y='50' width='160' height='300' rx='24' fill='%230f172a' stroke='%231e293b' stroke-width='8'/><rect x='145' y='80' width='40' height='60' rx='8' fill='%231e293b'/><circle cx='165' cy='100' r='10' fill='%230284c7'/><circle cx='165' cy='125' r='6' fill='%2364748b'/><rect x='132' y='62' width='136' height='276' rx='16' fill='none' stroke='%233b82f6' stroke-width='3'/></svg>" alt="Mobile Cover">
+                        <svg viewBox="0 0 100 100" fill="none" xmlns="http://w3.org">
+                            <rect x="25" y="10" width="50" height="80" rx="10" fill="#1e1b4b" stroke="#4338ca" stroke-width="4"/>
+                            <circle cx="38" cy="22" r="3" fill="#4f46e5"/>
+                        </svg>
                     </div>
                     <div class="card-content">
                         <div>
@@ -192,16 +229,20 @@
                                 <span class="price-current">₹249</span>
                                 <span class="price-strike">₹499</span>
                             </div>
-                            <a href="https://wa.me" target="_blank" class="buy-btn">
-                                <i class="fab fa-whatsapp"></i> Buy Now
-                            </a>
+                            <button onclick="addToCart('Premium Matte Liquid Silicone Case', 249)" class="buy-btn">
+                                <i class="fas fa-cart-plus"></i> Add to Cart
+                            </button>
                         </div>
                     </div>
                 </div>
-                <!-- Card 3 (Fast Charger Photo Data) -->
+
+                <!-- Product Element Card 3 -->
                 <div class="product-card">
                     <div class="card-media">
-                        <img src="data:image/svg+xml;utf8,<svg xmlns='http://w3.org' width='400' height='400' viewBox='0 0 400 400'><rect width='100%' height='100%' fill='%23f1f5f9'/><rect x='130' y='120' width='140' height='160' rx='16' fill='%23ffffff' stroke='%23cbd5e1' stroke-width='4'/><rect x='140' y='130' width='120' height='140' rx='12' fill='%23f8fafc'/><path d='M170 60 L170 120 M230 60 L230 120' stroke='%2394a3b8' stroke-width='8' stroke-linecap='round'/><rect x='175' y='230' width='50' height='20' rx='4' fill='%23e2e8f0' stroke='%2394a3b8' stroke-width='2'/><path d='M200 160 L185 190 H215 L200 220' fill='%23ef4444'/></svg>" alt="Fast Adapter">
+                        <svg viewBox="0 0 100 100" fill="none" xmlns="http://w3.org">
+                            <rect x="30" y="25" width="40" height="45" rx="6" fill="#f8fafc" stroke="#64748b" stroke-width="3"/>
+                            <path d="M47 34L43 42H51L47 48" stroke="#ef4444" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
                     </div>
                     <div class="card-content">
                         <div>
@@ -213,17 +254,20 @@
                                 <span class="price-current">₹399</span>
                                 <span class="price-strike">₹899</span>
                             </div>
-                            <a href="https://wa.me" target="_blank" class="buy-btn">
-                                <i class="fab fa-whatsapp"></i> Buy Now
-                            </a>
+                            <button onclick="addToCart('20W Super Fast Type-C Adapter', 399)" class="buy-btn">
+                                <i class="fas fa-cart-plus"></i> Add to Cart
+                            </button>
                         </div>
                     </div>
                 </div>
 
-                <!-- Card 4 (Fast Cable Photo Data) -->
+                <!-- Product Element Card 4 -->
                 <div class="product-card">
-                    <div class="container card-media">
-                        <img src="data:image/svg+xml;utf8,<svg xmlns='http://w3.org' width='400' height='400' viewBox='0 0 400 400'><rect width='100%' height='100%' fill='%23f8fafc'/><circle cx='200' cy='200' r='100' fill='none' stroke='%23cbd5e1' stroke-width='14'/><circle cx='200' cy='200' r='100' fill='none' stroke='%2364748b' stroke-width='6' stroke-dasharray='15 10'/><rect x='175' y='60' width='50' height='80' rx='8' fill='%23334155'/><rect x='187' y='20' width='26' height='40' rx='3' fill='%23e2e8f0'/></svg>" alt="Fast Cable">
+                    <div class="card-media">
+                        <svg viewBox="0 0 100 100" fill="none" xmlns="http://w3.org">
+                            <path d="M50 90C50 90 25 75 25 50C25 25 50 10 50 10" stroke="#94a3b8" stroke-width="4"/>
+                            <rect x="42" y="10" width="16" height="22" rx="2" fill="#f1f5f9" stroke="#475569" stroke-width="2.5"/>
+                        </svg>
                     </div>
                     <div class="card-content">
                         <div>
@@ -235,9 +279,9 @@
                                 <span class="price-current">₹129</span>
                                 <span class="price-strike">₹299</span>
                             </div>
-                            <a href="https://wa.me" target="_blank" class="buy-btn">
-                                <i class="fab fa-whatsapp"></i> Buy Now
-                            </a>
+                            <button onclick="addToCart('Braided Fast Charging Cable (65W)', 129)" class="buy-btn">
+                                <i class="fas fa-cart-plus"></i> Add to Cart
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -272,7 +316,7 @@
                             <td style="text-align: center; font-weight: 700; color: #6b7280; font-size: 13px;">50 Pcs</td>
                             <td><strong style="font-size: 16px; color: #111827;">₹15</strong> <span style="font-size: 11px; color: #9ca3af;">/pc</span></td>
                             <td>
-                                <input type="number" placeholder="0" min="0" data-item="9D Tempered Glass" data-price="15" class="qty-field">
+                                <input type="number" placeholder="0" min="0" data-item="9D Tempered Glass" data-price="15" class="qty-field input-wholesale">
                             </td>
                         </tr>
                         <tr>
@@ -284,7 +328,7 @@
                             <td style="text-align: center; font-weight: 700; color: #6b7280; font-size: 13px;">20 Pcs</td>
                             <td><strong style="font-size: 16px; color: #111827;">₹28</strong> <span style="font-size: 11px; color: #9ca3af;">/pc</span></td>
                             <td>
-                                <input type="number" placeholder="0" min="0" data-item="Clear Back Covers" data-price="28" class="qty-field">
+                                <input type="number" placeholder="0" min="0" data-item="Clear Back Covers" data-price="28" class="qty-field input-wholesale">
                             </td>
                         </tr>
                         <tr>
@@ -296,7 +340,7 @@
                             <td style="text-align: center; font-weight: 700; color: #6b7280; font-size: 13px;">10 Pcs</td>
                             <td><strong style="font-size: 16px; color: #111827;">₹135</strong> <span style="font-size: 11px; color: #9ca3af;">/pc</span></td>
                             <td>
-                                <input type="number" placeholder="0" min="0" data-item="20W Adapters" data-price="135" class="qty-field">
+                                <input type="number" placeholder="0" min="0" data-item="20W Adapters" data-price="135" class="qty-field input-wholesale">
                             </td>
                         </tr>
                     </tbody>
@@ -315,6 +359,58 @@
         </div>
     </main>
 
+    <!-- UPPER RIGHT END SLIDING OVERLAY DRAWER PANEL -->
+    <div id="cart-drawer-panel" class="cart-overlay-drawer">
+        <div class="drawer-header">
+            <h4><i class="fas fa-shopping-basket text-blue-600"></i> Shopping Bag Items</h4>
+            <button onclick="closeCartDrawer()" class="drawer-close-btn" title="Close Panel">&times;</button>
+        </div>
+        
+        <div class="drawer-body">
+            <!-- Dynamic Selected Items Node -->
+            <div id="cart-items-list" style="margin-bottom: 20px;"></div>
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; font-weight: 900; font-size: 18px; border-top: 2px solid #f3f4f6; padding-top: 14px; margin-bottom: 24px;">
+                <span>Total Bill Amount:</span>
+                <span style="color: #2563eb;">₹<span id="cart-total-display">0</span></span>
+            </div>
+
+            <!-- CUSTOMER ADDRESS AND PROMPT QUESTIONS FORM -->
+            <div style="background-color: #f8fafc; padding: 16px; border-radius: 12px; border: 1px solid #e2e8f0; margin-bottom: 12px;">
+                <h5 style="font-weight: 700; margin-bottom: 14px; color: #111827; font-size: 14px;">Delivery & Payments Setup</h5>
+                
+                <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px;">
+                    <input type="text" id="cust-name" placeholder="Enter Your Name" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 13px;" required>
+                    <input type="tel" id="cust-mobile" placeholder="Enter Mobile Number" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 13px;" required>
+                    <textarea id="cust-address" placeholder="Enter Delivery Address" rows="2" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 13px; font-family: inherit;" required></textarea>
+                </div>
+
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; font-weight: 700; font-size: 12px; color: #475569; margin-bottom: 6px;">Payment Mode Option:</label>
+                    <div style="display: flex; flex-direction: column; gap: 8px; font-size: 13px;">
+                        <label style="cursor: pointer; font-weight: 600;"><input type="radio" name="pay-mode" value="COD" checked onclick="togglePaymentMode('COD')"> Cash on Delivery (COD)</label>
+                        <label style="cursor: pointer; font-weight: 600;"><input type="radio" name="pay-mode" value="ONLINE" onclick="togglePaymentMode('ONLINE')"> Pay Online via Dynamic UPI QR</label>
+                    </div>
+                </div>
+
+                <!-- SPECIFIC MANDATED PARSED NPCI 9718439786@YBL ENGINE CONTAINER -->
+                <div id="qr-display-block" style="display: none; text-align: center; background: white; padding: 16px; border: 2px dashed #2563eb; border-radius: 12px; margin-bottom: 16px;">
+                    <p style="font-size: 12px; font-weight: 700; color: #1e3a8a; margin-bottom: 8px;">📲 Scan using GPay, PhonePe or Paytm</p>
+                  <div style="background: #ffffff; display: inline-block; padding: 6px; border: 1px solid #e2e8f0; border-radius: 8px;">
+    <!-- The library targets this div container to generate a perfect pixel QR code canvas locally -->
+    <div id="upi-qr-image" style="width: 160px; height: 160px; display: block; margin: 0 auto;"></div>
+</div>
+
+                    <p style="font-size: 14px; font-weight: 800; color: #047857; margin-top: 8px;">Autofilled Amount: ₹<span id="qr-amount-meta">0</span></p>
+                    <span style="font-size: 9px; color: #94a3b8; display: block; margin-top: 2px;">VPA Handle Locked: 9718439786@ybl</span>
+                </div>
+
+                <button onclick="placeRetailOrder()" class="submit-btn" style="background-color: #2563eb; box-shadow: 0 4px 6px rgba(37,99,235,0.15); width: 100%; padding: 12px; font-size: 13px;">
+                    <i class="fab fa-whatsapp"></i> Place Order via WhatsApp
+                </button>
+            </div>
+        </div>
+    </div>
     <!-- FOOTER WITH BUSINESS ADDRESS & TRUST SIGNALS -->
     <footer>
         <div class="container footer-grid">
@@ -324,20 +420,805 @@
             </div>
             <div>
                 <h5>Store Location</h5>
-                <p><i class="fas fa-map-marker-alt" style="color: #2563eb; margin-right: 8px;"></i>Near Bhatti Chowk, Rajnagar,<br>Madhubani, Bihar, 847235.</p>
+                <p><i class="fas fa-map-marker-alt" style="color: #2563eb; margin-right: 8px;"></i> Near Bhatti Chowk, Rajnagar,<br>Madhubani, Bihar - 847235</p>
             </div>
             <div>
                 <h5>Business Hours</h5>
-                <p><i class="fas fa-clock" style="color: #2563eb; margin-right: 8px;"></i> Tue - Sun: 10:00 AM to 08:30 PM<br><span style="color: #f59e0b; font-weight: 600;">Monday Closed</span></p>
+                <p><i class="fas fa-clock" style="color: #2563eb; margin-right: 8px;"></i> Mon - Sat: 10:00 AM to 08:30 PM<br><span style="color: #f59e0b; font-weight: 600;">Sunday Closed</span></p>
             </div>
         </div>
         <div class="footer-bottom">
-            &copy; 2026 Indian Telecom. All rights reserved. Embedded Photo Layout System.
+            &copy; 2026 Indian Telecom. All rights reserved. Registered NPCI Universal Payment Node Architecture.
         </div>
     </footer>
 
     <!-- INTERACTION CONTROLLER SCRIPT ENGINE -->
     <script>
+        let cart = [];
+
+        function openCartDrawer() {
+            document.getElementById('cart-drawer-panel').classList.add('cart-overlay-active');
+            document.getElementById('cart-backdrop').classList.add('backdrop-active');
+        }
+
+        function closeCartDrawer() {
+            document.getElementById('cart-drawer-panel').classList.remove('cart-overlay-active');
+            document.getElementById('cart-backdrop').classList.remove('backdrop-active');
+        }
+
+        function addToCart(name, price) {
+            let existingItem = cart.find(item => item.name === name);
+            if (existingItem) {
+                existingItem.qty += 1;
+            } else {
+                cart.push({ name: name, price: price, qty: 1 });
+            }
+            updateCartUI();
+            
+            // Visual Feedback: Shake the cart button slightly to notify user item added
+            const btn = document.querySelector('.upper-right-cart-btn');
+            btn.style.transform = 'scale(1.1)';
+            setTimeout(() => btn.style.transform = 'none', 150);
+        }
+
+        function removeFromCart(name) {
+            cart = cart.filter(item => item.name !== name);
+            updateCartUI();
+        }
+
+        function updateCartUI() {
+            const listDisplay = document.getElementById('cart-items-list');
+            const badgeCounter = document.getElementById('global-badge-counter');
+            
+            let totalItems = 0;
+            let totalAmount = 0;
+            listDisplay.innerHTML = '';
+
+            cart.forEach(item => {
+                let itemTotal = item.price * item.qty;
+                totalAmount += itemTotal;
+                totalItems += item.qty;
+                listDisplay.innerHTML += `
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px dashed #e2e8f0; font-size: 13px;">
+                        <div style="max-width: 75%;">
+                            <strong style="color: #030712; display: block;">${item.name}</strong> 
+                            <span style="color: #6b7280; font-size: 11px;">Qty: ${item.qty} x ₹${item.price}</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <span style="font-weight: 700; color: #111827;">₹${itemTotal}</span>
+                            <button onclick="removeFromCart('${item.name}')" style="background: none; border: none; color: #ef4444; cursor: pointer; font-size: 13px;"><i class="fas fa-trash-alt"></i></button>
+                        </div>
+                    </div>`;
+            });
+
+            // Handle Sticky Upper Right Counter visibility
+            if (totalItems > 0) {
+                badgeCounter.innerText = totalItems;
+                badgeCounter.style.display = 'flex';
+            } else {
+                badgeCounter.style.display = 'none';
+                listDisplay.innerHTML = '<p style="text-align: center; color: #9ca3af; font-size: 13px; padding: 20px 0;">Your shopping bag is completely empty.</p>';
+            }
+
+            document.getElementById('cart-total-display').innerText = totalAmount;
+            
+            const mode = document.querySelector('input[name="pay-mode"]:checked').value;
+            if (mode === 'ONLINE') {
+                generateDynamicUPIQR(totalAmount);
+            }
+        }
+        function togglePaymentMode(mode) {
+            const qrBlock = document.getElementById('qr-display-block');
+            if (mode === 'ONLINE') {
+                let total = document.getElementById('cart-total-display').innerText;
+                generateDynamicUPIQR(total);
+                qrBlock.style.display = 'block';
+            } else {
+                qrBlock.style.display = 'none';
+            }
+        }
+
+        /**
+         * Generates NPCI Spec-Compliant Universal Merchant Payment Strings
+         * Enforces user layout UPI Virtual Private Address: 9718439786@ybl
+         */
+       // ✅ CORRECTED (Replace your function with this)
+/**
+ * Generates NPCI Spec-Compliant Universal Merchant Payment Strings
+ * Enforces correct EasyQRCodeJS library object structural execution parameters
+ */
+function generateDynamicUPIQR(amount) {
+    let upiID = "9718439786@ybl"; 
+    let merchantName = "Indian Telecom";
+    let merchantCategoryCode = "5732"; 
+    let uniqueTransactionRef = "IT" + Date.now(); 
+    let transactionNote = "Order Payment Details";
+    
+    // Step 1: Secure string parameter combination rules
+    let upiString = "upi://pay?pa=" + upiID + "&pn=" + encodeURIComponent(merchantName) + "&mc=" + merchantCategoryCode + "&tr=" + uniqueTransactionRef + "&tn=" + encodeURIComponent(transactionNote) + "&am=" + amount + "&cu=INR";
+    
+    // Step 2: Grab the target canvas presentation container
+    const qrContainer = document.getElementById('upi-qr-image');
+    if (!qrContainer) {
+        console.error("Critical Layout Error: Element with ID 'upi-qr-image' not found.");
+        return;
+    }
+    
+    // Step 3: Clear any existing elements before redrawing
+    qrContainer.innerHTML = ''; 
+    
+    try {
+        // Step 4: ✅ CORRECT EASYQRCODEJS EXPLICIT PARAMETER TARGET SELECTION
+        new QRCode(qrContainer, {
+            text: upiString,
+            width: 160,
+            height: 160,
+            colorDark: "#000000",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.M
+        });
+    } catch (libraryLoadError) {
+        console.error("CDN Runtime Failure. Fallback to backup link pipeline...", libraryLoadError);
+        // Instant fallback backup rule if the CDN script crashes
+        qrContainer.innerHTML = '<img src="https://cdn.jsdelivr.net/npm/easyqrcodejs@4.6.2/dist/easy.qrcode.min.js' + encodeURIComponent(upiString) + '" style="width:160px; height:160px; display:block; margin:0 auto;">';
+    }
+    
+    // Step 5: Update balance details summary
+    document.getElementById('qr-amount-meta').innerText = amount;
+}
+
+
+        function placeRetailOrder() {
+            if (cart.length === 0) {
+                alert("Please add at least one accessory to your bag before trying to checkout.");
+                return;
+            }
+
+            const name = document.getElementById('cust-name').value.trim();
+            const mobile = document.getElementById('cust-mobile').value.trim();
+            const address = document.getElementById('cust-address').value.trim();
+            const mode = document.querySelector('input[name="pay-mode"]:checked').value;
+
+            if (!name || !mobile || !address) {
+                alert("Please complete Name, Mobile Number, and Delivery Address parameters.");
+                return;
+            }
+
+            <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Indian Telecom | Mobile Accessories Wholesale & Retail</title>
+    
+    <!-- EasyQRCodeJS Engine CDN Link -->
+    <script src="https://cdn.jsdelivr.net/npm/easyqrcodejs@4.6.2/dist/easy.qrcode.min.js"></script>
+    
+    <style>
+        /* Base Reset Layout Elements */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f9fafb; color: #1f2937; line-height: 1.5; }
+        .container { max-width: 1140px; margin: 0 auto; padding: 0 16px; width: 100%; }
+        
+        /* Top Informational Notification Alert Banner */
+        .announcement-bar { background-color: #2563eb; color: white; font-size: 13px; font-weight: 600; padding: 10px 16px; text-align: center; text-transform: uppercase; letter-spacing: 0.5px; }
+        
+        /* Main Layout Sticky Configuration Header */
+        header { background-color: white; border-bottom: 1px solid #e5e7eb; position: sticky; top: 0; z-index: 50; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .header-flex { display: flex; align-items: center; justify-content: space-between; padding: 16px 0; }
+        .logo-title { font-size: 24px; font-weight: 900; color: #2563eb; letter-spacing: -0.5px; text-transform: uppercase; }
+        .logo-sub { font-size: 12px; color: #6b7280; font-weight: 500; margin-top: 2px; }
+        
+        /* Header Right Side Action Configuration Nodes */
+        .header-actions-group { display: flex; align-items: center; gap: 14px; }
+        .upper-right-cart-btn { background-color: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; padding: 10px 18px; border-radius: 12px; font-size: 14px; font-weight: 700; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; position: relative; transition: all 0.2s ease; }
+        .upper-right-cart-btn:hover { background-color: #2563eb; color: white; border-color: #2563eb; }
+        .cart-badge-counter { position: absolute; top: -6px; right: -6px; background-color: #ef4444; color: white; font-size: 11px; font-weight: 800; min-width: 20px; height: 20px; padding: 0 5px; border-radius: 50px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(239,68,68,0.3); border: 2px solid white; }
+        .whatsapp-btn { background-color: #22c55e; color: white; padding: 10px 20px; text-decoration: none; font-size: 14px; font-weight: 700; display: inline-flex; align-items: center; gap: 8px; border-radius: 50px; box-shadow: 0 2px 4px rgba(34,197,94,0.2); transition: all 0.2s ease; }
+        .whatsapp-btn:hover { background-color: #16a34a; transform: translateY(-1px); }
+        /* Brand Hero Showcase Section */
+        .hero { background: linear-gradient(135deg, #1d4ed8, #4338ca); color: white; padding: 56px 16px; text-align: center; }
+        .hero-tag { background-color: rgba(255, 255, 255, 0.15); color: #fff; font-size: 11px; font-weight: 700; padding: 6px 14px; border-radius: 9999px; display: inline-block; text-transform: uppercase; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.1); letter-spacing: 0.5px; }
+        .hero h2 { font-size: 38px; font-weight: 800; margin-bottom: 16px; line-height: 1.2; letter-spacing: -0.5px; }
+        .hero p { font-size: 15px; color: #e0e7ff; max-width: 640px; margin: 0 auto 28px auto; line-height: 1.6; }
+        .hero-features { display: flex; justify-content: center; flex-wrap: wrap; gap: 12px; font-size: 13px; font-weight: 600; }
+        .hero-features div { background-color: rgba(255,255,255,0.08); padding: 8px 18px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.15); display: flex; align-items: center; }
+
+        /* Interface Mode Selection Switcher Nav Bar */
+        .tabs-nav { background-color: white; border-bottom: 1px solid #e5e7eb; position: sticky; top: 73px; z-index: 40; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .tabs-flex { display: flex; justify-content: center; }
+        .tab-btn { width: 50%; max-width: 260px; padding: 18px 16px; background: none; border: none; border-bottom: 4px solid transparent; font-weight: 700; font-size: 14px; color: #6b7280; cursor: pointer; text-align: center; transition: all 0.2s ease; letter-spacing: 0.5px; }
+        .tab-btn:hover { color: #2563eb; background-color: #fcfdfe; }
+        
+        /* Application View Visibility Core Management */
+        main { padding: 32px 0; }
+        .view-section { display: none; }
+        .view-active { display: block !important; }
+        .tab-active { border-bottom-color: #2563eb !important; color: #2563eb !important; background-color: rgba(37,99,235,0.02); }
+        
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; border-bottom: 1px solid #f3f4f6; padding-bottom: 12px; }
+        .section-header h3 { font-size: 20px; font-weight: 800; color: #111827; letter-spacing: -0.3px; }
+        .section-header span { font-size: 12px; color: #6b7280; font-weight: 500; }
+        
+        /* Responsive Framework Media Query System Matrices */
+        .products-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+        @media (min-width: 768px) { .products-grid { grid-template-columns: repeat(4, 1fr); gap: 24px; } }
+        /* Consumer Product Display Panel Blueprints */
+        .product-card { background-color: white; border-radius: 14px; border: 1px solid #e5e7eb; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.02); transition: all 0.2s ease; display: flex; flex-direction: column; }
+        .product-card:hover { box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); transform: translateY(-2px); }
+        .card-media { aspect-ratio: 1; background-color: #f8fafc; display: flex; align-items: center; justify-content: center; position: relative; border-bottom: 1px solid #f1f5f9; overflow: hidden; height: 220px; padding: 20px; }
+        .card-media svg { width: 100%; height: 100%; max-height: 140px; transition: transform 0.3s ease; }
+        .product-card:hover .card-media svg { transform: scale(1.06); }
+        .card-badge { position: absolute; top: 12px; left: 12px; background-color: #ef4444; color: white; font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 6px; letter-spacing: 0.5px; z-index: 10; }
+        
+        .card-content { padding: 16px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
+        .card-tag { font-size: 10px; font-weight: 700; color: #2563eb; text-transform: uppercase; letter-spacing: 0.5px; }
+        .card-title { font-size: 14px; font-weight: 700; color: #111827; margin: 4px 0 12px 0; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 40px; }
+        .card-pricing { display: flex; align-items: baseline; gap: 8px; margin-bottom: 14px; }
+        .price-current { font-size: 20px; font-weight: 800; color: #111827; }
+        .price-strike { font-size: 13px; color: #9ca3af; text-decoration: line-through; }
+        .buy-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; background-color: #eff6ff; color: #2563eb; padding: 10px; border-radius: 10px; text-decoration: none; font-size: 13px; font-weight: 700; transition: all 0.2s ease; border: 1px solid transparent; cursor: pointer; }
+        .buy-btn:hover { background-color: #2563eb; color: white; }
+        
+        /* Wholesale Matrix Table Layout Blueprint */
+        .alert-box { background-color: #fffbeb; border: 1px solid #fef3c7; color: #92400e; padding: 16px; border-radius: 12px; font-size: 13px; margin-bottom: 24px; display: flex; gap: 12px; line-height: 1.5; }
+        .table-container { background-color: white; border-radius: 14px; border: 1px solid #e5e7eb; overflow-x: auto; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
+        .bulk-table { width: 100%; border-collapse: collapse; text-align: left; min-width: 600px; }
+        .bulk-table th { background-color: #f9fafb; border-bottom: 1px solid #e5e7eb; padding: 16px; font-size: 11px; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; }
+        .bulk-table td { padding: 16px; border-bottom: 1px solid #f3f4f6; font-size: 14px; vertical-align: middle; }
+        .bulk-table tr:last-child td { border-bottom: none; }
+        .row-title { font-weight: 700; color: #111827; font-size: 14px; }
+        .row-sub { font-size: 12px; color: #6b7280; margin-top: 1px; }
+        .row-tier { font-size: 11px; color: #2563eb; font-weight: 700; margin-top: 4px; display: inline-block; background-color: #eff6ff; padding: 2px 8px; border-radius: 4px; }
+        .qty-field { width: 100%; max-width: 110px; background-color: #f9fafb; border: 1px solid #d1d5db; padding: 10px; border-radius: 8px; text-align: center; font-weight: 700; font-size: 14px; color: #111827; transition: all 0.2s ease; }
+        .qty-field:focus { background-color: white; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.1); outline: none; }
+        
+        .summary-sticky { background-color: #f9fafb; padding: 20px; border-top: 1px solid #e5e7eb; display: flex; flex-direction: column; gap: 16px; justify-content: space-between; align-items: center; border-radius: 0 0 14px 14px; }
+        @media (min-width: 768px) { .summary-sticky { flex-direction: row; padding: 24px; } }
+        .total-meta { font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; }
+        .total-val { font-size: 28px; font-weight: 900; color: #111827; margin-top: 2px; }
+        .submit-btn { background-color: #22c55e; color: white; padding: 14px 28px; border: none; border-radius: 12px; font-weight: 700; font-size: 14px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 6px rgba(34,197,94,0.15); width: 100%; transition: all 0.2s ease; text-decoration: none; }
+        @media (min-width: 768px) { .submit-btn { width: auto; } }
+        .submit-btn:hover { background-color: #16a34a; transform: translateY(-1px); box-shadow: 0 6px 12px rgba(34,197,94,0.2); }
+        
+        footer { background-color: #030712; color: #9ca3af; padding: 56px 0 28px 0; margin-top: 56px; border-top: 1px solid #111827; font-size: 14px; }
+        .footer-grid { display: grid; grid-template-columns: 1fr; gap: 40px; }
+        @media (min-width: 768px) { .footer-grid { grid-template-columns: repeat(3, 1fr); } }
+        footer h5 { color: white; font-size: 16px; font-weight: 700; margin-bottom: 16px; letter-spacing: -0.2px; }
+        footer p { line-height: 1.6; }
+        .footer-bottom { text-align: center; font-size: 12px; margin-top: 48px; padding-top: 24px; border-top: 1px solid #111827; color: #4b5563; font-weight: 500; }
+
+        /* UPPER RIGHT SIDE SLIDE CART OVERLAY PANEL */
+        .cart-overlay-drawer { position: fixed; top: 0; right: -400px; width: 100%; max-width: 400px; height: 100%; background-color: white; z-index: 100; box-shadow: -4px 0 24px rgba(0,0,0,0.15); display: flex; flex-direction: column; transition: right 0.3s ease; border-left: 1px solid #e5e7eb; }
+        .cart-overlay-active { right: 0; }
+        .drawer-header { padding: 20px; border-bottom: 1px solid #f3f4f6; display: flex; align-items: center; justify-content: space-between; background-color: #f8fafc; }
+        .drawer-header h4 { font-size: 16px; font-weight: 800; color: #111827; display: flex; align-items: center; gap: 8px; }
+        .drawer-close-btn { background: none; border: none; font-size: 20px; color: #9ca3af; cursor: pointer; transition: color 0.2s; }
+        .drawer-close-btn:hover { color: #ef4444; }
+        .drawer-body { padding: 20px; flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; }
+        .drawer-backdrop { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(3,7,18,0.4); z-index: 90; display: none; }
+        .backdrop-active { display: block; }
+    </style>
+</head>
+<body>
+    <div id="cart-backdrop" class="drawer-backdrop" onclick="closeCartDrawer()"></div>
+
+    <div class="announcement-bar">
+        🚀 Wholesale & Retail | Pan-India Shipping Available | Contact: +91 97184 39786
+    </div>
+    <header>
+        <div class="container header-flex">
+            <div>
+                <h1 class="logo-title">INDIAN TELECOM</h1>
+                <p class="logo-sub">Premium Mobile Accessories Hub</p>
+            </div>
+            <div class="header-actions-group">
+                <button onclick="openCartDrawer()" class="upper-right-cart-btn" title="Open Local Shopping Cart">
+                    <i class="fas fa-shopping-bag"></i>
+                    <span>Cart</span>
+                    <div id="global-badge-counter" class="cart-badge-counter" style="display: none;">0</div>
+                </button>
+                <a href="https://whatsapp.com" target="_blank" class="whatsapp-btn">
+                    <i class="fab fa-whatsapp" style="font-size: 16px;"></i>
+                    <span>Chat Now</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <span class="hero-tag">Direct Importer & Distributor</span>
+            <h2>Get High-Quality Mobile Accessories At Lowest Prices</h2>
+            <p>Supplying premium tempered glass, designer back covers, fast chargers, and cables to thousands of retail customers and shopkeepers daily across India.</p>
+            <div class="hero-features">
+                <div><i class="fas fa-check-circle" style="color: #4ade80; margin-right: 8px;"></i>Best Wholesale Rates</div>
+                <div><i class="fas fa-check-circle" style="color: #4ade80; margin-right: 8px;"></i>100% Quality Check</div>
+            </div>
+        </div>
+    </section>
+
+    <div class="tabs-nav">
+        <div class="tabs-flex">
+            <button onclick="switchMode('retail')" id="tab-retail" class="tab-btn tab-active">
+                <i class="fas fa-shopping-bag" style="margin-right: 6px;"></i>RETAIL STORE
+            </button>
+            <button onclick="switchMode('wholesale')" id="tab-wholesale" class="tab-btn">
+                <i class="fas fa-boxes" style="margin-right: 6px;"></i>WHOLESALE MATRIX
+            </button>
+        </div>
+    </div>
+    <main class="container">
+        <!-- 1. RETAIL CONSUMER VIEW VIEWPORT -->
+        <div id="view-retail" class="view-section view-active">
+            <div class="section-header">
+                <h3>Trending Accessories</h3>
+                <span>Click add to cart to collect items in upper-right corner bag</span>
+            </div>
+            
+            <div class="products-grid">
+                <!-- Product Element Card 1 -->
+                <div class="product-card">
+                    <div class="card-media">
+                        <span class="card-badge">HOT</span>
+                        <svg viewBox="0 0 100 100" fill="none">
+                            <rect x="25" y="10" width="50" height="80" rx="8" fill="#3b82f6" fill-opacity="0.1" stroke="#2563eb" stroke-width="3"/>
+                            <rect x="28" y="13" width="44" height="74" rx="5" fill="none" stroke="#60a5fa" stroke-width="1.5" stroke-dasharray="4 2"/>
+                            <circle cx="50" cy="84" r="3" fill="#2563eb"/>
+                        </svg>
+                    </div>
+                    <div class="card-content">
+                        <div>
+                            <span class="card-tag">Screen Protection</span>
+                            <h4 class="card-title">9D Curved Tempered Glass</h4>
+                        </div>
+                        <div>
+                            <div class="card-pricing">
+                                <span class="price-current">₹149</span>
+                                <span class="price-strike">₹299</span>
+                            </div>
+                            <button onclick="addToCart('9D Curved Tempered Glass', 149)" class="buy-btn">
+                                <i class="fas fa-cart-plus"></i> Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product Element Card 2 -->
+                <div class="product-card">
+                    <div class="card-media">
+                        <svg viewBox="0 0 100 100" fill="none">
+                            <rect x="25" y="10" width="50" height="80" rx="10" fill="#1e1b4b" stroke="#4338ca" stroke-width="4"/>
+                            <circle cx="38" cy="22" r="3" fill="#4f46e5"/>
+                        </svg>
+                    </div>
+                    <div class="card-content">
+                        <div>
+                            <span class="card-tag">Covers</span>
+                            <h4 class="card-title">Premium Matte Liquid Silicone Case</h4>
+                        </div>
+                        <div>
+                            <div class="card-pricing">
+                                <span class="price-current">₹249</span>
+                                <span class="price-strike">₹499</span>
+                            </div>
+                            <button onclick="addToCart('Premium Matte Liquid Silicone Case', 249)" class="buy-btn">
+                                <i class="fas fa-cart-plus"></i> Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product Element Card 3 -->
+                <div class="product-card">
+                    <div class="card-media">
+                        <svg viewBox="0 0 100 100" fill="none">
+                            <rect x="30" y="25" width="40" height="45" rx="6" fill="#f8fafc" stroke="#64748b" stroke-width="3"/>
+                            <path d="M47 34L43 42H51L47 48" stroke="#ef4444" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <div class="card-content">
+                        <div>
+                            <span class="card-tag">Power</span>
+                            <h4 class="card-title">20W Super Fast Type-C Adapter</h4>
+                        </div>
+                        <div>
+                            <div class="card-pricing">
+                                <span class="price-current">₹399</span>
+                                <span class="price-strike">₹899</span>
+                            </div>
+                            <button onclick="addToCart('20W Super Fast Type-C Adapter', 399)" class="buy-btn">
+                                <i class="fas fa-cart-plus"></i> Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product Element Card 4 -->
+                <div class="product-card">
+                    <div class="card-media">
+                        <svg viewBox="0 0 100 100" fill="none">
+                            <path d="M50 90C50 90 25 75 25 50C25 25 50 10 50 10" stroke="#94a3b8" stroke-width="4"/>
+                            <rect x="42" y="10" width="16" height="22" rx="2" fill="#f1f5f9" stroke="#475569" stroke-width="2.5"/>
+                        </svg>
+                    </div>
+                    <div class="card-content">
+                        <div>
+                            <span class="card-tag">Cables</span>
+                            <h4 class="card-title">Braided Fast Charging Cable (65W)</h4>
+                        </div>
+                        <div>
+                            <div class="card-pricing">
+                                <span class="price-current">₹129</span>
+                                <span class="price-strike">₹299</span>
+                            </div>
+                            <button onclick="addToCart('Braided Fast Charging Cable (65W)', 129)" class="buy-btn">
+                                <i class="fas fa-cart-plus"></i> Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- 2. WHOLESALE VIEW BLOCK -->
+        <div id="view-wholesale" class="view-section">
+            <div class="alert-box">
+                <i class="fas fa-exclamation-circle" style="font-size: 18px; margin-top: 2px;"></i>
+                <div>
+                    <strong>Wholesale Terms:</strong> Minimum total order quantity must be 50 pieces or minimum billing value ₹3,000. Enter bulk quantities below to auto-calculate your custom B2B estimate.
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table class="bulk-table">
+                    <thead>
+                        <tr>
+                            <th>Item Details</th>
+                            <th style="text-align: center;">MOQ</th>
+                            <th>Wholesale Price</th>
+                            <th style="width: 140px;">Order Qty</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div class="row-title">9D Tempered Glass (Mixed Models)</div>
+                                <div class="row-sub">Box Packing (50 pcs/box)</div>
+                                <span class="row-tier">Tier: 100+ pcs @ ₹12</span>
+                            </td>
+                            <td style="text-align: center; font-weight: 700; color: #6b7280; font-size: 13px;">50 Pcs</td>
+                            <td><strong style="font-size: 16px; color: #111827;">₹15</strong> <span style="font-size: 11px; color: #9ca3af;">/pc</span></td>
+                            <td>
+                                <input type="number" placeholder="0" min="0" data-item="9D Tempered Glass" data-price="15" class="qty-field input-wholesale">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="row-title">Silicone Clear Back Covers</div>
+                                <div class="row-sub">Assorted Best Selling Models</div>
+                                <span class="row-tier">Tier: 200+ pcs @ ₹22</span>
+                            </td>
+                            <td style="text-align: center; font-weight: 700; color: #6b7280; font-size: 13px;">20 Pcs</td>
+                            <td><strong style="font-size: 16px; color: #111827;">₹28</strong> <span style="font-size: 11px; color: #9ca3af;">/pc</span></td>
+                            <td>
+                                <input type="number" placeholder="0" min="0" data-item="Clear Back Covers" data-price="28" class="qty-field input-wholesale">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="row-title">20W Fast Charging Adapters</div>
+                                <div class="row-sub">6-Month Warranty Included</div>
+                                <span class="row-tier">Tier: 50+ pcs @ ₹110</span>
+                            </td>
+                            <td style="text-align: center; font-weight: 700; color: #6b7280; font-size: 13px;">10 Pcs</td>
+                            <td><strong style="font-size: 16px; color: #111827;">₹135</strong> <span style="font-size: 11px; color: #9ca3af;">/pc</span></td>
+                            <td>
+                                <input type="number" placeholder="0" min="0" data-item="20W Adapters" data-price="135" class="qty-field input-wholesale">
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="summary-sticky">
+                    <div>
+                        <div class="total-meta">Estimated Order Total:</div>
+                        <div class="total-val">₹<span id="bulk-total-display">0</span></div>
+                    </div>
+                    <button onclick="sendWholesaleOrder()" class="submit-btn">
+                        <i class="fab fa-whatsapp" style="font-size: 18px;"></i> Submit Bulk Order via WhatsApp
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+    <!-- UPPER RIGHT END SLIDING OVERLAY DRAWER PANEL -->
+    <div id="cart-drawer-panel" class="cart-overlay-drawer">
+        <div class="drawer-header">
+            <h4><i class="fas fa-shopping-basket" style="color: #2563eb;"></i> Shopping Bag Items</h4>
+            <button onclick="closeCartDrawer()" class="drawer-close-btn" title="Close Panel">&times;</button>
+        </div>
+        
+        <div class="drawer-body">
+            <!-- Dynamic Selected Items Node -->
+            <div id="cart-items-list" style="margin-bottom: 20px;"></div>
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; font-weight: 900; font-size: 18px; border-top: 2px solid #f3f4f6; padding-top: 14px; margin-bottom: 24px;">
+                <span>Total Bill Amount:</span>
+                <span style="color: #2563eb;">₹<span id="cart-total-display">0</span></span>
+            </div>
+
+            <!-- CUSTOMER ADDRESS AND PROMPT QUESTIONS FORM -->
+            <div style="background-color: #f8fafc; padding: 16px; border-radius: 12px; border: 1px solid #e2e8f0; margin-bottom: 12px;">
+                <h5 style="font-weight: 700; margin-bottom: 14px; color: #111827; font-size: 14px;">Delivery & Payments Setup</h5>
+                
+                <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px;">
+                    <input type="text" id="cust-name" placeholder="Enter Your Name" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 13px;" required>
+                    <input type="tel" id="cust-mobile" placeholder="Enter Mobile Number" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 13px;" required>
+                    <textarea id="cust-address" placeholder="Enter Delivery Address" rows="2" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 13px; font-family: inherit;" required></textarea>
+                </div>
+
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; font-weight: 700; font-size: 12px; color: #475569; margin-bottom: 6px;">Payment Mode Option:</label>
+                    <div style="display: flex; flex-direction: column; gap: 8px; font-size: 13px;">
+                        <label style="cursor: pointer; font-weight: 600;"><input type="radio" name="pay-mode" value="COD" checked onclick="togglePaymentMode('COD')"> Cash on Delivery (COD)</label>
+                        <label style="cursor: pointer; font-weight: 600;"><input type="radio" name="pay-mode" value="ONLINE" onclick="togglePaymentMode('ONLINE')"> Pay Online via Dynamic UPI QR</label>
+                    </div>
+                </div>
+
+                <!-- SPECIFIC MANDATED PARSED NPCI ENGINE CONTAINER -->
+                <div id="qr-display-block" style="display: none; text-align: center; background: white; padding: 16px; border: 2px dashed #2563eb; border-radius: 12px; margin-bottom: 16px;">
+                    <p style="font-size: 12px; font-weight: 700; color: #1e3a8a; margin-bottom: 8px;">📲 Scan using GPay, PhonePe or Paytm</p>
+                    <div style="background: #ffffff; display: inline-block; padding: 6px; border: 1px solid #e2e8f0; border-radius: 8px;">
+                        <div id="upi-qr-image" style="width: 160px; height: 160px; display: block; margin: 0 auto;"></div>
+                    </div>
+                    <p style="font-size: 14px; font-weight: 800; color: #047857; margin-top: 8px;">Autofilled Amount: ₹<span id="qr-amount-meta">0</span></p>
+                    <span style="font-size: 9px; color: #94a3b8; display: block; margin-top: 2px;">VPA Handle Locked: 9718439786@ybl</span>
+                </div>
+
+                <button onclick="placeRetailOrder()" class="submit-btn" style="background-color: #2563eb; box-shadow: 0 4px 6px rgba(37,99,235,0.15); width: 100%; padding: 12px; font-size: 13px;">
+                    <i class="fab fa-whatsapp"></i> Place Order via WhatsApp
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER WITH BUSINESS ADDRESS & TRUST SIGNALS -->
+    <footer>
+        <div class="container footer-grid">
+            <div>
+                <h5>Indian Telecom</h5>
+                <p>Your trustworthy partner for mobile accessories since 2018. Delivering high-margin goods directly to retailers and tech shops across India.</p>
+            </div>
+            <div>
+                <h5>Store Location</h5>
+                <p><i class="fas fa-map-marker-alt" style="color: #2563eb; margin-right: 8px;"></i> Near Bhatti Chowk, Rajnagar,<br>Madhubani, Bihar - 847235</p>
+            </div>
+            <div>
+                <h5>Business Hours</h5>
+                <p><i class="fas fa-clock" style="color: #2563eb; margin-right: 8px;"></i> Mon - Sat: 10:00 AM to 08:30 PM<br><span style="color: #f59e0b; font-weight: 600;">Sunday Closed</span></p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            &copy; 2026 Indian Telecom. All rights reserved. Registered NPCI Universal Payment Node Architecture.
+        </div>
+    </footer>
+
+    <!-- FontAwesome Library for High-Utility UI Icons -->
+    <link rel="stylesheet" href="https://cloudflare.com" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script>
+        // Global State & Configuration Parameters
+        let cart = [];
+        const contactWhatsAppNumber = "919718439786";
+
+        function openCartDrawer() {
+            document.getElementById('cart-drawer-panel').classList.add('cart-overlay-active');
+            document.getElementById('cart-backdrop').classList.add('backdrop-active');
+        }
+
+        function closeCartDrawer() {
+            document.getElementById('cart-drawer-panel').classList.remove('cart-overlay-active');
+            document.getElementById('cart-backdrop').classList.remove('backdrop-active');
+        }
+
+        function addToCart(name, price) {
+            let existingItem = cart.find(item => item.name === name);
+            if (existingItem) {
+                existingItem.qty += 1;
+            } else {
+                cart.push({ name: name, price: price, qty: 1 });
+            }
+            updateCartUI();
+            openCartDrawer();
+            
+            const btn = document.querySelector('.upper-right-cart-btn');
+            if(btn) {
+                btn.style.transform = 'scale(1.1)';
+                setTimeout(() => btn.style.transform = 'none', 150);
+            }
+        }
+
+        function removeFromCart(name) {
+            cart = cart.filter(item => item.name !== name);
+            updateCartUI();
+        }
+
+        function updateCartUI() {
+            const listDisplay = document.getElementById('cart-items-list');
+            const badgeCounter = document.getElementById('global-badge-counter');
+            
+            let totalItems = 0;
+            let totalAmount = 0;
+            listDisplay.innerHTML = '';
+
+            cart.forEach(item => {
+                let itemTotal = item.price * item.qty;
+                totalAmount += itemTotal;
+                totalItems += item.qty;
+                listDisplay.innerHTML += `
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px dashed #e2e8f0; font-size: 13px;">
+                        <div style="max-width: 75%;">
+                            <strong style="color: #030712; display: block;">${item.name}</strong> 
+                            <span style="color: #6b7280; font-size: 11px;">Qty: ${item.qty} x ₹${item.price}</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <span style="font-weight: 700; color: #111827;">₹${itemTotal}</span>
+                            <button onclick="removeFromCart('${item.name}')" style="background: none; border: none; color: #ef4444; cursor: pointer; font-size: 13px;"><i class="fas fa-trash-alt"></i></button>
+                        </div>
+                    </div>`;
+            });
+
+            if (totalItems > 0) {
+                badgeCounter.innerText = totalItems;
+                badgeCounter.style.display = 'flex';
+            } else {
+                badgeCounter.style.display = 'none';
+                listDisplay.innerHTML = '<p style="text-align: center; color: #9ca3af; font-size: 13px; padding: 20px 0;">Your shopping bag is completely empty.</p>';
+            }
+
+            document.getElementById('cart-total-display').innerText = totalAmount;
+            
+            const selectedMode = document.querySelector('input[name="pay-mode"]:checked');
+            if (selectedMode && selectedMode.value === 'ONLINE') {
+                generateDynamicUPIQR(totalAmount);
+            }
+        }
+        function togglePaymentMode(mode) {
+            const qrBlock = document.getElementById('qr-display-block');
+            if (mode === 'ONLINE') {
+                let total = parseInt(document.getElementById('cart-total-display').innerText) || 0;
+                generateDynamicUPIQR(total);
+                qrBlock.style.display = 'block';
+            } else {
+                qrBlock.style.display = 'none';
+            }
+        }
+
+        function generateDynamicUPIQR(amount) {
+            let upiID = "9718439786@ybl"; 
+            let merchantName = "Indian Telecom";
+            let merchantCategoryCode = "5732"; 
+            let uniqueTransactionRef = "IT" + Date.now(); 
+            let transactionNote = "Order Payment Details";
+            
+            let upiString = "upi://pay?pa=" + upiID + "&pn=" + encodeURIComponent(merchantName) + "&mc=" + merchantCategoryCode + "&tr=" + uniqueTransactionRef + "&tn=" + encodeURIComponent(transactionNote) + "&am=" + amount + "&cu=INR";
+            
+            const qrContainer = document.getElementById('upi-qr-image');
+            if (!qrContainer) return;
+            
+            qrContainer.innerHTML = ''; 
+            
+            try {
+                // Instantiating the core object target directly
+                new QRCode(qrContainer, {
+                    text: upiString,
+                    width: 160,
+                    height: 160,
+                    colorDark: "#000000",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.M
+                });
+            } catch (libraryLoadError) {
+                console.error("Runtime Failure: EasyQRCodeJS structural element error.", libraryLoadError);
+                qrContainer.innerHTML = `<img src="https://qrserver.com{encodeURIComponent(upiString)}" style="width:160px; height:160px; display:block; margin:0 auto;">`;
+            }
+            
+            document.getElementById('qr-amount-meta').innerText = amount;
+        }
+
+        const wholesaleInputs = document.querySelectorAll('.input-wholesale');
+        wholesaleInputs.forEach(input => {
+            input.addEventListener('input', () => {
+                if (input.value < 0) input.value = 0;
+                calculateWholesaleMatrix();
+            });
+        });
+
+        function calculateWholesaleMatrix() {
+            let total = 0;
+            wholesaleInputs.forEach(i => {
+                const qty = parseInt(i.value) || 0;
+                const price = parseFloat(i.getAttribute('data-price')) || 0;
+                const itemName = i.getAttribute('data-item');
+                
+                let activePrice = price;
+
+                // Reactive bulk tier scaling rates matching layout rules
+                if (itemName === "9D Tempered Glass" && qty >= 100) activePrice = 12;
+                if (itemName === "Clear Back Covers" && qty >= 200) activePrice = 22;
+                if (itemName === "20W Adapters" && qty >= 50) activePrice = 110;
+
+                total += qty * activePrice;
+            });
+            document.getElementById('bulk-total-display').innerText = total.toLocaleString('en-IN');
+        }
+        function placeRetailOrder() {
+            if (cart.length === 0) {
+                alert("Please add at least one accessory to your bag before trying to checkout.");
+                return;
+            }
+
+            const name = document.getElementById('cust-name').value.trim();
+            const mobile = document.getElementById('cust-mobile').value.trim();
+            const address = document.getElementById('cust-address').value.trim();
+            const checkedPayModeNode = document.querySelector('input[name="pay-mode"]:checked');
+            const mode = checkedPayModeNode ? checkedPayModeNode.value : 'COD';
+
+            if (!name || !mobile || !address) {
+                alert("Please complete Name, Mobile Number, and Delivery Address parameters.");
+                return;
+            }
+
+            let orderText = `🛒 *NEW RETAIL ORDER - INDIAN TELECOM*\n\n`;
+            orderText += `👤 *Customer Details:*\nName: ${name}\nPhone: ${mobile}\n📍 Address: ${address}\n\n`;
+            orderText += `📦 *Ordered Items:*\n`;
+            
+            let total = 0;
+            cart.forEach(item => {
+                let itemTotal = item.price * item.qty;
+                total += itemTotal;
+                orderText += `▪️ ${item.name} (Qty: ${item.qty}) = ₹${itemTotal}\n`;
+            });
+
+            orderText += `\n💵 *Total Bill:* ₹${total}\n`;
+            orderText += `💳 *Payment Mode:* ${mode === 'COD' ? '💰 Cash on Delivery' : '✅ Paid Online via Compliant UPI QR'}`;
+
+            const whatsappUrl = `https://whatsapp.com{contactWhatsAppNumber}&text=${encodeURIComponent(orderText)}`;
+            window.open(whatsappUrl, '_blank');
+        }
+
+        function sendWholesaleOrder() {
+            let orderText = "🏢 *B2B WHOLESALE ESTIMATE REQUEST - INDIAN TELECOM*\n\n";
+            let hasItems = false;
+            let total = 0;
+
+            wholesaleInputs.forEach(i => {
+                const qty = parseInt(i.value) || 0;
+                if (qty > 0) {
+                    hasItems = true;
+                    const name = i.getAttribute('data-item');
+                    const price = parseFloat(i.getAttribute('data-price'));
+                    
+                    let activePrice = price;
+                    if (name === "9D Tempered Glass" && qty >= 100) activePrice = 12;
+                    if (name === "Clear Back Covers" && qty >= 200) activePrice = 22;
+                    if (name === "20W Adapters" && qty >= 50) activePrice = 110;
+
+                    const itemTotal = qty * activePrice;
+                    total += itemTotal;
+                    orderText += `▪️ ${name}\n   Qty: ${qty} pcs x ₹${activePrice}/pc = ₹${itemTotal}\n`;
+                }
+            });
+
+            if (!hasItems) {
+                alert("Please enter a quantity for at least one item before submitting.");
+                return;
+            }
+
+            orderText += `\n📊 *Estimated Total: ₹${total.toLocaleString('en-IN')}*`;
+            const whatsappUrl = `https://whatsapp.com{contactWhatsAppNumber}&text=${encodeURIComponent(orderText)}`;
+            window.open(whatsappUrl, '_blank');
+        }
+
         function switchMode(mode) {
             const retailView = document.getElementById('view-retail');
             const wholesaleView = document.getElementById('view-wholesale');
@@ -354,48 +1235,10 @@
                 wholesaleView.classList.add('view-active');
                 tabRetail.classList.remove('tab-active');
                 tabWholesale.classList.add('tab-active');
+                calculateWholesaleMatrix();
             }
-        }
-
-        const inputs = document.querySelectorAll('.qty-field');
-        inputs.forEach(input => {
-            input.addEventListener('input', () => {
-                let total = 0;
-                inputs.forEach(i => {
-                    const qty = parseInt(i.value) || 0;
-                    const price = parseFloat(i.getAttribute('data-price')) || 0;
-                    total += qty * price;
-                });
-                document.getElementById('bulk-total-display').innerText = total.toLocaleString('en-IN');
-            });
-        });
-
-        function sendWholesaleOrder() {
-            let orderText = "Hello Indian Telecom, I want to place a Wholesale Order:\n\n";
-            let hasItems = false;
-            let total = 0;
-
-            inputs.forEach(i => {
-                const qty = parseInt(i.value) || 0;
-                if (qty > 0) {
-                    hasItems = true;
-                    const name = i.getAttribute('data-item');
-                    const price = parseFloat(i.getAttribute('data-price'));
-                    const itemTotal = qty * price;
-                    total += itemTotal;
-                    orderText += `▪️ ${name}\n   Qty: ${qty} pcs x ₹${price} = ₹${itemTotal}\n`;
-                }
-            });
-
-            if (!hasItems) {
-                alert("Please enter a quantity for at least one item before submitting.");
-                return;
-            }
-
-            orderText += `\n📊 *Estimated Total: ₹${total}*`;
-            const whatsappUrl = `https://wa.me{encodeURIComponent(orderText)}`;
-            window.open(whatsappUrl, '_blank');
         }
     </script>
 </body>
 </html>
+
