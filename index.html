@@ -211,13 +211,12 @@
             if(typeof filterCategory === 'function') filterCategory('trending');
         });
 
-        // 1. DATA EXCHANGE PIPELINE: FETCH SERVER CATALOG LIVE STRAIGHT FROM UPSTASH
+                // 1. DATA EXCHANGE PIPELINE: FETCH SERVER CATALOG LIVE STRAIGHT FROM UPSTASH
         async function syncInventoryCatalog() {
             try {
                 const response = await fetch('/api/products');
                 const catalog = await response.json();
                 
-                // Segment grid map references matching your dynamic framework IDs
                 const segmentGrids = {
                     'trending': document.getElementById('grid-trending'),
                     'headphone': document.getElementById('grid-headphone'),
@@ -242,6 +241,7 @@
                 }
 
                 catalog.forEach(item => {
+                    // 🌟 CRITICAL FIX: Target grid ko strictly item ki uploaded category ke hisab se select karein
                     const gridTarget = segmentGrids[item.category];
                     if (!gridTarget) return;
 
@@ -273,6 +273,18 @@
                     `;
                     gridTarget.insertAdjacentHTML('beforeend', cardBlueprint);
                 });
+
+                // 🌟 NEW FIX: Agar kisi grid mein koi item nahi hai toh empty placeholder dikhayein
+                Object.keys(segmentGrids).forEach(catKey => {
+                    if (segmentGrids[catKey] && segmentGrids[catKey].children.length === 0) {
+                        segmentGrids[catKey].innerHTML = `
+                            <div style="grid-column:1/-1; text-align:center; padding:64px 0; color:var(--text-muted);">
+                                <i class="fas fa-boxes" style="font-size:32px; margin-bottom:12px; opacity:0.5;"></i>
+                                <p style="margin:0; font-size:13px; font-weight:600;">No items found under this group tier yet.</p>
+                            </div>`;
+                    }
+                });
+
             } catch (err) {
                 console.error("Critical System Warning: Cloud asset execution sync collapsed.", err);
             }
