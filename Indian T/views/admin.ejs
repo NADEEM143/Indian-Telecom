@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Indian Telecom - Master Administration Desk</title>
+    <link rel="stylesheet" href="https://cloudflare.com">
+    <style>
+        :root { --dark: #090d16; --border: #cbd5e1; --danger: #ef4444; }
+        body { font-family: system-ui, -apple-system, sans-serif; background: #f8fafc; padding: 40px 20px; margin: 0; color: var(--dark); }
+        .master-layout { max-width: 1300px; margin: 0 auto; display: grid; grid-template-columns: 1fr; gap: 40px; }
+        @media (min-width: 992px) { .master-layout { grid-template-columns: 440px 1fr; } }
+        .control-panel { background: white; padding: 32px; border-radius: 16px; border: 1px solid #e2e8f0; height: max-content; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02); }
+        .form-group { margin-bottom: 18px; }
+        label { display: block; font-weight: 700; font-size: 11px; text-transform: uppercase; margin-bottom: 6px; color: #475569; letter-spacing: 0.5px; }
+        .input-box { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; box-sizing: border-box; font-size: 14px; font-family: inherit; }
+        .input-box:focus { outline: none; border-color: var(--dark); }
+        .dropzone-box { border: 2px dashed #94a3b8; border-radius: 12px; padding: 24px; text-align: center; cursor: pointer; background: #f8fafc; }
+        .preview-thumbnail { max-width: 100%; max-height: 120px; object-fit: contain; margin-top: 12px; display: none; border-radius: 6px; }
+        .submit-trigger { background: var(--dark); color: white; width: 100%; border: none; padding: 14px; border-radius: 12px; font-weight: 700; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .submit-trigger:hover { background: #1e293b; }
+        
+        .table-card { background: white; padding: 32px; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02); overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 500px; }
+        th { text-align: left; padding: 12px; background: #f1f5f9; font-size: 11px; text-transform: uppercase; color: #475569; border-bottom: 1px solid #e2e8f0; }
+        td { padding: 12px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+        .row-asset-img { width: 44px; height: 44px; object-fit: contain; border-radius: 6px; background: #fafafa; border: 1px solid #e2e8f0; }
+        .badge-pill { background: #e2e8f0; padding: 4px 8px; border-radius: 12px; font-size: 11px; font-weight: 700; color: #334155; text-transform: uppercase; }
+        .delete-btn { background: none; border: none; color: var(--danger); cursor: pointer; font-size: 16px; padding: 4px; }
+        .delete-btn:hover { opacity: 0.7; }
+        .empty-state { text-align: center; padding: 40px; color: #64748b; font-weight: 500; }
+    </style>
+</head>
+<body>
+
+<div style="max-width:1300px; margin: 0 auto 24px auto; display:flex; justify-content:space-between; align-items:center; flex-wrap: wrap; gap: 16px;">
+    <div>
+        <h1 style="margin:0; font-size:26px; font-weight:900; letter-spacing:-0.5px;">Master System Control Terminal</h1>
+        <p style="margin:4px 0 0 0; color:#64748b; font-size:14px;">Operational Matrix for Indian Telecom Storefront</p>
+    </div>
+</div>
+
+<div class="master-layout">
+    <!-- PANEL LEFT: PRODUCT CREATION ENGINE -->
+    <div class="control-panel">
+        <h3 style="margin-top:0; border-bottom:2px solid var(--dark); padding-bottom:8px; text-transform:uppercase; font-size:14px;">Inject Dynamic Inventory</h3>
+        <form id="itemDeployForm" enctype="multipart/form-data">
+            <div class="form-group">
+                <label>Product Display Title</label>
+                <input type="text" name="title" class="input-box" placeholder="e.g. 9D Curved Tempered Glass" required>
+            </div>
+            <div class="form-group">
+                <label>Mini Content Tag</label>
+                <input type="text" name="tag" class="input-box" placeholder="e.g. PROTECTION / AUDIO" required>
+            </div>
+            <div class="form-group">
+                <label>Active Display Target Tab</label>
+                <select name="category" class="input-box" required>
+                    <option value="trending">Trending Module Grid</option>
+                    <option value="headphone">Headphones Target Grid</option>
+                    <option value="charger">Chargers Target Grid</option>
+                    <option value="repair">Repairing & Spares Target Grid</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Promo Ribbon Text (Optional)</label>
+                <input type="text" name="badge" class="input-box" placeholder="e.g. HOT / OG 100%">
+            </div>
+            <div style="display:flex; gap:16px;">
+                <div class="form-group" style="flex:1;">
+                    <label>Selling Price (₹)</label>
+                    <input type="number" name="currentPrice" class="input-box" placeholder="149" required>
+                </div>
+                <div class="form-group" style="flex:1;">
+                    <label>Strike Price (₹)</label>
+                    <input type="number" name="strikePrice" class="input-box" placeholder="299">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Media Asset Graphic</label>
+                <div class="dropzone-box" onclick="document.getElementById('fileInp').click()">
+                    <i class="fas fa-images" style="font-size:24px; color:#64748b; margin-bottom:6px;"></i>
+                    <p style="margin:0; font-size:12px; color:#64748b;">Click to browse local product visual assets</p>
+                    <input type="file" id="fileInp" name="productImage" style="display:none;" accept="image/*" required>
+                    <img id="imagePreview" class="preview-thumbnail">
+                </div>
+            </div>
+            <button type="submit" class="submit-trigger"><i class="fas fa-plus"></i> Synchronize Item</button>
+        </form>
+    </div>
+    <!-- PANEL RIGHT: REAL-TIME DATABASE MONITOR -->
+    <div class="table-card">
+        <h3 style="margin-top:0; border-bottom:2px solid var(--dark); padding-bottom:8px; text-transform:uppercase; font-size:14px;">Live Inventory Array Monitor</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Asset</th>
+                    <th>Product Context</th>
+                    <th>Target Tab</th>
+                    <th>Price Vector</th>
+                    <th style="text-align:center;">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- SERVER EMBEDDED LOOP NODE BLOCK -->
+                <% if (typeof products !== 'undefined' && products.length > 0) { %>
+                    <% products.forEach(p => { %>
+                        <tr id="item-row-<%= p.id %>">
+                            <td><img src="<%= p.imageUrl %>" class="row-asset-img" alt="Product Image"></td>
+                            <td>
+                                <strong style="display:block; color: var(--dark);"><%= p.title %></strong>
+                                <span style="font-size:11px; color:#64748b;"><%= p.tag %></span>
+                            </td>
+                            <td><span class="badge-pill"><%= p.category %></span></td>
+                            <td>
+                                <strong style="display:block;">₹<%= p.currentPrice %></strong>
+                                <% if (p.strikePrice) { %>
+                                    <span style="font-size:11px; text-decoration:line-through; color:#94a3b8;">₹<%= p.strikePrice %></span>
+                                <% } %>
+                            </td>
+                            <td style="text-align:center;">
+                                <button onclick="purgeItem('<%= p.id %>')" class="delete-btn" title="Delete Product"><i class="fas fa-trash-alt"></i></button>
+                            </td>
+                        </tr>
+                    <% }) %>
+                <% } else { %>
+                    <tr>
+                        <td colspan="5" class="empty-state">
+                            <i class="fas fa-box-open" style="font-size:28px; margin-bottom:8px; display:block;"></i>
+                            No custom assets running on live database stream.
+                        </td>
+                    </tr>
+                <% } %>
+            </tbody>
+        </table>
+    </div>
+</div>
+<script>
+    // File reader engine preview stream
+    document.getElementById('fileInp').onchange = function() {
+        const [file] = this.files;
+        if (file) {
+            const pv = document.getElementById('imagePreview');
+            pv.src = URL.createObjectURL(file);
+            pv.style.display = 'block';
+        }
+    };
+
+    // Form data posting engine
+    document.getElementById('itemDeployForm').onsubmit = async function(e) {
+        e.preventDefault();
+        const payload = new FormData(this);
+        
+        try {
+            const res = await fetch('/api/products/create', { method: 'POST', body: payload });
+            const data = await res.json();
+            if(data.success) {
+                alert('Success: Catalog update successfully committed.');
+                window.location.reload();
+            } else {
+                alert('Pipeline Error: ' + data.message);
+            }
+        } catch (err) {
+            alert('Server error occurred during data push operations.');
+        }
+    };
+
+    // Data removal processing layer
+    async function purgeItem(id) {
+        if(!confirm('Purge this asset completely from deployment indices?')) return;
+        try {
+            const res = await fetch(`/api/products/delete/${id}`, { method: 'DELETE' });
+            const data = await res.json();
+            if(data.success) {
+                document.getElementById(`item-row-${id}`).remove();
+            } else {
+                alert('Wipe operation failed: ' + data.message);
+            }
+        } catch (err) {
+            alert('Communication failure while handling cancellation thread.');
+        }
+    }
+</script>
+</body>
+</html>
