@@ -1,4 +1,4 @@
-// api/products.js - Dynamic Cloud Pattern Scanning Engine
+// api/products.js - Production Key Scanning Engine
 const { createClient } = require('@vercel/kv');
 
 const kv = createClient({
@@ -10,24 +10,12 @@ module.exports = async (req, res) => {
     if (req.method !== 'GET') return res.status(405).json({ message: 'Method Not Allowed' });
 
     try {
-        let keys = [];
-        let cursor = '0';
-        
-        do {
-            // Scans and captures all active mobile accessory database records securely
-            const reply = await kv.scan(cursor, { match: 'telecom_item:*', count: 100 });
-            
-            cursor = reply[0] || '0';
-            const batchKeys = reply[1] || [];
-            
-            if (batchKeys.length > 0) {
-                keys = keys.concat(batchKeys);
-            }
-        } while (cursor !== '0' && cursor !== 0);
+        // Fetch all operational product database keys directly using clean cloud metrics
+        const keys = await kv.keys('telecom_item:*');
 
-        if (keys.length === 0) return res.status(200).json([]);
+        if (!keys || keys.length === 0) return res.status(200).json([]);
 
-        // Pull all individual product data streams simultaneously
+        // Pull all individual product data payloads together simultaneously
         const pipelineResult = await Promise.all(keys.map(key => kv.get(key)));
         
         // Sort items cleanly so your newest catalog updates show up first
