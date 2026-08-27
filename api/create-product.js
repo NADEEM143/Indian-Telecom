@@ -1,4 +1,4 @@
-// api/products.js - Dynamic Cloud Pattern Scanning Engine
+// api/create-product.js - High-Performance Individual Key Cloud Endpoint
 const { createClient } = require('@vercel/kv');
 
 const kv = createClient({
@@ -7,31 +7,28 @@ const kv = createClient({
 });
 
 module.exports = async (req, res) => {
-    if (req.method !== 'GET') return res.status(405).json({ message: 'Method Not Allowed' });
+    if (req.method !== 'POST') return res.status(405).json({ message: 'Method Not Allowed' });
 
     try {
-        // 🌟 FIX: Scan the cloud database for all keys starting with 'telecom_item:'
-        let keys = [];
-        let cursor = '0';
-        
-        do {
-            const reply = await kv.scan(cursor, { match: 'telecom_item:*', count: 100 });
-            cursor = reply[0];
-            keys = keys.concat(reply[1]);
-        } while (cursor !== '0');
+        const productId = 'prod_' + Date.now();
+        const newProduct = {
+            id: productId,
+            title: req.body.title,
+            tag: req.body.tag,
+            category: req.body.category,
+            badge: req.body.badge,
+            currentPrice: req.body.currentPrice,
+            strikePrice: req.body.strikePrice,
+            imageUrl: req.body.imageUrl // Direct separate string payload execution
+        };
 
-        if (keys.length === 0) return res.status(200).json([]);
+        // 🌟 FIX: Save this specific product as its own lightweight dataset key string
+        await kv.set(`telecom_item:${productId}`, newProduct);
 
-        // Pull all individual product payloads together simultaneously
-        const pipelineResult = await Promise.all(keys.map(key => kv.get(key)));
-        
-        // Sort items so the newest uploaded accessories show up first
-        const sortedProducts = pipelineResult.filter(Boolean).sort((a, b) => {
-            return b.id.replace('prod_', '') - a.id.replace('prod_', '');
-        });
-
-        return res.status(200).json(sortedProducts);
+        return res.status(200).json({ success: true });
     } catch (err) {
-        return res.status(500).json([]);
+        return res.status(500).json({ success: false, message: err.message });
     }
 };
+
+export const config = { api: { bodyParser: { sizeLimit: '4.5mb' } } };
