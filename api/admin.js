@@ -1,4 +1,4 @@
-// api/admin.js - High-Performance Stable Enterprise Control Panel
+// api/admin.js - Final Production Enterprise Control Panel Matrix
 const { createClient } = require('@vercel/kv');
 
 const kv = createClient({
@@ -22,9 +22,7 @@ module.exports = async (req, res) => {
             return res.status(500).json({ success: false, products: [], orders: [] });
         }
     }
-
-    // UI LAYER ROUTE: Delivers the base template cleanly with no string concatenation conflicts
-    const rawContainerOutputString = `<!DOCTYPE html>
+    const standaloneAdminHtmlOutput = `<!DOCTYPE html>
     <html lang="en">
     <head>
         <meta charset="UTF-8">
@@ -60,7 +58,6 @@ module.exports = async (req, res) => {
             <button onclick="downloadOrdersCSV()" class="export-btn" style="background:#1e3a8a;"><i class="fas fa-download"></i> Download Orders CSV</button>
         </div>
     </div>
-
     <div class="master-layout">
         <div class="control-panel">
             <h3 id="panel-title" style="margin-top:0; text-transform:uppercase; font-size:13px; color:var(--primary); letter-spacing:0.5px;">Inject Dynamic Inventory</h3>
@@ -114,7 +111,6 @@ module.exports = async (req, res) => {
                 <button type="button" id="cancel-edit-btn" onclick="resetFormState()" style="display:none; width:100%; margin-top:8px; padding:12px; background:#64748b; color:white; border:none; border-radius:12px; font-weight:700; cursor:pointer; text-transform:uppercase; font-size:13px;">Cancel Edit</button>
             </form>
         </div>
-
         <div style="display:flex; flex-direction:column;">
             <div class="table-card">
                 <h3 style="margin-top:0; text-transform:uppercase; font-size:13px; color:#475569; letter-spacing:0.5px;">Live Catalog Inventory Array</h3>
@@ -127,7 +123,6 @@ module.exports = async (req, res) => {
                     </tbody>
                 </table>
             </div>
-
             <div class="table-card">
                 <h3 style="margin-top:0; text-transform:uppercase; font-size:13px; color:#1e3a8a; letter-spacing:0.5px;">Live Sales Verification Order Book</h3>
                 <table>
@@ -145,9 +140,12 @@ module.exports = async (req, res) => {
         let localProductCacheMemory = [];
         let base64ImagePayload = "";
 
+        // 🌟 ABSOLUTE DOMAIN RESOLVER OVERRIDE: Locks down communication to correct live server paths
+        const API_BASE_BASE = window.location.origin + window.location.pathname;
+
         async function loadDashboardData() {
             try {
-                const response = await fetch('?action=fetch_all_data');
+                const response = await fetch(API_BASE_BASE + '?action=fetch_all_data');
                 const data = await response.json();
                 if(data.success) {
                     localProductCacheMemory = data.products || [];
@@ -159,14 +157,13 @@ module.exports = async (req, res) => {
             }
         }
 
-        // 🌟 FIXED LOOP: Built with safe string combinations to remove browser interpreter conflicts completely
         function renderProductsTable(products) {
             const tbody = document.getElementById('products-table-body');
             if(!products || products.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:40px; color:#64748b;">No inventory data records active.</td></tr>';
                 return;
             }
-            let rowsHtml = '';
+            let rowsHtml = "";
             products.forEach(function(p) {
                 const count = p.stockCount || 0;
                 const status = p.stockStatus || 'OUTOFSTOCK';
@@ -193,7 +190,7 @@ module.exports = async (req, res) => {
                 tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:40px; color:#64748b;">No customer shopping logs recorded yet.</td></tr>';
                 return;
             }
-            let rowsHtml = '';
+            let rowsHtml = "";
             orders.forEach(function(o) {
                 const itemsStr = o.items.map(function(i) { return i.name + ' (x' + i.qty + ')'; }).join(', ');
                 const isFulfilled = o.status === 'FULFILLED';
@@ -326,5 +323,5 @@ module.exports = async (req, res) => {
     </html>`;
 
     res.setHeader('Content-Type', 'text/html');
-    res.status(200).send(rawContainerOutputString);
+    res.status(200).send(standaloneAdminHtmlOutput);
 };
