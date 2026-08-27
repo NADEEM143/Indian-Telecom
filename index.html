@@ -384,7 +384,7 @@
             try {
                 new QRCode(qrContainer, { text: upiString, width: 160, height: 160, colorDark: "#0f172a", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.M });
             } catch (e) {
-                qrContainer.innerHTML = `<img src="https://qrserver.com{encodeURIComponent(upiString)}" style="width:160px; height:160px; display:block; margin:0 auto;">`;
+                qrContainer.innerHTML = `<img src="https://cdn.jsdelivr.net/npm/easyqrcodejs@4.6.2/dist/easy.qrcode.min.js" style="width:160px; height:160px; display:block; margin:0 auto;">`;
             }
             document.getElementById('qr-amount-meta').innerText = amount.toLocaleString('en-IN');
         }
