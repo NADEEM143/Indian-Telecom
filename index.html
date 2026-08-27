@@ -212,6 +212,7 @@
         });
 
                 // 1. DATA EXCHANGE PIPELINE: FETCH SERVER CATALOG LIVE STRAIGHT FROM UPSTASH
+                // 1. DATA EXCHANGE PIPELINE: FETCH SERVER CATALOG LIVE STRAIGHT FROM UPSTASH
         async function syncInventoryCatalog() {
             try {
                 const response = await fetch('/api/products');
@@ -224,7 +225,7 @@
                     'repair': document.getElementById('grid-repair')
                 };
 
-                // Flush fallback empty container wrappers clean
+                // Clear out all layout panels clean before rendering freshly
                 Object.values(segmentGrids).forEach(grid => { if(grid) grid.innerHTML = ''; });
 
                 if(!catalog || catalog.length === 0) {
@@ -241,9 +242,9 @@
                 }
 
                 catalog.forEach(item => {
-                    // 🌟 CRITICAL FIX: Target grid ko strictly item ki uploaded category ke hisab se select karein
+                    // 🌟 CRITICAL PRODUCTION FIX: Select target grid strictly according to individual item category
                     const gridTarget = segmentGrids[item.category];
-                    if (!gridTarget) return;
+                    if (!gridTarget) return; // Skips processing if no matching wrapper is active
 
                     const badgeMarkup = item.badge ? `<span class="card-badge">${item.badge}</span>` : '';
                     const strikeMarkup = item.strikePrice ? `<span class="price-strike">₹${parseInt(item.strikePrice).toLocaleString('en-IN')}</span>` : '';
@@ -271,10 +272,11 @@
                             </div>
                         </div>
                     `;
+                    // Push the product card ONLY into its matching filtered category tab layout container
                     gridTarget.insertAdjacentHTML('beforeend', cardBlueprint);
                 });
 
-                // 🌟 NEW FIX: Agar kisi grid mein koi item nahi hai toh empty placeholder dikhayein
+                // 🌟 ADVANCED SECTOR ISOLATION FILLER: If a tab doesn't have any items, render an empty state text
                 Object.keys(segmentGrids).forEach(catKey => {
                     if (segmentGrids[catKey] && segmentGrids[catKey].children.length === 0) {
                         segmentGrids[catKey].innerHTML = `
