@@ -27,7 +27,7 @@ module.exports = async (req, res) => {
         products = [];
     }
 
-    const dataRows = products.map(p => `
+        const dataRows = products.map(p => `
         <tr id="item-row-${p.id}">
             <td><img src="${p.imageUrl}" style="width:44px; height:44px; object-fit:contain; border-radius:6px; background:#fafafa; border:1px solid #e2e8f0;"></td>
             <td>
@@ -36,8 +36,11 @@ module.exports = async (req, res) => {
             </td>
             <td><span style="background:#e2e8f0; padding:4px 8px; border-radius:12px; font-size:11px; font-weight:700; text-transform:uppercase;">${p.category}</span></td>
             <td><strong>₹${p.currentPrice}</strong></td>
+            <!-- 🌟 FIXED: Added the action delete icon button inside this column -->
             <td style="text-align:center;">
-                <button onclick="purgeItem('${p.id}')" style="background:none; border:none; color:#ef4444; cursor:pointer; font-size:16px;"><i class="fas fa-trash-alt"></i></button>
+                <button onclick="purgeItem('${p.id}')" style="background:none; border:none; color:#ef4444; cursor:pointer; font-size:16px; padding:6px;" title="Delete Product">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
             </td>
         </tr>
     `).join('');
