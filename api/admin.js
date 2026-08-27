@@ -1,4 +1,4 @@
-// api/admin.js - Vercel Serverless Admin Gateway Engine
+// api/admin.js - Optimized Vercel Serverless Admin Panel Engine
 const fs = require('fs');
 const path = require('path');
 
@@ -105,7 +105,6 @@ module.exports = async (req, res) => {
                     </div>
                 </div>
                 
-                <!-- SYSTEM DIRECT FILE INPUT DROPZONE INTERFACE -->
                 <div class="form-group">
                     <label>Product Image Asset</label>
                     <div class="dropzone-box" onclick="document.getElementById('fileInp').click()">
@@ -132,16 +131,40 @@ module.exports = async (req, res) => {
     <script>
         let base64ImagePayload = "";
 
-        // Client conversion encoder to process binary to string
+        // Canvas Compression Engine to shrink down large local file sizes
         document.getElementById('fileInp').onchange = function() {
             const [file] = this.files;
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    base64ImagePayload = e.target.result;
-                    const pv = document.getElementById('imagePreview');
-                    pv.src = base64ImagePayload;
-                    pv.style.display = 'block';
+                    const img = new Image();
+                    img.src = e.target.result;
+                    img.onload = function() {
+                        const canvas = document.createElement('canvas');
+                        const ctx = canvas.getContext('2d');
+                        
+                        // Limit dimensions to a max of 800px width/height to drastically reduce text payload size
+                        let width = img.width;
+                        let height = img.height;
+                        const max_size = 800;
+                        
+                        if (width > height) {
+                            if (width > max_size) { height *= max_size / width; width = max_size; }
+                        } else {
+                            if (height > max_size) { width *= max_size / height; height = max_size; }
+                        }
+                        
+                        canvas.width = width;
+                        canvas.height = height;
+                        ctx.drawImage(img, 0, 0, width, height);
+                        
+                        // Compress to web-optimized JPEG format with 60% quality ratio
+                        base64ImagePayload = canvas.toDataURL('image/jpeg', 0.6);
+                        
+                        const pv = document.getElementById('imagePreview');
+                        pv.src = base64ImagePayload;
+                        pv.style.display = 'block';
+                    };
                 };
                 reader.readAsDataURL(file);
             }
@@ -161,13 +184,22 @@ module.exports = async (req, res) => {
                 imageUrl: base64ImagePayload
             };
             
-            const res = await fetch('/api/create-product', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-            const data = await res.json();
-            if(data.success) { alert('Success: Item synchronized!'); window.location.reload(); }
+            try {
+                const res = await fetch('/api/create-product', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                if(data.success) { 
+                    alert('Success: Item synchronized successfully!'); 
+                    window.location.reload(); 
+                } else {
+                    alert('Server processing error: ' + data.message);
+                }
+            } catch (err) {
+                alert('Connection timeout error. Image size is still too large.');
+            }
         };
 
         async function purgeItem(id) {
