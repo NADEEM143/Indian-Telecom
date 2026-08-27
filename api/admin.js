@@ -1,5 +1,5 @@
 // =========================================================================
-// 🧩 PIECE 1 OF 8: DATABASE INITIALIZATION & GLOBAL CONFIG NODES
+// 🧩 PIECE 1 OF 10: SYSTEM IMPORTS AND VERCEL KV SETUP
 // =========================================================================
 const { createClient } = require('@vercel/kv');
 
@@ -7,31 +7,21 @@ const kv = createClient({
   url: process.env.KV_REST_API_URL,
   token: process.env.KV_REST_API_TOKEN,
 });
-
-// Configure proper commonJS size limits for large base64 string buffers
-module.exports.config = {
-    api: {
-        bodyParser: {
-            sizeLimit: '4.5mb'
-        }
-    }
-};
 // =========================================================================
-// 🧩 PIECE 2 OF 8: CORE SERVERLESS HANDLER & REQUEST ROUTING
+// 🧩 PIECE 2 OF 10: CORE SERVERLESS ROUTER INITIALIZATION
 // =========================================================================
 module.exports = async (req, res) => {
     const { method, query, body } = req;
 
     try {
         // =========================================================================
-        // 🧩 PIECE 3 OF 8: ENDPOINT ?action=loadData (UNIFIED API MATRIX)
+        // 🧩 PIECE 3 OF 10: API ENDPOINT - DASHBOARD DATA SYNC (loadData)
         // =========================================================================
-        if (method === 'GET' && query.action === 'loadData') {
+        if (method === 'GET' && (query.action === 'loadData' || query.loadData === 'true')) {
             const keys = await kv.keys('telecom_item:*');
             let products = [];
             
             if (keys && keys.length > 0) {
-                // High-speed atomic batch execution pipeline
                 const pipeline = kv.pipeline();
                 keys.forEach(key => pipeline.get(key));
                 const pipelineResult = await pipeline.exec();
@@ -42,29 +32,27 @@ module.exports = async (req, res) => {
             return res.status(200).json({ success: true, products, orders });
         }
         // =========================================================================
-        // 🧩 PIECE 4 OF 8: ENDPOINT ?action=create-product (PRODUCT SAVE/EDIT NODE)
+        // 🧩 PIECE 4 OF 10: API ENDPOINT - DYNAMIC PRODUCT INJECTION (create-product)
         // =========================================================================
-        if (method === 'POST' && query.action === 'create-product') {
+        if (method === 'POST' && (query.action === 'create-product' || query.action === 'saveProduct')) {
             const { customEditId, title, tag, category, badge, currentPrice, strikePrice, stockCount, imageUrl } = body;
             
-            // Safety: Preserves original ID if editing; creates unified item format if new
             const finalProductId = customEditId ? customEditId : 'item_' + Date.now();
             const targetKey = `telecom_item:${finalProductId}`;
-            
-            const stockInitial = parseInt(stockCount) || 0;
+            const count = parseInt(stockCount) || 0;
 
             const productPayload = {
                 id: finalProductId,
                 title,
                 tag,
-                category: String(category || '').trim(),
+                category: String(category || 'trending').trim(),
                 badge: badge || null,
                 currentPrice: parseInt(currentPrice) || 0,
                 strikePrice: strikePrice ? parseInt(strikePrice) : null,
-                imageUrl: imageUrl || "",
-                imageAsset: imageUrl || "", // Backend schema alignment fallback
-                stockCount: stockInitial,
-                stockStatus: stockInitial > 0 ? 'INSTOCK' : 'OUTOFSTOCK',
+                imageUrl: imageUrl || "",      
+                imageAsset: imageUrl || "",    
+                stockCount: count,
+                stockStatus: count > 0 ? 'INSTOCK' : 'OUTOFSTOCK',
                 updatedAt: new Date().toISOString()
             };
 
@@ -72,11 +60,11 @@ module.exports = async (req, res) => {
             return res.status(200).json({ success: true, item: productPayload });
         }
         // =========================================================================
-        // 🧩 PIECE 5 OF 8: ENDPOINTS ?action=delete-product & ?action=fulfill-order
+        // 🧩 PIECE 5 OF 10: API ENDPOINTS - PRODUCT PURGING & ORDER FULFILLMENT
         // =========================================================================
         if (method === 'DELETE' && query.action === 'delete-product') {
             const { id } = query;
-            if (!id) return res.status(400).json({ success: false, message: 'Missing product identifier key.' });
+            if (!id) return res.status(400).json({ success: false, message: 'Missing product identification token.' });
             
             const targetKey = id.startsWith('telecom_item:') ? id : `telecom_item:${id}`;
             await kv.del(targetKey);
@@ -92,7 +80,6 @@ module.exports = async (req, res) => {
             if (!targetOrder) return res.status(404).json({ success: false, message: 'Order reference mismatch.' });
             if (targetOrder.status === 'FULFILLED') return res.status(400).json({ success: false, message: 'Transaction already completed.' });
 
-            // Fetch product lookup maps to protect against blank or unmapped frontend IDs
             const allProductKeys = await kv.keys('telecom_item:*');
             let dynamicProductCache = [];
             if (allProductKeys && allProductKeys.length > 0) {
@@ -110,7 +97,6 @@ module.exports = async (req, res) => {
                     targetProduct = await kv.get(targetKey);
                 }
 
-                // Fallback: If ID isn't found, track item matching by title string name
                 if (!targetProduct && item.name) {
                     const matchedCacheItem = dynamicProductCache.find(p => p.title === item.name);
                     if (matchedCacheItem) {
@@ -129,10 +115,10 @@ module.exports = async (req, res) => {
 
             targetOrder.status = 'FULFILLED';
             await kv.set('telecom_orders_log', currentOrders);
-            return res.status(200).json({ success: true, message: 'Order systems marked FULFILLED and stock structural balances updated!' });
+            return res.status(200).json({ success: true, message: 'Order marked FULFILLED and stock balances updated!' });
         }
         // =========================================================================
-        // 🧩 PIECE 6 OF 8: ENDPOINTS ?action=place-order & ?action=public-products
+        // 🧩 PIECE 6 OF 10: API ENDPOINTS - PUBLIC CUSTOMER CHANNELS
         // =========================================================================
         if (method === 'POST' && query.action === 'place-order') {
             const { name, mobile, address, mode, total, totalBill, items } = body;
@@ -174,13 +160,12 @@ module.exports = async (req, res) => {
                     strikePrice: item.strikePrice,
                     imageUrl: item.imageUrl || item.imageAsset || ''
                 }));
-                
-                sortedProducts = cleanList.sort((a, b) => parseInt(b.id?.split('_')[1] || 0) - parseInt(a.id?.split('_')[1] || 0));
+                sortedProducts = cleanList.sort((a, b) => b.id > a.id ? 1 : -1);
             }
             return res.status(200).json(sortedProducts);
         }
         // =========================================================================
-        // 🧩 PIECE 7 OF 8: CORE UI DOCUMENT SURFACE PRESENTATION SHELL
+        // 🧩 PIECE 7 OF 10: UI DASHBOARD PRESENTATION SHELL - PART A
         // =========================================================================
         if (method === 'GET') {
             res.setHeader('Content-Type', 'text/html');
@@ -210,6 +195,13 @@ module.exports = async (req, res) => {
     </style>
 </head>
 <body>
+`);
+        }
+        // =========================================================================
+        // 🧩 PIECE 8 OF 10: UI DASHBOARD PRESENTATION SHELL - PART B
+        // =========================================================================
+        if (method === 'GET') {
+            return res.status(200).send(`
 <div style="max-width:1450px; margin:0 auto 28px auto; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
     <div>
         <h1 style="margin:0; font-size:26px; font-weight:900;">Master System Control Terminal</h1>
@@ -302,7 +294,7 @@ module.exports = async (req, res) => {
 `);
         }
         // =========================================================================
-        // 🧩 PIECE 8a OF 8: FRONTEND TABLE LAYOUT RENDERERS & IMAGE CANVAS
+        // 🧩 PIECE 9 OF 10: DASHBOARD CLIENT SCRIPTS - TABLE GENERATION
         // =========================================================================
         if (method === 'GET') {
             return res.status(200).send(`
@@ -383,21 +375,26 @@ module.exports = async (req, res) => {
                     const canvas = document.createElement('canvas');
                     const ctx = canvas.getContext('2d');
                     let width = img.width; let height = img.height;
-                    if (width > 800) { height *= 800 / width; width = 800; }
+                    if (width > 400) { height *= 400 / width; width = 400; }
                     canvas.width = width; canvas.height = height;
                     ctx.drawImage(img, 0, 0, width, height);
-                    base64ImagePayload = canvas.toDataURL('image/jpeg', 0.6);
+                    base64ImagePayload = canvas.toDataURL('image/jpeg', 0.4);
                     const pv = document.getElementById('imagePreview');
                     pv.src = base64ImagePayload; pv.style.display = 'block';
-                    document.getElementById('upload-prompt').innerText = "Image Selected!";
+                    document.getElementById('upload-prompt').innerText = "Image Compressed & Ready!";
                 };
             };
             reader.readAsDataURL(file);
         }
     };
-    // =========================================================================
-    // 🧩 PIECE 8b OF 8: FORM MUTATORS, CSV EXPORTERS & GLOBAL CLOSURE
-    // =========================================================================
+`);
+        }
+        // =========================================================================
+        // 🧩 PIECE 10 OF 10: FORM ACTIONS & CLOSING BLOCK
+        // =========================================================================
+        if (method === 'GET') {
+            return res.status(200).send(`
+<script>
     function triggerLocalEdit(targetId) {
         const product = localProductCacheMemory.find(item => item.id === targetId);
         if(!product) return;
@@ -415,7 +412,7 @@ module.exports = async (req, res) => {
         const pv = document.getElementById('imagePreview');
         if(base64ImagePayload) {
             pv.src = base64ImagePayload; pv.style.display = 'block';
-            document.getElementById('upload-prompt').innerText = "Image Loaded!";
+            document.getElementById('upload-prompt').innerText = "Existing Image Loaded";
         } else {
             pv.style.display = 'none';
         }
@@ -460,7 +457,7 @@ module.exports = async (req, res) => {
             body: JSON.stringify(payload) 
         });
         const data = await res.json();
-        if(data.success) { alert('Done!'); resetFormState(); loadDashboardData(); }
+        if(data.success) { alert('Data Synchronized Successfully!'); resetFormState(); loadDashboardData(); }
     };
 
     async function processFulfillment(orderId) {
@@ -517,6 +514,8 @@ module.exports = async (req, res) => {
 
     } catch (globalError) {
         console.error("Monolithic Core Crash Log:", globalError);
-        return res.status(500).json({ success: false, message: "Internal application handling crash error." });
+        return res.status(500).json({ success: false, message: "Internal server handling error." });
     }
 };
+
+module.exports.config = { api: { bodyParser: { sizeLimit: '4.5mb' } } };
