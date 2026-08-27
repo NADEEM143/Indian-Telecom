@@ -1,14 +1,27 @@
-// api/admin.js - Optimized Vercel Serverless Admin Panel Engine
-const fs = require('fs');
-const path = require('path');
+// api/admin.js - Vercel Serverless KV Database Admin Rendering Panel
+const { createClient } = require('@vercel/kv');
 
-const DB_PATH = path.join(process.cwd(), 'data', 'products.json');
+const kv = createClient({
+  url: process.env.KV_REST_API_URL,
+  token: process.env.KV_REST_API_TOKEN,
+});
 
 module.exports = async (req, res) => {
     let products = [];
     try {
-        if (fs.existsSync(DB_PATH)) {
-            products = JSON.parse(fs.readFileSync(DB_PATH, 'utf8'));
+        // Fetch all operational product database keys directly using clean cloud metrics
+        const keys = await kv.keys('telecom_item:*');
+
+        if (keys && keys.length > 0) {
+            // Pull all individual product data payloads together simultaneously
+            const pipelineResult = await Promise.all(keys.map(key => kv.get(key)));
+            
+            // Sort items cleanly so your newest catalog updates show up first
+            products = pipelineResult.filter(Boolean).sort((a, b) => {
+                const idA = parseInt(a.id?.replace('prod_', '')) || 0;
+                const idB = parseInt(b.id?.replace('prod_', '')) || 0;
+                return idB - idA;
+            });
         }
     } catch (e) {
         products = [];
@@ -37,7 +50,6 @@ module.exports = async (req, res) => {
             </td>
         </tr>
     `;
-
     const standaloneAdminHtmlOutput = `
     <!DOCTYPE html>
     <html lang="en">
@@ -131,7 +143,6 @@ module.exports = async (req, res) => {
     <script>
         let base64ImagePayload = "";
 
-        // Canvas Compression Engine to shrink down large local file sizes
         document.getElementById('fileInp').onchange = function() {
             const [file] = this.files;
             if (file) {
@@ -142,25 +153,18 @@ module.exports = async (req, res) => {
                     img.onload = function() {
                         const canvas = document.createElement('canvas');
                         const ctx = canvas.getContext('2d');
-                        
-                        // Limit dimensions to a max of 800px width/height to drastically reduce text payload size
                         let width = img.width;
                         let height = img.height;
                         const max_size = 800;
-                        
                         if (width > height) {
                             if (width > max_size) { height *= max_size / width; width = max_size; }
                         } else {
                             if (height > max_size) { width *= max_size / height; height = max_size; }
                         }
-                        
                         canvas.width = width;
                         canvas.height = height;
                         ctx.drawImage(img, 0, 0, width, height);
-                        
-                        // Compress to web-optimized JPEG format with 60% quality ratio
                         base64ImagePayload = canvas.toDataURL('image/jpeg', 0.6);
-                        
                         const pv = document.getElementById('imagePreview');
                         pv.src = base64ImagePayload;
                         pv.style.display = 'block';
@@ -191,14 +195,9 @@ module.exports = async (req, res) => {
                     body: JSON.stringify(payload)
                 });
                 const data = await res.json();
-                if(data.success) { 
-                    alert('Success: Item synchronized successfully!'); 
-                    window.location.reload(); 
-                } else {
-                    alert('Server processing error: ' + data.message);
-                }
+                if(data.success) { alert('Success: Item synchronized successfully!'); window.location.reload(); }
             } catch (err) {
-                alert('Connection timeout error. Image size is still too large.');
+                alert('Connection tracking pipeline error.');
             }
         };
 
