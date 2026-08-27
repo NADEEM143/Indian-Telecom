@@ -2,11 +2,9 @@
 const fs = require('fs');
 const path = require('path');
 
-// Reference local data tracking index file path pointer configurations
 const DB_PATH = path.join(process.cwd(), 'data', 'products.json');
 
 module.exports = async (req, res) => {
-    // Ensure default structural tracking scopes exist cleanly on system wake
     let products = [];
     try {
         if (fs.existsSync(DB_PATH)) {
@@ -16,7 +14,6 @@ module.exports = async (req, res) => {
         products = [];
     }
 
-    // Process direct dynamic catalog layout data row generations
     const dataRows = products.map(p => `
         <tr id="item-row-${p.id}">
             <td><img src="${p.imageUrl}" style="width:44px; height:44px; object-fit:contain; border-radius:6px; background:#fafafa; border:1px solid #e2e8f0;"></td>
@@ -41,7 +38,6 @@ module.exports = async (req, res) => {
         </tr>
     `;
 
-    // Pure administrative user interface injection block
     const standaloneAdminHtmlOutput = `
     <!DOCTYPE html>
     <html lang="en">
@@ -58,9 +54,10 @@ module.exports = async (req, res) => {
             .form-group { margin-bottom: 18px; }
             label { display: block; font-weight: 700; font-size: 11px; text-transform: uppercase; margin-bottom: 6px; color: #475569; }
             .input-box { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; box-sizing: border-box; font-size: 14px; }
-            .dropzone-box { border: 2px dashed #94a3b8; border-radius: 12px; padding: 24px; text-align: center; cursor: pointer; background: #f8fafc; }
-            .preview-thumbnail { max-width: 100%; max-height: 120px; object-fit: contain; margin-top: 12px; display: none; border-radius: 6px; }
-            .submit-trigger { background: var(--dark); color: white; width: 100%; border: none; padding: 14px; border-radius: 12px; font-weight: 700; cursor: pointer; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 8px; }
+            .dropzone-box { border: 2px dashed #94a3b8; border-radius: 12px; padding: 24px; text-align: center; cursor: pointer; background: #f8fafc; transition: 0.2s; }
+            .dropzone-box:hover { border-color: var(--dark); background: #f1f5f9; }
+            .preview-thumbnail { max-width: 100%; max-height: 120px; object-fit: contain; margin-top: 12px; display: none; border-radius: 6px; margin-left: auto; margin-right: auto; }
+            .submit-trigger { background: var(--dark); color: white; width: 100%; border: none; padding: 14px; border-radius: 12px; font-weight: 700; cursor: pointer; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; }
             .table-card { background: white; padding: 32px; border-radius: 16px; border: 1px solid #e2e8f0; overflow-x: auto; }
             table { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 500px; }
             th { text-align: left; padding: 12px; background: #f1f5f9; font-size: 11px; text-transform: uppercase; color: #475569; border-bottom: 1px solid #e2e8f0; }
@@ -107,10 +104,18 @@ module.exports = async (req, res) => {
                         <input type="number" id="strikePrice" class="input-box">
                     </div>
                 </div>
+                
+                <!-- SYSTEM DIRECT FILE INPUT DROPZONE INTERFACE -->
                 <div class="form-group">
-                    <label>Image Resource Link (Direct URL)</label>
-                    <input type="url" id="imageUrl" class="input-box" placeholder="https://example.com" required>
+                    <label>Product Image Asset</label>
+                    <div class="dropzone-box" onclick="document.getElementById('fileInp').click()">
+                        <i class="fas fa-images" style="font-size:24px; color:#64748b; margin-bottom:6px;"></i>
+                        <p style="margin:0; font-size:12px; color:#64748b;">Click to upload product image file</p>
+                        <input type="file" id="fileInp" style="display:none;" accept="image/*" required>
+                        <img id="imagePreview" class="preview-thumbnail">
+                    </div>
                 </div>
+                
                 <button type="submit" class="submit-trigger"><i class="fas fa-plus"></i> Synchronize Item</button>
             </form>
         </div>
@@ -125,8 +130,27 @@ module.exports = async (req, res) => {
         </div>
     </div>
     <script>
+        let base64ImagePayload = "";
+
+        // Client conversion encoder to process binary to string
+        document.getElementById('fileInp').onchange = function() {
+            const [file] = this.files;
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    base64ImagePayload = e.target.result;
+                    const pv = document.getElementById('imagePreview');
+                    pv.src = base64ImagePayload;
+                    pv.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        };
+
         document.getElementById('itemDeployForm').onsubmit = async function(e) {
             e.preventDefault();
+            if(!base64ImagePayload) { alert("Please attach a valid product picture asset."); return; }
+
             const payload = {
                 title: document.getElementById('title').value,
                 tag: document.getElementById('tag').value,
@@ -134,19 +158,21 @@ module.exports = async (req, res) => {
                 badge: document.getElementById('badge').value,
                 currentPrice: document.getElementById('currentPrice').value,
                 strikePrice: document.getElementById('strikePrice').value,
-                imageUrl: document.getElementById('imageUrl').value
+                imageUrl: base64ImagePayload
             };
+            
             const res = await fetch('/api/create-product', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
             });
             const data = await res.json();
-            if(data.success) { alert('Success!'); window.location.reload(); }
+            if(data.success) { alert('Success: Item synchronized!'); window.location.reload(); }
         };
+
         async function purgeItem(id) {
             if(!confirm('Purge item?')) return;
-            const res = await fetch('/api/delete-product?id=' + id, { method: 'DELETE' });
+            await fetch('/api/delete-product?id=' + id, { method: 'DELETE' });
             window.location.reload();
         }
     </script>
