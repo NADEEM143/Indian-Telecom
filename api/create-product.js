@@ -1,16 +1,19 @@
-// api/create-product.js - Serverless Form Data Sync Endpoint
-const fs = require('fs');
-const path = require('path');
-const DB_PATH = path.join(process.cwd(), 'data', 'products.json');
+// api/create-product.js - Cloud Serverless Database Sync Endpoint
+const { createClient } = require('@vercel/kv');
+
+// Automatically connects with your live Upstash Redis database
+const kv = createClient({
+  url: process.env.KV_REST_API_URL,
+  token: process.env.KV_REST_API_TOKEN,
+});
 
 module.exports = async (req, res) => {
     if (req.method !== 'POST') return res.status(405).json({ message: 'Method Not Allowed' });
 
     try {
-        if (!fs.existsSync(path.dirname(DB_PATH))) fs.mkdirSync(path.dirname(DB_PATH), { recursive: true });
-        
-        let products = [];
-        if (fs.existsSync(DB_PATH)) products = JSON.parse(fs.readFileSync(DB_PATH, 'utf8'));
+        // Fetch existing inventory list array directly from your active cloud storage pool
+        let products = await kv.get('telecom_inventory_store');
+        if (!products) products = [];
 
         const newProduct = {
             id: 'prod_' + Date.now(),
@@ -20,11 +23,13 @@ module.exports = async (req, res) => {
             badge: req.body.badge,
             currentPrice: req.body.currentPrice,
             strikePrice: req.body.strikePrice,
-            imageUrl: req.body.imageUrl // Holds the Base64 image payload string safely
+            imageUrl: req.body.imageUrl // High quality compressed image text string
         };
 
         products.unshift(newProduct);
-        fs.writeFileSync(DB_PATH, JSON.stringify(products, null, 2));
+        
+        // Push the updated product listing array block back up live to the cloud
+        await kv.set('telecom_inventory_store', products);
 
         return res.status(200).json({ success: true });
     } catch (err) {
@@ -32,11 +37,4 @@ module.exports = async (req, res) => {
     }
 };
 
-// CRITICAL CONFIGURATION: Extends serverless processing limits to receive text image payloads safely
-export const config = {
-    api: {
-        bodyParser: {
-            sizeLimit: '4.5mb' // Vercel's absolute serverless function limit ceiling
-        }
-    }
-};
+export const config = { api: { bodyParser: { sizeLimit: '4.5mb' } } };
