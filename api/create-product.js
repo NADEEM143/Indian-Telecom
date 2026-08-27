@@ -1,4 +1,4 @@
-// api/create-product.js - High-Performance Individual Key Cloud Endpoint
+// api/create-product.js - Production Sync, Edit Overrider, and Stock Initializer Endpoint
 const { createClient } = require('@vercel/kv');
 
 const kv = createClient({
@@ -10,20 +10,29 @@ module.exports = async (req, res) => {
     if (req.method !== 'POST') return res.status(405).json({ message: 'Method Not Allowed' });
 
     try {
-        const productId = 'prod_' + Date.now();
-        const newProduct = {
-            id: productId,
+        const isEditing = req.body.customEditId ? true : false;
+        
+        // 🌟 FIX: If editing, keep the exact same original ID instead of generating a new timestamp
+        const finalProductId = isEditing ? req.body.customEditId : 'prod_' + Date.now();
+        
+        const stockInitial = parseInt(req.body.stockCount) || 0;
+
+        const productPayload = {
+            id: finalProductId,
             title: req.body.title,
             tag: req.body.tag,
             category: req.body.category,
-            badge: req.body.badge,
-            currentPrice: req.body.currentPrice,
-            strikePrice: req.body.strikePrice,
-            imageUrl: req.body.imageUrl // Direct separate string payload execution
+            badge: req.body.badge || null,
+            currentPrice: parseInt(req.body.currentPrice),
+            strikePrice: req.body.strikePrice ? parseInt(req.body.strikePrice) : null,
+            imageUrl: req.body.imageUrl,
+            // 🌟 NEW: Inventory Control parameters
+            stockCount: stockInitial,
+            stockStatus: stockInitial > 0 ? 'INSTOCK' : 'OUTOFSTOCK'
         };
 
-        // 🌟 FIX: Save this specific product as its own lightweight dataset key string
-        await kv.set(`telecom_item:${productId}`, newProduct);
+        // Writes or cleanly overwrites the matching cloud key, eliminating duplication
+        await kv.set(`telecom_item:${finalProductId}`, productPayload);
 
         return res.status(200).json({ success: true });
     } catch (err) {
