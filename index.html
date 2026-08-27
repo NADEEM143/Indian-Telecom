@@ -292,12 +292,21 @@
             }
         }
         // 2. PREMIUM CATEGORY PILL FILTER NAVIGATION MATRIX
+                // 2. PREMIUM CATEGORY PILL FILTER NAVIGATION MATRIX
         function filterCategory(targetCategory) {
-            document.querySelectorAll('.catalog-grid').forEach(grid => { grid.style.display = 'none'; });
+            // 🌟 FIXED: We force-override CSS styles by removing the active class and applying an important flag
+            document.querySelectorAll('.catalog-grid').forEach(grid => { 
+                grid.style.setProperty('display', 'none', 'important'); 
+                grid.classList.remove('active-grid');
+            });
             document.querySelectorAll('.tab-btn').forEach(btn => { btn.classList.remove('tab-active'); });
 
             const targetElement = document.getElementById('grid-' + targetCategory);
-            if(targetElement) targetElement.style.display = 'grid';
+            if(targetElement) {
+                // 🌟 FIXED: Forcing the chosen grid to show up explicitly as a grid layout override
+                targetElement.style.setProperty('display', 'grid', 'important');
+                targetElement.classList.add('active-grid');
+            }
             
             const activeTab = document.getElementById('tab-' + targetCategory);
             if(activeTab) activeTab.classList.add('tab-active');
@@ -324,7 +333,6 @@
             updateCartUI();
             openCartDrawer();
         }
-
         function removeFromCart(name) {
             cart = cart.filter(item => item.name !== name);
             updateCartUI();
