@@ -432,6 +432,59 @@
 
             window.open(`https://whatsapp.com{contactWhatsAppNumber}&text=${encodeURIComponent(orderText)}`, '_blank');
         }
+// Ensure this specific function is active inside your index.html script tag
+async function syncInventoryCatalog() {
+    try {
+        // This calls your new cloud database endpoint handler script perfectly
+        const response = await fetch('/api/products');
+        const catalog = await response.json();
+        
+        const segmentGrids = {
+            'trending': document.getElementById('grid-trending'),
+            'headphone': document.getElementById('grid-headphone'),
+            'charger': document.getElementById('grid-charger'),
+            'repair': document.getElementById('grid-repair')
+        };
+
+        Object.values(segmentGrids).forEach(grid => { if(grid) grid.innerHTML = ''; });
+        if(catalog.length === 0 || !Array.isArray(catalog)) return;
+
+        catalog.forEach(item => {
+            const gridTarget = segmentGrids[item.category];
+            if (!gridTarget) return;
+
+            const badgeMarkup = item.badge ? `<span class="card-badge">${item.badge}</span>` : '';
+            const strikeMarkup = item.strikePrice ? `<span class="price-strike">₹${item.strikePrice}</span>` : '';
+
+            const cardBlueprint = `
+                <div class="product-card" data-server-id="${item.id}">
+                    <div class="card-media">
+                        ${badgeMarkup}
+                        <img src="${item.imageUrl}" alt="${item.title}" style="width:100%; height:100%; object-fit:contain; max-height:160px;">
+                    </div>
+                    <div class="card-content">
+                        <div>
+                            <span class="card-tag">${item.tag}</span>
+                            <h4 class="card-title">${item.title}</h4>
+                        </div>
+                        <div>
+                            <div class="card-pricing">
+                                <span class="price-current">₹${item.currentPrice}</span>
+                                ${strikeMarkup}
+                            </div>
+                            <button onclick="addToCart('${item.title.replace(/'/g, "\\'")}', ${parseInt(item.currentPrice)})" class="buy-btn">
+                                <i class="fas fa-plus"></i> Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            gridTarget.insertAdjacentHTML('beforeend', cardBlueprint);
+        });
+    } catch (err) {
+        console.error("Catalog update mapping error:", err);
+    }
+}
     </script>
 </body>
 </html>
