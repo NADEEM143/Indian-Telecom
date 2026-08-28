@@ -175,29 +175,63 @@
             </form>
         </div>
     </div>
-
+    <!-- DYNAMIC AUTHENTICATION POPUP LAYOUT -->
+    <div class="modal" id="auth-modal" style="display: flex;">
+        <div class="modal-content">
+            <div class="drawer-header" style="padding: 0 0 16px 0; margin-bottom: 20px;">
+                <h3 id="auth-title">Customer Registration</h3>
+            </div>
+            <form id="auth-form" onsubmit="handleAuthentication(event)">
+                <div class="form-group" id="auth-name-group">
+                    <label>Full Name</label>
+                    <input type="text" id="user-name" required>
+                </div>
+                <div class="form-group">
+                    <label>Mobile Number</label>
+                    <input type="tel" id="user-phone" pattern="[0-9]{10}" placeholder="10-digit number" required>
+                </div>
+                <div class="form-group">
+                    <label>Create Secret Password</label>
+                    <input type="password" id="user-pass" required>
+                </div>
+                
+                <button type="submit" class="checkout-trigger" id="auth-submit-btn" style="margin-top: 15px; background: #0f172a;">Register Account</button>
+                
+                <p style="font-size: 13px; text-align: center; margin-top: 14px; color: #64748b; cursor: pointer; font-weight: 600;" onclick="toggleAuthMode()">
+                    Already registered? Switch to Login Mode
+                </p>
+            </form>
+        </div>
+    </div>
     <a target="_blank" href="https://wa.me/919718439786" class="whatsapp-float">💬</a>
     <!-- SAFELY ENCAPSULATED CONTROLLER JAVASCRIPT BLOCK -->
     <script>
-        const API_BASE_ENDPOINT = '/api';
+                const API_BASE_ENDPOINT = '/api';
         let productsList = [];
-        let cart = [];
+        
+        // 🟢 FIXED: Automatically downloads existing basket contents from browser storage keys on load
+        let cart = JSON.parse(localStorage.getItem('IT_STOREFRONT_CART')) || [];
 
-              async function fetchLiveInventory() {
+        // Helper framework routine updating internal machine storage on layout mutation cycles
+        function syncCartToBrowserLocalStorage() {
+            localStorage.setItem('IT_STOREFRONT_CART', JSON.stringify(cart));
+        }
 
+        async function fetchLiveInventory() {
             try {
                 const response = await fetch(`${API_BASE_ENDPOINT}/admin?type=products`);
                 if (response.ok) {
                     const databaseItems = await response.json();
                     productsList = databaseItems.filter(item => item.isLive !== false);
                 }
-                // Added wait keyword hook here
                 await renderProducts(productsList);
+                
+                // 🟢 FIXED: Keeps the basket count badges accurate if a returning buyer refreshes the site
+                updateCartUI();
             } catch (err) {
                 console.error("Pipeline Sync Error:", err.message);
             }
         }
-
                 // NATIVE HARDWARE MEDIA STORAGE LOOKUP ENGINE FOR CUSTOMER SIDE
         function openIndexedDB() {
             return new Promise((resolve) => {
@@ -266,22 +300,32 @@
             renderProducts(productsList.filter(p => p.category === cat));
         }
 
+                function syncCartToBrowserLocalStorage() {
+            localStorage.setItem('IT_STOREFRONT_CART', JSON.stringify(cart));
+        }
+
         function addToCart(id) {
             const item = productsList.find(p => p.id === id);
             const exists = cart.find(c => c.id === id);
             if(exists) { exists.qty++ } else { cart.push({...item, qty: 1}) }
+            
+            // Secure basket content memory to browser cache states
+            syncCartToBrowserLocalStorage();
             updateCartUI();
         }
+
         function updateCartUI() {
             const badge = document.getElementById("cart-badge");
             const totalStr = document.getElementById("cart-total");
             const count = cart.reduce((acc, current) => acc + current.qty, 0);
             const total = cart.reduce((acc, current) => acc + (current.discountPrice * current.qty), 0);
             
-            badge.innerText = count;
-            totalStr.innerText = `₹${total}`;
+            if (badge) badge.innerText = count;
+            if (totalStr) totalStr.innerText = `₹${total}`;
             
             const container = document.getElementById("cart-items-container");
+            if (!container) return;
+            
             if(cart.length === 0) {
                 container.innerHTML = `<p style="text-align:center;color:#94a3b8;padding:40px 0;">Your basket is empty</p>`;
                 return;
@@ -301,6 +345,9 @@
 
         function removeItem(id) {
             cart = cart.filter(c => c.id !== id);
+            
+            // 🟢 FIXED: Saves the updated cart configuration to local storage immediately upon deletion
+            syncCartToBrowserLocalStorage();
             updateCartUI();
         }
 
@@ -362,7 +409,7 @@
             }
         }
 
-        async function submitOrder(e) {
+               async function submitOrder(e) {
             e.preventDefault();
             const mode = document.querySelector('input[name="mop"]:checked').value;
             const utrNum = document.getElementById("pay-utr").value.trim();
@@ -408,7 +455,79 @@
             }
         }
 
-        window.onload = () => fetchLiveInventory();
+        // =========================================================================
+        // 👥 CUSTOMER REGISTER & LOGIN CONTROLLER LOGIC ENGINE
+        // =========================================================================
+        let isLoginMode = false;
+        let activeSessionUser = JSON.parse(localStorage.getItem('IT_ACTIVE_USER')) || null;
+
+        function toggleAuthMode() {
+            isLoginMode = !isLoginMode;
+            document.getElementById("auth-title").innerText = isLoginMode ? "Customer Login" : "Customer Registration";
+            document.getElementById("auth-submit-btn").innerText = isLoginMode ? "Login to Store" : "Register Account";
+            document.getElementById("auth-name-group").style.display = isLoginMode ? "none" : "block";
+            document.getElementById("user-name").required = !isLoginMode;
+            document.getElementById("auth-form").reset();
+        }
+
+        async function handleAuthentication(e) {
+            e.preventDefault();
+            const phone = document.getElementById("user-phone").value.trim();
+            const pass = document.getElementById("user-pass").value;
+            const name = document.getElementById("user-name").value.trim();
+
+            try {
+                const response = await fetch(`${API_BASE_ENDPOINT}/admin?type=users`);
+                let databaseUsersList = [];
+                if (response.ok) { databaseUsersList = await response.json(); }
+
+                if (isLoginMode) {
+                    const matchingProfile = databaseUsersList.find(u => u.phone === phone && u.password === pass);
+                    if (!matchingProfile) {
+                        alert("Invalid Credentials! Check mobile number or password strings.");
+                        return;
+                    }
+                    activeSessionUser = matchingProfile;
+                    alert(`Welcome Back, ${activeSessionUser.name}! Opening storefront accessories grid...`);
+                } else {
+                    if (databaseUsersList.some(u => u.phone === phone)) {
+                        alert("This mobile number is already registered! Please switch to Login mode.");
+                        return;
+                    }
+                    
+                    const newProfilePayload = { id: "U_" + Date.now(), name, phone, password: pass };
+                    databaseUsersList.push(newProfilePayload);
+
+                    await fetch(`${API_BASE_ENDPOINT}/admin?type=users`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(databaseUsersList)
+                    });
+
+                    activeSessionUser = newProfilePayload;
+                    alert("Account Registered Successfully inside Indian Telecom repository matrix!");
+                }
+
+                localStorage.setItem('IT_ACTIVE_USER', JSON.stringify(activeSessionUser));
+                document.getElementById("auth-modal").style.display = "none";
+            } catch (err) {
+                alert("Server verification operations error. Try reconnecting parameter blocks.");
+            }
+        }
+
+        function evaluateUserAccessSession() {
+            if (activeSessionUser) {
+                document.getElementById("auth-modal").style.display = "none";
+            } else {
+                document.getElementById("auth-modal").style.display = "flex";
+            }
+        }
+
+        // INITIALIZE APPLICATION BOOT ACTIONS
+        window.onload = () => {
+            evaluateUserAccessSession();
+            fetchLiveInventory();
+        };
     </script>
 </body>
 </html>
