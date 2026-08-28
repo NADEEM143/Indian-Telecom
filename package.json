@@ -1,7 +1,14 @@
 {
   "name": "indian-telecom",
   "version": "1.0.0",
+  "description": "Premium Mobile Accessories Storefront & Admin Control Center",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
   "dependencies": {
-    "@vercel/kv": "^1.0.1"
+    "@vercel/kv": "^1.0.1",
+    "express": "^4.19.2",
+    "dotenv": "^16.4.5"
   }
 }
