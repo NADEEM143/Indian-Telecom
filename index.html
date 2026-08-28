@@ -4,11 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>INDIAN TELECOM - Premium Mobile Accessories</title>
-    <!-- Vector Icons Package -->
-    <link rel="stylesheet" href="https://cloudflare.com">
-    
     <style>
-        /* 100% Native Pure CSS Core - Works Perfectly Offline and Locally */
+        /* 100% Native CSS Core Engine - Full Desktop, Laptop, and Mobile Cross-Compatibility Layout */
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #f8fafc; color: #1e293b; padding-bottom: 60px; }
         
@@ -20,13 +17,13 @@
         .logo span { color: #2563eb; }
         .logo p { font-size: 11px; color: #94a3b8; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; margin-top: 2px; }
         
-        .cart-trigger { background: none; border: none; position: relative; cursor: pointer; color: #334155; padding: 8px; transition: color 0.2s; }
+        .cart-trigger { background: none; border: none; position: relative; cursor: pointer; color: #334155; padding: 8px; font-size: 24px; transition: color 0.2s; }
         .cart-trigger:hover { color: #2563eb; }
         .cart-badge { position: absolute; top: -2px; right: -2px; background: #2563eb; color: white; font-size: 11px; font-weight: 700; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+
         .hero-banner { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: white; padding: 40px; border-radius: 24px; margin: 24px 6%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 10px 25px -5px rgba(15,23,42,0.15); }
         .hero-text h2 { font-size: 32px; font-weight: 800; margin-bottom: 10px; line-height: 1.2; }
         .hero-text p { color: #94a3b8; font-size: 15px; max-width: 500px; }
-
         .categories-container { padding: 0 6%; margin-bottom: 20px; overflow-x: auto; display: flex; gap: 10px; }
         .cat-btn { background: white; border: 1px solid #e2e8f0; padding: 10px 20px; border-radius: 12px; cursor: pointer; font-weight: 600; font-size: 14px; color: #475569; white-space: nowrap; transition: all 0.2s; }
         .cat-btn.active, .cat-btn:hover { background: #0f172a; color: white; border-color: #0f172a; box-shadow: 0 4px 12px rgba(15,23,42,0.1); }
@@ -34,8 +31,8 @@
         #product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 24px; padding: 0 6% 40px 6%; }
         .product-card { background: white; border: 1px solid #f1f5f9; border-radius: 20px; padding: 16px; box-shadow: 0 4px 18px rgba(15,23,42,0.02); display: flex; flex-direction: column; justify-content: space-between; transition: transform 0.2s, box-shadow 0.2s; }
         .product-card:hover { transform: translateY(-4px); box-shadow: 0 12px 24px rgba(15,23,42,0.06); }
-        .img-container { background: #f8fafc; aspect-ratio: 1; border-radius: 14px; display: flex; align-items: center; justify-content: center; margin-bottom: 14px; position: relative; color: #94a3b8; font-size: 48px; border: 1px dashed #e2e8f0; }
-        .save-tag { position: absolute; top: 8px; left: 8px; background: #2563eb; color: white; font-size: 10px; font-weight: 700; padding: 4px 8px; border-radius: 20px; }
+        .img-container { background: #f8fafc; aspect-ratio: 1; border-radius: 14px; display: flex; align-items: center; justify-content: center; margin-bottom: 14px; position: relative; color: #94a3b8; font-size: 48px; border: 1px dashed #e2e8f0; overflow: hidden; }
+        .save-tag { position: absolute; top: 8px; left: 8px; background: #2563eb; color: white; font-size: 10px; font-weight: 700; padding: 4px 8px; border-radius: 20px; z-index: 2; }
         
         .product-info p { font-size: 11px; color: #2563eb; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
         .product-info h4 { font-size: 15px; color: #1e293b; font-weight: 700; margin: 4px 0 12px 0; min-height: 40px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
@@ -45,10 +42,10 @@
         
         .bag-btn { width: 100%; background: #f1f5f9; color: #1e293b; border: none; padding: 12px; border-radius: 12px; font-weight: 700; font-size: 13px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px; }
         .bag-btn:hover { background: #0f172a; color: white; }
-        /* Slide Out Checkout/Cart Components */
+
         .drawer-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.4); backdrop-filter: blur(4px); z-index: 200; display: none; }
         .cart-drawer { position: fixed; top: 0; right: 0; bottom: 0; width: 100%; max-width: 440px; background: white; z-index: 201; display: flex; flex-direction: column; transform: translateX(100%); transition: transform 0.3s ease-in-out; box-shadow: -10px 0 30px rgba(0,0,0,0.05); }
-        .drawer-header { padding: 24px; border-b: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; }
+        .drawer-header { padding: 24px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; }
         .drawer-header h3 { font-size: 18px; font-weight: 800; }
         .close-btn { background: none; border: none; font-size: 20px; color: #94a3b8; cursor: pointer; }
         .cart-body { flex: 1; overflow-y: auto; padding: 24px; }
@@ -57,54 +54,48 @@
         .checkout-trigger { width: 100%; background: #2563eb; color: white; border: none; padding: 16px; border-radius: 14px; font-weight: 700; font-size: 15px; cursor: pointer; box-shadow: 0 4px 12px rgba(37,99,235,0.2); }
 
         .cart-item { display: flex; align-items: center; gap: 14px; padding-bottom: 16px; border-bottom: 1px solid #f1f5f9; margin-bottom: 16px; }
-        .cart-item-img { width: 50px; height: 50px; background: #f8fafc; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #94a3b8; border: 1px solid #e2e8f0; }
+        .cart-item-img { width: 50px; height: 50px; background: #f8fafc; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #94a3b8; border: 1px solid #e2e8f0; overflow: hidden; }
 
-        /* Modal Architecture */
         .modal { position: fixed; inset: 0; background: rgba(15,23,42,0.6); backdrop-filter: blur(4px); z-index: 300; display: none; align-items: center; justify-content: center; padding: 20px; }
         .modal-content { background: white; width: 100%; max-width: 500px; border-radius: 24px; padding: 28px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
         .form-group { margin-bottom: 16px; }
         .form-group label { display: block; font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 6px; }
-        .form-group input, .form-group textarea { width: 100%; padding: 12px 16px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; font-size: 14px; outline: none; }
+        .form-group input, .form-group textarea { width: 100%; padding: 12px 16px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; font-size: 14px; outline: none; color: #0f172a; }
         .form-group input:focus, .form-group textarea:focus { border-color: #2563eb; background: white; }
         
         .radio-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 6px; }
-        .radio-label { border: 1px solid #e2e8f0; background: #f8fafc; padding: 14px; border-radius: 12px; display: flex; align-items: center; gap: 10px; cursor: pointer; font-weight: 600; font-size: 14px; }
+        .radio-label { border: 1px solid #e2e8f0; background: #f8fafc; padding: 14px; border-radius: 12px; display: flex; align-items: center; gap: 10px; cursor: pointer; font-weight: 600; font-size: 14px; color: #0f172a; }
         
         #qr-section { background: #f8fafc; border: 1px dashed #e2e8f0; border-radius: 16px; padding: 20px; margin-top: 16px; text-align: center; display: none; }
         .qr-placeholder { background: white; width: 140px; height: 140px; margin: 0 auto 12px auto; display: flex; align-items: center; justify-content: center; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.02); }
+        .qr-placeholder img { width: 120px; height: 120px; object-fit: contain; }
         
-        .whatsapp-float { position: fixed; bottom: 24px; right: 24px; background: #25D366; color: white; width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; box-shadow: 0 8px 24px rgba(37,211,102,0.3); text-decoration: none; z-index: 99; }
+        .whatsapp-float { position: fixed; bottom: 24px; right: 24px; background: #25D366; color: white; width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; box-shadow: 0 8px 24px rgba(37,211,102,0.3); text-decoration: none; z-index: 99; }
     </style>
 </head>
 <body>
-    <!-- 1. MEGA OFFER ADVERTISEMENT BANNER -->
-        <!-- 1. MEGA OFFER ADVERTISEMENT BANNER -->
     <div id="mega-offer-banner">
         🔥 MEGA OFFER: FLAT 30% OFF ON PREMIUM CHARGERS & COVERS! LIMITED STOCK!
     </div>
 
-    <!-- 2. STYLED HEADER -->
     <header>
         <div class="logo">
             <h1>INDIAN <span>TELECOM</span></h1>
             <p>Prop. Nadim Ahmad</p>
         </div>
         <button class="cart-trigger" onclick="toggleCart(true)">
-            <span style="font-size: 24px;">🛍️</span>
-            <span class="cart-badge" id="cart-badge">0</span>
+            🛍️ <span class="cart-badge" id="cart-badge">0</span>
         </button>
     </header>
 
-    <!-- 3. PREMIUM LOOK HERO SHOWCASE -->
     <section class="hero-banner">
         <div class="hero-text">
             <h2>Luxury Armor For Your Devices</h2>
-            <p>Explore an elite range of mobile components handpicked by Indian Telecom for premium drop protection and super fast performance.</p>
+            <p>Explore an elite range of mobile accessories handpicked by Indian Telecom for premium drop protection and super fast charging performance.</p>
         </div>
         <div style="font-size: 72px; opacity: 0.3;">🛡️</div>
     </section>
 
-    <!-- 4. CATEGORY HORIZONTAL FILTER -->
     <div class="categories-container">
         <button class="cat-btn active" onclick="filterCategory('All', this)">All Items</button>
         <button class="cat-btn" onclick="filterCategory('Cases', this)">Premium Cases</button>
@@ -112,10 +103,8 @@
         <button class="cat-btn" onclick="filterCategory('Audio', this)">Wireless Audio</button>
     </div>
 
-    <!-- 5. PRODUCT DISPLAY GRID -->
     <main id="product-grid"></main>
 
-    <!-- 6. SLIDE-OUT CART PANEL -->
     <div class="drawer-overlay" id="drawer-overlay" onclick="toggleCart(false)"></div>
     <div class="cart-drawer" id="cart-drawer">
         <div class="drawer-header">
@@ -132,7 +121,6 @@
         </div>
     </div>
 
-    <!-- 7. CHECKOUT MODAL -->
     <div class="modal" id="checkout-modal">
         <div class="modal-content">
             <div class="drawer-header" style="padding: 0 0 16px 0; margin-bottom: 20px;">
@@ -164,7 +152,6 @@
                     </div>
                 </div>
 
-                <!-- UPI CONTAINER HUB -->
                 <div id="qr-section">
                     <div class="qr-placeholder">
                         <img src="https://qrserver.com" alt="UPI QR">
@@ -181,24 +168,23 @@
         </div>
     </div>
 
-          const API_BASE_ENDPOINT = '/api';
+    <a href="https://wa.me" target="_blank" class="whatsapp-float">💬</a>
+    <!-- SAFELY ENCAPSULATED CONTROLLER JAVASCRIPT BLOCK -->
+    <script>
+        const API_BASE_ENDPOINT = '/api';
         let productsList = [];
         let cart = [];
 
         async function fetchLiveInventory() {
             try {
-                // Fetch dynamic items directly from your live Vercel KV cloud database mapping
                 const response = await fetch(`${API_BASE_ENDPOINT}/admin?type=products`);
                 if (response.ok) {
                     const databaseItems = await response.json();
-                    // Filters out any unlisted or disabled products deactivated inside admin controls
                     productsList = databaseItems.filter(item => item.isLive !== false);
-                } else {
-                    console.error("Backend repository streaming validation warning.");
                 }
                 renderProducts(productsList);
             } catch (err) {
-                console.error("Inventory sync pipeline execution crash:", err.message);
+                console.error("Pipeline Sync Error:", err.message);
             }
         }
 
@@ -207,7 +193,7 @@
             if (!grid) return;
             
             if (items.length === 0) {
-                grid.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding: 40px; color:#94a3b8; font-weight:bold;">Welcome to Indian Telecom! New mobile accessories are arriving shortly. Stay tuned!</div>`;
+                grid.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding: 40px; color:#94a3b8; font-weight:bold;">Welcome to Indian Telecom! Premium items are being deployed from our console live. Stay tuned!</div>`;
                 return;
             }
 
@@ -245,8 +231,7 @@
             if(exists) { exists.qty++ } else { cart.push({...item, qty: 1}) }
             updateCartUI();
         }
-
-                function updateCartUI() {
+        function updateCartUI() {
             const badge = document.getElementById("cart-badge");
             const totalStr = document.getElementById("cart-total");
             const count = cart.reduce((acc, current) => acc + current.qty, 0);
@@ -294,6 +279,7 @@
             if(cart.length === 0) return alert("Add items to your cart first!");
             document.getElementById("checkout-modal").style.display = "flex";
         }
+        
         function closeCheckout() { document.getElementById("checkout-modal").style.display = "none"; }
 
         function togglePaymentMode(mode) {
@@ -358,5 +344,3 @@
     </script>
 </body>
 </html>
-
-
