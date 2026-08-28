@@ -3,446 +3,316 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>INDIAN TELECOM - Premium Mobile Accessories Hub</title>
+    <title>INDIAN TELECOM - Premium Mobile Accessories</title>
+    <!-- Vector Icons Package -->
     <link rel="stylesheet" href="https://cloudflare.com">
+    
     <style>
-        :root {
-            --primary: #2563eb;
-            --primary-hover: #1d4ed8;
-            --dark: #0f172a;
-            --text-muted: #64748b;
-            --card-border: #e2e8f0;
-            --bg-light: #f8fafc;
-            --success: #10b981;
-        }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; background-color: #ffffff; color: var(--dark); -webkit-font-smoothing: antialiased; }
-        .container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 20px; box-sizing: border-box; }
-        header { background-color: #ffffff; border-bottom: 1px solid #f1f5f9; position: sticky; top: 0; z-index: 50; padding: 16px 0; }
-        .header-flex { display: flex; align-items: center; justify-content: space-between; }
-        .brand-block { display: flex; flex-direction: column; }
-        .logo-title { font-size: 20px; font-weight: 900; margin: 0; letter-spacing: -0.5px; color: var(--dark); text-transform: uppercase; }
-        .logo-sub { font-size: 11px; font-weight: 600; margin: 2px 0 0 0; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
-        .header-actions-group { display: flex; align-items: center; gap: 12px; }
-        .upper-right-cart-btn { background: #ffffff; border: 1px solid var(--card-border); padding: 10px 16px; border-radius: 20px; font-size: 13px; font-weight: 700; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; position: relative; transition: all 0.2s; color: var(--dark); }
-        .upper-right-cart-btn:hover { background-color: var(--bg-light); border-color: #cbd5e1; }
-        .cart-badge-counter { position: absolute; top: -6px; right: -6px; background-color: #ef4444; color: white; font-size: 10px; font-weight: 800; min-width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 2px; box-sizing: border-box; }
-        .whatsapp-btn { background-color: #00e676; color: white; text-decoration: none; padding: 10px 18px; border-radius: 20px; font-size: 13px; font-weight: 700; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(0,230,118,0.2); transition: all 0.2s; }
-        .whatsapp-btn:hover { background-color: #00c853; transform: translateY(-1px); }
-        .hero { background: radial-gradient(circle at top right, #f8fafc 0%, #ffffff 100%); padding: 56px 0; text-align: center; border-bottom: 1px solid #f1f5f9; }
-        .hero h2 { font-size: 32px; font-weight: 900; color: var(--dark); margin: 0 0 12px 0; letter-spacing: -0.75px; }
-        .hero p { font-size: 15px; color: var(--text-muted); max-width: 600px; margin: 0 auto; line-height: 1.6; }
-        .tabs-nav { background: #ffffff; border-bottom: 1px solid #f1f5f9; position: sticky; top: 68px; z-index: 40; padding: 12px 0; }
-        .tabs-flex { display: flex; align-items: center; gap: 8px; overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; padding-bottom: 4px; }
-        .tabs-flex::-webkit-scrollbar { display: none; }
-        .tab-btn { background: none; border: 1px solid transparent; padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: 700; color: var(--text-muted); cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s; white-space: nowrap; text-transform: uppercase; letter-spacing: 0.5px; }
-        .tab-btn:hover { color: var(--dark); background-color: var(--bg-light); }
-        .tab-active { background-color: var(--dark) !important; color: white !important; border-color: var(--dark) !important; }
-        .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 24px; padding: 40px 0; }
-        .catalog-grid { display: none; }
-        .active-grid { display: grid !important; }
-        .product-card { background-color: #ffffff; border-radius: 16px; border: 1px solid var(--card-border); overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.01), 0 4px 12px rgba(0,0,0,0.01); transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); display: flex; flex-direction: column; position: relative; }
-        .product-card:hover { box-shadow: 0 20px 32px rgba(15,23,42,0.06); transform: translateY(-4px); border-color: #e2e8f0; }
-        .card-media { aspect-ratio: 1; background-color: #fafafa; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; height: 230px; padding: 24px; box-sizing: border-box; transition: background-color 0.2s; }
-        .product-card:hover .card-media { background-color: #fcfcfc; }
-        .card-media img { max-width: 100%; max-height: 100%; object-fit: contain; transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
-        .product-card:hover .card-media img { transform: scale(1.05); }
-        .card-media svg { width: 100%; height: 100%; max-height: 140px; transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
-        .product-card:hover .card-media svg { transform: scale(1.05); }
-        .card-badge { position: absolute; top: 16px; left: 16px; background-color: var(--dark); color: white; font-size: 9px; font-weight: 800; padding: 4px 10px; border-radius: 20px; letter-spacing: 0.5px; text-transform: uppercase; z-index: 10; }
-        .card-content { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box; }
-        .card-tag { font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; display: block; }
-        .card-title { font-size: 15px; font-weight: 700; color: var(--dark); margin: 0 0 12px 0; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 42px; }
-        .card-pricing { display: flex; align-items: baseline; gap: 8px; margin-bottom: 18px; }
-        .price-current { font-size: 22px; font-weight: 800; color: var(--dark); letter-spacing: -0.5px; }
-        .price-strike { font-size: 13px; color: var(--text-muted); text-decoration: line-through; }
-        .buy-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; background-color: var(--dark); color: white; padding: 12px; border-radius: 12px; border: none; font-size: 13px; font-weight: 700; transition: all 0.2s; cursor: pointer; box-sizing: border-box; }
-        .buy-btn:hover { background-color: var(--primary); }
-        .submit-btn { background-color: var(--dark); color: white; padding: 14px 28px; border: none; border-radius: 12px; font-weight: 700; font-size: 14px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; transition: all 0.2s; text-decoration: none; box-sizing: border-box; }
-        .submit-btn:hover { background-color: #1e293b; }
-        footer { background-color: #090d16; color: #94a3b8; padding: 64px 0 32px 0; margin-top: 64px; border-top: 1px solid #1e293b; font-size: 14px; }
-        .footer-grid { display: grid; grid-template-columns: 1fr; gap: 40px; }
-        @media (min-width: 768px) { .footer-grid { grid-template-columns: repeat(2, 1fr); } }
-        footer h5 { color: white; font-size: 15px; font-weight: 700; margin-top: 0; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.5px; }
-        footer p { line-height: 1.6; margin: 0; }
-        .footer-bottom { text-align: center; font-size: 12px; margin-top: 48px; padding-top: 24px; border-top: 1px solid #1e293b; color: #475569; font-weight: 500; }
-        .cart-overlay-drawer { position: fixed; top: 0; right: -420px; width: 100%; max-width: 420px; height: 100%; background-color: white; z-index: 100; box-shadow: -8px 0 32px rgba(15,23,42,0.08); display: flex; flex-direction: column; transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1); border-left: 1px solid #e2e8f0; box-sizing: border-box; }
-        .cart-overlay-active { right: 0; }
-        .drawer-header { padding: 24px; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; justify-content: space-between; }
-        .drawer-header h4 { font-size: 16px; font-weight: 800; color: var(--dark); display: flex; align-items: center; gap: 8px; text-transform: uppercase; letter-spacing: 0.5px; margin: 0; }
-        .drawer-close-btn { background: none; border: none; font-size: 24px; color: var(--text-muted); cursor: pointer; transition: color 0.2s; padding: 0; line-height: 1; }
-        .drawer-close-btn:hover { color: #ef4444; }
-        .drawer-body { padding: 24px; flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; box-sizing: border-box; }
-        .cart-backdrop { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(15, 23, 42, 0.3); backdrop-filter: blur(4px); z-index: 90; display: none; }
-        .backdrop-active { display: block; }
+        /* 100% Native Pure CSS Core - Works Perfectly Offline and Locally */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #f8fafc; color: #1e293b; padding-bottom: 60px; }
+        
+        #mega-offer-banner { background: linear-gradient(135deg, #f59e0b, #ea580c, #dc2626); color: white; text-align: center; padding: 12px; font-weight: 700; font-size: 14px; letter-spacing: 0.5px; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.9; } }
+
+        header { background: #ffffff; padding: 15px 6%; display: flex; justify-content: space-between; align-items: center; border-b: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02); }
+        .logo h1 { font-size: 24px; color: #0f172a; font-weight: 800; letter-spacing: -0.5px; }
+        .logo span { color: #2563eb; }
+        .logo p { font-size: 11px; color: #94a3b8; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; margin-top: 2px; }
+        
+        .cart-trigger { background: none; border: none; position: relative; cursor: pointer; color: #334155; padding: 8px; transition: color 0.2s; }
+        .cart-trigger:hover { color: #2563eb; }
+        .cart-badge { position: absolute; top: -2px; right: -2px; background: #2563eb; color: white; font-size: 11px; font-weight: 700; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        .hero-banner { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: white; padding: 40px; border-radius: 24px; margin: 24px 6%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 10px 25px -5px rgba(15,23,42,0.15); }
+        .hero-text h2 { font-size: 32px; font-weight: 800; margin-bottom: 10px; line-height: 1.2; }
+        .hero-text p { color: #94a3b8; font-size: 15px; max-width: 500px; }
+
+        .categories-container { padding: 0 6%; margin-bottom: 20px; overflow-x: auto; display: flex; gap: 10px; }
+        .cat-btn { background: white; border: 1px solid #e2e8f0; padding: 10px 20px; border-radius: 12px; cursor: pointer; font-weight: 600; font-size: 14px; color: #475569; white-space: nowrap; transition: all 0.2s; }
+        .cat-btn.active, .cat-btn:hover { background: #0f172a; color: white; border-color: #0f172a; box-shadow: 0 4px 12px rgba(15,23,42,0.1); }
+
+        #product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 24px; padding: 0 6% 40px 6%; }
+        .product-card { background: white; border: 1px solid #f1f5f9; border-radius: 20px; padding: 16px; box-shadow: 0 4px 18px rgba(15,23,42,0.02); display: flex; flex-direction: column; justify-content: space-between; transition: transform 0.2s, box-shadow 0.2s; }
+        .product-card:hover { transform: translateY(-4px); box-shadow: 0 12px 24px rgba(15,23,42,0.06); }
+        .img-container { background: #f8fafc; aspect-ratio: 1; border-radius: 14px; display: flex; align-items: center; justify-content: center; margin-bottom: 14px; position: relative; color: #94a3b8; font-size: 48px; border: 1px dashed #e2e8f0; }
+        .save-tag { position: absolute; top: 8px; left: 8px; background: #2563eb; color: white; font-size: 10px; font-weight: 700; padding: 4px 8px; border-radius: 20px; }
+        
+        .product-info p { font-size: 11px; color: #2563eb; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        .product-info h4 { font-size: 15px; color: #1e293b; font-weight: 700; margin: 4px 0 12px 0; min-height: 40px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .price-row { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+        .disc-price { font-size: 18px; font-weight: 800; color: #0f172a; }
+        .orig-price { font-size: 13px; color: #94a3b8; text-decoration: line-through; }
+        
+        .bag-btn { width: 100%; background: #f1f5f9; color: #1e293b; border: none; padding: 12px; border-radius: 12px; font-weight: 700; font-size: 13px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px; }
+        .bag-btn:hover { background: #0f172a; color: white; }
+        /* Slide Out Checkout/Cart Components */
+        .drawer-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.4); backdrop-filter: blur(4px); z-index: 200; display: none; }
+        .cart-drawer { position: fixed; top: 0; right: 0; bottom: 0; width: 100%; max-width: 440px; background: white; z-index: 201; display: flex; flex-direction: column; transform: translateX(100%); transition: transform 0.3s ease-in-out; box-shadow: -10px 0 30px rgba(0,0,0,0.05); }
+        .drawer-header { padding: 24px; border-b: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; }
+        .drawer-header h3 { font-size: 18px; font-weight: 800; }
+        .close-btn { background: none; border: none; font-size: 20px; color: #94a3b8; cursor: pointer; }
+        .cart-body { flex: 1; overflow-y: auto; padding: 24px; }
+        .cart-footer { padding: 24px; border-top: 1px solid #e2e8f0; background: #f8fafc; }
+        .total-row { display: flex; justify-content: space-between; font-weight: 800; font-size: 18px; margin-bottom: 16px; }
+        .checkout-trigger { width: 100%; background: #2563eb; color: white; border: none; padding: 16px; border-radius: 14px; font-weight: 700; font-size: 15px; cursor: pointer; box-shadow: 0 4px 12px rgba(37,99,235,0.2); }
+
+        .cart-item { display: flex; align-items: center; gap: 14px; padding-bottom: 16px; border-bottom: 1px solid #f1f5f9; margin-bottom: 16px; }
+        .cart-item-img { width: 50px; height: 50px; background: #f8fafc; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #94a3b8; border: 1px solid #e2e8f0; }
+
+        /* Modal Architecture */
+        .modal { position: fixed; inset: 0; background: rgba(15,23,42,0.6); backdrop-filter: blur(4px); z-index: 300; display: none; align-items: center; justify-content: center; padding: 20px; }
+        .modal-content { background: white; width: 100%; max-width: 500px; border-radius: 24px; padding: 28px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 6px; }
+        .form-group input, .form-group textarea { width: 100%; padding: 12px 16px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; font-size: 14px; outline: none; }
+        .form-group input:focus, .form-group textarea:focus { border-color: #2563eb; background: white; }
+        
+        .radio-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 6px; }
+        .radio-label { border: 1px solid #e2e8f0; background: #f8fafc; padding: 14px; border-radius: 12px; display: flex; align-items: center; gap: 10px; cursor: pointer; font-weight: 600; font-size: 14px; }
+        
+        #qr-section { background: #f8fafc; border: 1px dashed #e2e8f0; border-radius: 16px; padding: 20px; margin-top: 16px; text-align: center; display: none; }
+        .qr-placeholder { background: white; width: 140px; height: 140px; margin: 0 auto 12px auto; display: flex; align-items: center; justify-content: center; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.02); }
+        
+        .whatsapp-float { position: fixed; bottom: 24px; right: 24px; background: #25D366; color: white; width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; box-shadow: 0 8px 24px rgba(37,211,102,0.3); text-decoration: none; z-index: 99; }
     </style>
 </head>
 <body>
-    <div id="cart-backdrop" class="cart-backdrop" onclick="closeCartDrawer()"></div>
+    <!-- 1. MEGA OFFER ADVERTISEMENT BANNER -->
+        <!-- 1. MEGA OFFER ADVERTISEMENT BANNER -->
+    <div id="mega-offer-banner">
+        🔥 MEGA OFFER: FLAT 30% OFF ON PREMIUM CHARGERS & COVERS! LIMITED STOCK!
+    </div>
+
+    <!-- 2. STYLED HEADER -->
     <header>
-        <div class="container header-flex">
-            <div class="brand-block">
-                <h1 class="logo-title">INDIAN TELECOM</h1>
-                <p class="logo-sub">Premium Mobile Accessories Hub</p>
-            </div>
-            <div class="header-actions-group">
-                <button onclick="openCartDrawer()" class="upper-right-cart-btn" title="Open Shopping Bag">
-                    <i class="fas fa-shopping-bag"></i>
-                    <span>Cart</span>
-                    <div id="global-badge-counter" class="cart-badge-counter" style="display: none;">0</div>
-                </button>
-                <a href="https://wa.me" target="_blank" class="whatsapp-btn">
-                    <i class="fab fa-whatsapp" style="font-size: 16px;"></i>
-                    <span>Chat</span>
-                </a>
-            </div>
+        <div class="logo">
+            <h1>INDIAN <span>TELECOM</span></h1>
+            <p>Prop. Nadim Ahmad</p>
         </div>
+        <button class="cart-trigger" onclick="toggleCart(true)">
+            <span style="font-size: 24px;">🛍️</span>
+            <span class="cart-badge" id="cart-badge">0</span>
+        </button>
     </header>
 
-    <section class="hero">
-        <div class="container">
-            <span class="hero-tag" style="background-color: rgba(15,23,42,0.05); padding: 6px 14px; border-radius: 20px; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; display: inline-block; margin-bottom: 16px; color: var(--dark); text-transform: uppercase;">Curated Collection Store</span>
-            <h2>Premium Smartphone Accessories & Hardware</h2>
-            <p>Explore high-end audio hardware modules, multi-device fast power hubs, structural protection glasses, and elite debugging tooling setups.</p>
+    <!-- 3. PREMIUM LOOK HERO SHOWCASE -->
+    <section class="hero-banner">
+        <div class="hero-text">
+            <h2>Luxury Armor For Your Devices</h2>
+            <p>Explore an elite range of mobile components handpicked by Indian Telecom for premium drop protection and super fast performance.</p>
         </div>
+        <div style="font-size: 72px; opacity: 0.3;">🛡️</div>
     </section>
 
-    <div class="tabs-nav">
-        <div class="container tabs-flex">
-            <button onclick="filterCategory('trending')" id="tab-trending" class="tab-btn tab-active"><i class="fas fa-bolt"></i> Trending</button>
-            <button onclick="filterCategory('headphone')" id="tab-headphone" class="tab-btn"><i class="fas fa-headphones"></i> Headphones</button>
-            <button onclick="filterCategory('charger')" id="tab-charger" class="tab-btn"><i class="fas fa-charging-station"></i> Chargers</button>
-            <button onclick="filterCategory('repair')" id="tab-repair" class="tab-btn"><i class="fas fa-screwdriver"></i> Repairing & Screen Spares</button>
-        </div>
+    <!-- 4. CATEGORY HORIZONTAL FILTER -->
+    <div class="categories-container">
+        <button class="cat-btn active" onclick="filterCategory('All', this)">All Items</button>
+        <button class="cat-btn" onclick="filterCategory('Cases', this)">Premium Cases</button>
+        <button class="cat-btn" onclick="filterCategory('Chargers', this)">Fast Chargers</button>
+        <button class="cat-btn" onclick="filterCategory('Audio', this)">Wireless Audio</button>
     </div>
-    <main class="container">
-        <!-- TRENDING GENERAL CATALOG GRID FRAME -->
-        <div class="products-grid catalog-grid active-grid" id="grid-trending">
-            <!-- Driven and filled dynamically straight by Vercel KV via Client JS Loop -->
-        </div>
 
-        <!-- HEADPHONICS SPECIFIC SEGMENT GRID CONTAINER -->
-        <div class="products-grid catalog-grid" id="grid-headphone">
-            <!-- Driven and filled dynamically straight by Vercel KV via Client JS Loop -->
-        </div>
+    <!-- 5. PRODUCT DISPLAY GRID -->
+    <main id="product-grid"></main>
 
-        <!-- POWER & CHARGERS SEGMENT GRID CONTAINER -->
-        <div class="products-grid catalog-grid" id="grid-charger">
-            <!-- Driven and filled dynamically straight by Vercel KV via Client JS Loop -->
-        </div>
-
-        <!-- REPAIRING PARTS & LCD SCREEN MATRIX GRID -->
-        <div class="products-grid catalog-grid" id="grid-repair">
-            <!-- Driven and filled dynamically straight by Vercel KV via Client JS Loop -->
-        </div>
-    </main>
-    <!-- UPPER RIGHT SIDE SLIDE CART OVERLAY PANEL -->
-    <div id="cart-drawer-panel" class="cart-overlay-drawer">
+    <!-- 6. SLIDE-OUT CART PANEL -->
+    <div class="drawer-overlay" id="drawer-overlay" onclick="toggleCart(false)"></div>
+    <div class="cart-drawer" id="cart-drawer">
         <div class="drawer-header">
-            <h4><i class="fas fa-shopping-basket" style="color: var(--primary);"></i> Checkout Pipeline</h4>
-            <button onclick="closeCartDrawer()" class="drawer-close-btn" title="Close Checkout Panel">&times;</button>
+            <h3>Your Basket</h3>
+            <button class="close-btn" onclick="toggleCart(false)">❌</button>
         </div>
-        
-        <div class="drawer-body">
-            <!-- Dynamic Items Container -->
-            <div id="cart-items-list" style="margin-bottom: 24px;"></div>
-            
-            <div style="display: flex; justify-content: space-between; align-items: center; font-weight: 800; font-size: 16px; border-top: 1px solid #f1f5f9; padding-top: 18px; margin-bottom: 28px; color: var(--dark);">
+        <div class="cart-body" id="cart-items-container"></div>
+        <div class="cart-footer">
+            <div class="total-row">
                 <span>Total Payable:</span>
-                <span style="color: var(--primary); font-size:22px; font-weight:900;">₹<span id="cart-total-display">0</span></span>
+                <span id="cart-total">₹0</span>
             </div>
-
-            <!-- ENHANCED METRIC DESIGN INPUT FORM NODES -->
-            <div style="background-color: var(--bg-light); padding: 20px; border-radius: 16px; border: 1px solid #e2e8f0; margin-bottom: 16px; box-sizing: border-box;">
-                <h5 style="font-weight: 700; margin-top: 0; margin-bottom: 16px; color: var(--dark); font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;">Shipping & Verification Address</h5>
-                
-                <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px;">
-                    <input type="text" id="cust-name" placeholder="Full Name" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 13px; background-color: white; box-sizing: border-box;" required>
-                    <input type="tel" id="cust-mobile" placeholder="Active Mobile Line" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 13px; background-color: white; box-sizing: border-box;" required>
-                    <textarea id="cust-address" placeholder="Complete Doorstep Destination Address" rows="2" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 13px; font-family: inherit; background-color: white; box-sizing: border-box; resize: none;" required></textarea>
-                </div>
-
-                <div style="margin-bottom: 20px;">
-                    <label style="display: block; font-weight: 700; font-size: 11px; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">Payment Framework Gateway</label>
-                    <div style="display: flex; flex-direction: column; gap: 10px; font-size: 13px;">
-                        <label style="cursor: pointer; font-weight: 600; display:flex; align-items:center; gap:8px; margin: 0;"><input type="radio" name="pay-mode" value="COD" checked onclick="togglePaymentMode('COD')" style="accent-color:var(--dark);"> Cash on Delivery (COD)</label>
-                        <label style="cursor: pointer; font-weight: 600; display:flex; align-items:center; gap:8px; margin: 0;"><input type="radio" name="pay-mode" value="ONLINE" onclick="togglePaymentMode('ONLINE')" style="accent-color:var(--dark);"> Pay Online via Realtime UPI Node QR</label>
-                    </div>
-                </div>
-                <!-- NPCI UNIVERSAL SECURE NODE CONTAINER -->
-                <div id="qr-display-block" style="display: none; text-align: center; background: white; padding: 20px; border: 1px solid #bfdbfe; background-color:#eff6ff; border-radius: 12px; margin-bottom: 20px; box-sizing: border-box;">
-                    <p style="font-size: 11px; font-weight: 700; color: #1e40af; margin-top: 0; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">📲 Scan with Any Banking App</p>
-                    <div style="background: #ffffff; display: inline-block; padding: 10px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
-                        <div id="upi-qr-image" style="width: 160px; height: 160px; display: flex; align-items: center; justify-content: center; margin: 0 auto;"></div>
-                    </div>
-                    <p style="font-size: 15px; font-weight: 800; color: #065f46; margin-top: 12px; margin-bottom: 0;">Amount Locked: ₹<span id="qr-amount-meta">0</span></p>
-                </div>
-
-                <button onclick="placeRetailOrder()" class="submit-btn">
-                    <i class="fab fa-whatsapp"></i> Complete Order via WhatsApp
-                </button>
-            </div>
+            <button class="checkout-trigger" onclick="openCheckout()">Proceed to Checkout</button>
         </div>
     </div>
 
-    <footer>
-        <div class="container footer-grid">
-            <div>
-                <h5>Indian Telecom</h5>
-                <p>Premium grade micro-spares, hardware deployment equipment, protective layout glass sheets, and high fidelity acoustics distribution pipelines since 2018.</p>
+    <!-- 7. CHECKOUT MODAL -->
+    <div class="modal" id="checkout-modal">
+        <div class="modal-content">
+            <div class="drawer-header" style="padding: 0 0 16px 0; margin-bottom: 20px;">
+                <h3>Delivery Details</h3>
+                <button class="close-btn" onclick="closeCheckout()">❌</button>
             </div>
-            <div>
-                <h5>Operational Core Base</h5>
-                <p style="margin-bottom: 8px;"><i class="fas fa-map-marker-alt" style="color: var(--primary); margin-right: 8px;"></i> Near Bhatti Chowk, Rajnagar, Madhubani, Bihar - 847235</p>
-                <p><i class="fas fa-phone-alt" style="color: var(--primary); margin-right: 8px;"></i> +91 9718439786</p>
-            </div>
+            <form id="order-form" onsubmit="submitOrder(event)">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="cust-name" required>
+                </div>
+                <div class="form-group">
+                    <label>Mobile Number</label>
+                    <input type="tel" id="cust-phone" pattern="[0-9]{10}" placeholder="10-digit smartphone number" required>
+                </div>
+                <div class="form-group">
+                    <label>Complete Address</label>
+                    <textarea id="cust-address" rows="3" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Mode of Payment (MOP)</label>
+                    <div class="radio-grid">
+                        <label class="radio-label">
+                            <input type="radio" name="mop" value="COD" checked onclick="togglePaymentMode('COD')"> Cash on Delivery
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="mop" value="ONLINE" onclick="togglePaymentMode('ONLINE')"> Instant UPI
+                        </label>
+                    </div>
+                </div>
+
+                <!-- UPI CONTAINER HUB -->
+                <div id="qr-section">
+                    <div class="qr-placeholder">
+                        <img src="https://qrserver.com" alt="UPI QR">
+                    </div>
+                    <p style="font-size: 13px; font-weight: 700; color: #2563eb; margin-bottom: 12px;">Merchant ID: exple@ybl</p>
+                    <div class="form-group" style="text-align: left;">
+                        <label>Enter 12-Digit Bank UTR Number</label>
+                        <input type="text" id="pay-utr" placeholder="Enter Reference ID after paying">
+                    </div>
+                </div>
+
+                <button type="submit" class="checkout-trigger" style="margin-top: 15px; background: #0f172a;">Confirm & Place Order</button>
+            </form>
         </div>
-        <div class="container footer-bottom">&copy; 2026 Indian Telecom Premium Store. Registered Universal Payment Gateway Infrastructure Node.</div>
-    </footer>
+    </div>
 
-    <!-- Dependency scripts compilation libraries (QRCode generation fallback engine) -->
-    <script src="https://cloudflare.com"></script>
+    <!-- 8. WHATSAPP SUPPORT BRIDGE -->
+    <a href="https://wa.me" target="_blank" class="whatsapp-float">
+        <span style="font-size: 30px;">💬</span>
+    </a>
+    <!-- 9. RUNTIME INTERACTION CONTROLLER -->
     <script>
+        const productsList = [
+            { id: "p1", name: "Premium Carbon MagSafe Shield", category: "Cases", price: 1899, discountPrice: 1199, icon: "📱" },
+            { id: "p2", name: "65W GaN Super Fast Charger", category: "Chargers", price: 2499, discountPrice: 1649, icon: "🔌" },
+            { id: "p3", name: "Studio Pro ANC Neckband", category: "Audio", price: 2999, discountPrice: 1999, icon: "🎧" },
+            { id: "p4", name: "Liquid Velvet Silicone Case", category: "Cases", price: 999, discountPrice: 499, icon: "📲" }
+        ];
+
         let cart = [];
-        const contactWhatsAppNumber = "919718439786";
 
-        // GLOBAL DYNAMIC INVOKER ON ENGINE INITIALIZATION
-        window.addEventListener('DOMContentLoaded', async () => {
-            await syncInventoryCatalog();
-            if(typeof filterCategory === 'function') filterCategory('trending');
-        });
-
-                // 1. DATA EXCHANGE PIPELINE: FETCH SERVER CATALOG LIVE STRAIGHT FROM UPSTASH
-                // 1. DATA EXCHANGE PIPELINE: FETCH SERVER CATALOG LIVE STRAIGHT FROM UPSTASH
-        async function syncInventoryCatalog() {
-            try {
-                const response = await fetch('/api/products');
-                const catalog = await response.json();
-                
-                const segmentGrids = {
-                    'trending': document.getElementById('grid-trending'),
-                    'headphone': document.getElementById('grid-headphone'),
-                    'charger': document.getElementById('grid-charger'),
-                    'repair': document.getElementById('grid-repair')
-                };
-
-                // Clear out all layout panels clean before rendering freshly
-                Object.values(segmentGrids).forEach(grid => { if(grid) grid.innerHTML = ''; });
-
-                if(!catalog || catalog.length === 0) {
-                    Object.keys(segmentGrids).forEach(catKey => {
-                        if(segmentGrids[catKey]) {
-                            segmentGrids[catKey].innerHTML = `
-                                <div style="grid-column:1/-1; text-align:center; padding:64px 0; color:var(--text-muted);">
-                                    <i class="fas fa-boxes" style="font-size:32px; margin-bottom:12px; opacity:0.5;"></i>
-                                    <p style="margin:0; font-size:13px; font-weight:600;">No items found under this group tier yet.</p>
-                                </div>`;
-                        }
-                    });
-                    return;
-                }
-
-                catalog.forEach(item => {
-                    // 🌟 CRITICAL PRODUCTION FIX: Select target grid strictly according to individual item category
-                    const gridTarget = segmentGrids[item.category];
-                    if (!gridTarget) return; // Skips processing if no matching wrapper is active
-
-                    const badgeMarkup = item.badge ? `<span class="card-badge">${item.badge}</span>` : '';
-                    const strikeMarkup = item.strikePrice ? `<span class="price-strike">₹${parseInt(item.strikePrice).toLocaleString('en-IN')}</span>` : '';
-
-                    const cardBlueprint = `
-                        <div class="product-card" data-server-id="${item.id}">
-                            <div class="card-media">
-                                ${badgeMarkup}
-                                <img src="${item.imageUrl}" alt="${item.title}">
-                            </div>
-                            <div class="card-content">
-                                <div>
-                                    <span class="card-tag">${item.tag}</span>
-                                    <h4 class="card-title">${item.title}</h4>
-                                </div>
-                                <div>
-                                    <div class="card-pricing">
-                                        <span class="price-current">₹${parseInt(item.currentPrice).toLocaleString('en-IN')}</span>
-                                        ${strikeMarkup}
-                                    </div>
-                                    <button onclick="addToCart('${item.title.replace(/'/g, "\\'")}', ${item.currentPrice})" class="buy-btn">
-                                        <i class="fas fa-plus"></i> Add to Cart
-                                    </button>
-                                </div>
-                            </div>
+        function renderProducts(items) {
+            const grid = document.getElementById("product-grid");
+            grid.innerHTML = items.map(item => `
+                <div class="product-card">
+                    <div class="img-container">
+                        <span class="save-tag">Save ₹${item.price - item.discountPrice}</span>
+                        <div style="font-size: 54px;">${item.icon}</div>
+                    </div>
+                    <div class="product-info">
+                        <p>${item.category}</p>
+                        <h4>${item.name}</h4>
+                        <div class="price-row">
+                            <span class="disc-price">₹${item.discountPrice}</span>
+                            <span class="orig-price">₹${item.price}</span>
                         </div>
-                    `;
-                    // Push the product card ONLY into its matching filtered category tab layout container
-                    gridTarget.insertAdjacentHTML('beforeend', cardBlueprint);
-                });
-
-                // 🌟 ADVANCED SECTOR ISOLATION FILLER: If a tab doesn't have any items, render an empty state text
-                Object.keys(segmentGrids).forEach(catKey => {
-                    if (segmentGrids[catKey] && segmentGrids[catKey].children.length === 0) {
-                        segmentGrids[catKey].innerHTML = `
-                            <div style="grid-column:1/-1; text-align:center; padding:64px 0; color:var(--text-muted);">
-                                <i class="fas fa-boxes" style="font-size:32px; margin-bottom:12px; opacity:0.5;"></i>
-                                <p style="margin:0; font-size:13px; font-weight:600;">No items found under this group tier yet.</p>
-                            </div>`;
-                    }
-                });
-
-            } catch (err) {
-                console.error("Critical System Warning: Cloud asset execution sync collapsed.", err);
-            }
-        }
-        // 2. PREMIUM CATEGORY PILL FILTER NAVIGATION MATRIX
-                // 2. PREMIUM CATEGORY PILL FILTER NAVIGATION MATRIX
-        function filterCategory(targetCategory) {
-            // 🌟 FIXED: We force-override CSS styles by removing the active class and applying an important flag
-            document.querySelectorAll('.catalog-grid').forEach(grid => { 
-                grid.style.setProperty('display', 'none', 'important'); 
-                grid.classList.remove('active-grid');
-            });
-            document.querySelectorAll('.tab-btn').forEach(btn => { btn.classList.remove('tab-active'); });
-
-            const targetElement = document.getElementById('grid-' + targetCategory);
-            if(targetElement) {
-                // 🌟 FIXED: Forcing the chosen grid to show up explicitly as a grid layout override
-                targetElement.style.setProperty('display', 'grid', 'important');
-                targetElement.classList.add('active-grid');
-            }
-            
-            const activeTab = document.getElementById('tab-' + targetCategory);
-            if(activeTab) activeTab.classList.add('tab-active');
+                        <button class="bag-btn" onclick="addToCart('${item.id}')">
+                            ➕ Add To Bag
+                        </button>
+                    </div>
+                </div>
+            `).join('');
         }
 
-        // 3. COMPLETE ACTIVE SHOPPING BAG DATA CALCULATORS
-        function openCartDrawer() {
-            document.getElementById('cart-drawer-panel').classList.add('cart-overlay-active');
-            document.getElementById('cart-backdrop').classList.add('backdrop-active');
+        function filterCategory(cat, btn) {
+            document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            if(cat === 'All') return renderProducts(productsList);
+            renderProducts(productsList.filter(p => p.category === cat));
         }
 
-        function closeCartDrawer() {
-            document.getElementById('cart-drawer-panel').classList.remove('cart-overlay-active');
-            document.getElementById('cart-backdrop').classList.remove('backdrop-active');
-        }
-
-        function addToCart(name, price) {
-            let existingItem = cart.find(item => item.name === name);
-            if (existingItem) {
-                existingItem.qty += 1;
-            } else {
-                cart.push({ name: name, price: parseInt(price), qty: 1 });
-            }
-            updateCartUI();
-            openCartDrawer();
-        }
-        function removeFromCart(name) {
-            cart = cart.filter(item => item.name !== name);
+        function addToCart(id) {
+            const item = productsList.find(p => p.id === id);
+            const exists = cart.find(c => c.id === id);
+            if(exists) { exists.qty++ } else { cart.push({...item, qty: 1}) }
             updateCartUI();
         }
 
         function updateCartUI() {
-            const listDisplay = document.getElementById('cart-items-list');
-            const badgeCounter = document.getElementById('global-badge-counter');
-            let totalItems = 0, totalAmount = 0;
-            listDisplay.innerHTML = '';
-
-            cart.forEach(item => {
-                let itemTotal = item.price * item.qty;
-                totalAmount += itemTotal;
-                totalItems += item.qty;
-                listDisplay.innerHTML += `
-                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px dashed #e2e8f0; font-size: 13px;">
-                        <div><strong style="color:var(--dark);">${item.name}</strong><br><span style="color:var(--text-muted); font-size:11px;">Qty: ${item.qty} x ₹${item.price.toLocaleString('en-IN')}</span></div>
-                        <div style="display:flex; align-items:center; gap:8px;"><span style="font-weight:700; color:var(--dark);">₹${itemTotal.toLocaleString('en-IN')}</span><button onclick="removeFromCart('${item.name.replace(/'/g, "\\'")}')" style="background:none; border:none; color:#ef4444; cursor:pointer; padding:4px;"><i class="fas fa-trash-alt"></i></button></div>
-                    </div>`;
-            });
-
-            badgeCounter.innerText = totalItems;
-            badgeCounter.style.display = totalItems > 0 ? 'flex' : 'none';
-            if (totalItems === 0) listDisplay.innerHTML = '<p style="text-align: center; color: var(--text-muted); padding: 24px 0; font-size:13px;">Your bag is currently empty.</p>';
+            const badge = document.getElementById("cart-badge");
+            const totalStr = document.getElementById("cart-total");
+            const count = cart.reduce((acc, current) => acc + current.qty, 0);
+            const total = cart.reduce((acc, current) => acc + (current.discountPrice * current.qty), 0);
             
-            document.getElementById('cart-total-display').innerText = totalAmount.toLocaleString('en-IN');
-            if (document.querySelector('input[name="pay-mode"]:checked')?.value === 'ONLINE') generateDynamicUPIQR(totalAmount);
+            badge.innerText = count;
+            totalStr.innerText = `₹${total}`;
+            
+            const container = document.getElementById("cart-items-container");
+            if(cart.length === 0) {
+                container.innerHTML = `<p style="text-align:center;color:#94a3b8;padding:40px 0;">Your basket is empty</p>`;
+                return;
+            }
+            
+            container.innerHTML = cart.map(i => `
+                <div class="cart-item">
+                    <div class="cart-item-img" style="font-size:24px;">${i.icon}</div>
+                    <div style="flex:1;">
+                        <h5 style="font-size:14px;font-weight:700;">${i.name}</h5>
+                        <p style="font-size:12px;color:#64748b;">₹${i.discountPrice} × ${i.qty}</p>
+                    </div>
+                    <button style="border:none;background:none;font-size:16px;cursor:pointer;" onclick="removeItem('${i.id}')">🗑️</button>
+                </div>
+            `).join('');
         }
-        // 4. INSTANT LOCAL PILL TOGGLE CONTROLLERS
-        function togglePaymentMode(mode) {
-            const qrBlock = document.getElementById('qr-display-block');
-            if (mode === 'ONLINE') {
-                let currentRawTotal = document.getElementById('cart-total-display').innerText.replace(/,/g, '');
-                let total = parseInt(currentRawTotal) || 0;
-                generateDynamicUPIQR(total);
-                qrBlock.style.display = 'block';
+
+        function removeItem(id) {
+            cart = cart.filter(c => c.id !== id);
+            updateCartUI();
+        }
+
+        function toggleCart(show) {
+            const drawer = document.getElementById("cart-drawer");
+            const overlay = document.getElementById("drawer-overlay");
+            if(show) {
+                overlay.style.display = "block";
+                setTimeout(() => drawer.style.transform = "translateX(0)", 10);
             } else {
-                qrBlock.style.display = 'none';
+                drawer.style.transform = "translateX(100%)";
+                setTimeout(() => overlay.style.display = "none", 300);
             }
         }
 
-        // 5. DEEP-LINKED NPCI COMPLIANT UPI QR RENDER ENGINE (Fixed Fallback URL Syntaxes)
-        function generateDynamicUPIQR(amount) {
-            let upiString = `upi://pay?pa=9718439786@ybl&pn=Indian%20Telecom&mc=5732&tr=IT${Date.now()}&tn=Accessories%20Purchase&am=${amount}&cu=INR`;
-            const qrContainer = document.getElementById('upi-qr-image');
-            if (!qrContainer) return;
-            qrContainer.innerHTML = ''; 
-            try {
-                new QRCode(qrContainer, { text: upiString, width: 160, height: 160, colorDark: "#0f172a", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.M });
-            } catch (e) {
-                qrContainer.innerHTML = `<img src="https://cdn.jsdelivr.net/npm/easyqrcodejs@4.6.2/dist/easy.qrcode.min.js" style="width:160px; height:160px; display:block; margin:0 auto;">`;
+        function openCheckout() {
+            if(cart.length === 0) return alert("Add items to your cart first!");
+            document.getElementById("checkout-modal").style.display = "flex";
+        }
+        function closeCheckout() { document.getElementById("checkout-modal").style.display = "none"; }
+
+        function togglePaymentMode(mode) {
+            const qrSection = document.getElementById("qr-section");
+            const utrInput = document.getElementById("pay-utr");
+            if(mode === 'ONLINE') {
+                qrSection.style.display = "block";
+                utrInput.setAttribute("required", "required");
+            } else {
+                qrSection.style.display = "none";
+                utrInput.removeAttribute("required");
             }
-            document.getElementById('qr-amount-meta').innerText = amount.toLocaleString('en-IN');
         }
 
-               // 6. MASTER LIVE CONVERSION ORDER LOG TRACKER ROUTE DISPATCHER
-        async function placeRetailOrder() {
-            if (cart.length === 0) { alert("Please collect products into your bag before checking out."); return; }
-            const name = document.getElementById('cust-name').value.trim();
-            const mobile = document.getElementById('cust-mobile').value.trim();
-            const address = document.getElementById('cust-address').value.trim();
-            const mode = document.querySelector('input[name="pay-mode"]:checked')?.value || 'COD';
-
-            if (!name || !mobile || !address) { alert("Please complete name, mobile, and doorstep address parameters."); return; }
-
-            // 🌟 COMPUTE EXTENDED ARRAY SCHEMAS FOR REAL-TIME BACKEND LOGGING
-            let loggedItemsPayload = cart.map(item => {
-                const cardNode = document.querySelector(`[title="${item.name.replace(/'/g, "\\'")}"]`) || 
-                                 document.querySelector(`.product-card`);
-                const resolvedUniqueServerId = cardNode ? cardNode.closest('.product-card')?.getAttribute('data-server-id') : 'prod_unknown';
-                return {
-                    id: resolvedUniqueServerId,
-                    name: item.name,
-                    qty: item.qty
-                };
-            });
-
-            let total = 0;
-            cart.forEach(item => total += item.price * item.qty);
-
-            // 🌟 ASYNCHRONOUS BACKGROUND API TRANSMISSION INTERCEPTOR
-            try {
-                await fetch('/api/place-order', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        name, mobile, address, mode, total, items: loggedItemsPayload
-                    })
-                });
-            } catch(e) {
-                console.error("Order background log buffer delayed.");
+        function submitOrder(e) {
+            e.preventDefault();
+            const mode = document.querySelector('input[name="mop"]:checked').value;
+            if(mode === 'ONLINE' && document.getElementById("pay-utr").value.trim().length < 6) {
+                alert("Please enter a valid banking UTR reference number.");
+                return;
             }
-
-            // Standard WhatsApp API message generation link dispatch
-            let orderText = `🛍️ *NEW PREMIUM LOT ORDER - INDIAN TELECOM*\n\n👤 *Customer Details:*\nName: ${name}\nPhone: ${mobile}\n📍 Address: ${address}\n\n📦 *Items Matrix:*`;
-            cart.forEach(item => { orderText += `\n▪️ ${item.name} (x${item.qty}) = ₹${(item.price * item.qty).toLocaleString('en-IN')}`; });
-            orderText += `\n\n💵 *Total Final Bill:* ₹${total.toLocaleString('en-IN')}\n💳 *Payment Mode:* ${mode === 'COD' ? '💰 Cash On Delivery' : '✅ Transferred Online via Secure App QR'}`;
-
-            // FIXED: Corrected official structural connection link URL path string
-            window.open(`https://whatsapp.com{contactWhatsAppNumber}&text=${encodeURIComponent(orderText)}`, '_blank');
+            alert("Order Registered Successfully!\nProprietor Team (Nadim Ahmad) will review database arrays.");
+            cart = [];
+            updateCartUI();
+            closeCheckout();
+            toggleCart(false);
+            document.getElementById("order-form").reset();
+            togglePaymentMode('COD');
         }
 
-        // SECRET SYSTEM ADMIN COMBINATION GATED BACKDOOR ROUTE (Ctrl + Shift + A)
-        window.addEventListener('keydown', (e) => {
-            if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'a') {
-                e.preventDefault();
-                window.location.href = `/master-admin-console`;
-            }
-        });
+        window.onload = () => renderProducts(productsList);
     </script>
 </body>
 </html>
+
