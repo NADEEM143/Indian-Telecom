@@ -181,31 +181,44 @@
         </div>
     </div>
 
-    <!-- 8. WHATSAPP SUPPORT BRIDGE -->
-    <a href="https://wa.me" target="_blank" class="whatsapp-float">
-        <span style="font-size: 30px;">💬</span>
-    </a>
-    <!-- 9. RUNTIME INTERACTION CONTROLLER -->
-    <script>
-        const productsList = [
-            { id: "p1", name: "Premium Carbon MagSafe Shield", category: "Cases", price: 1899, discountPrice: 1199, icon: "📱" },
-            { id: "p2", name: "65W GaN Super Fast Charger", category: "Chargers", price: 2499, discountPrice: 1649, icon: "🔌" },
-            { id: "p3", name: "Studio Pro ANC Neckband", category: "Audio", price: 2999, discountPrice: 1999, icon: "🎧" },
-            { id: "p4", name: "Liquid Velvet Silicone Case", category: "Cases", price: 999, discountPrice: 499, icon: "📲" }
-        ];
-
+          const API_BASE_ENDPOINT = '/api';
+        let productsList = [];
         let cart = [];
+
+        async function fetchLiveInventory() {
+            try {
+                // Fetch dynamic items directly from your live Vercel KV cloud database mapping
+                const response = await fetch(`${API_BASE_ENDPOINT}/admin?type=products`);
+                if (response.ok) {
+                    const databaseItems = await response.json();
+                    // Filters out any unlisted or disabled products deactivated inside admin controls
+                    productsList = databaseItems.filter(item => item.isLive !== false);
+                } else {
+                    console.error("Backend repository streaming validation warning.");
+                }
+                renderProducts(productsList);
+            } catch (err) {
+                console.error("Inventory sync pipeline execution crash:", err.message);
+            }
+        }
 
         function renderProducts(items) {
             const grid = document.getElementById("product-grid");
+            if (!grid) return;
+            
+            if (items.length === 0) {
+                grid.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding: 40px; color:#94a3b8; font-weight:bold;">Welcome to Indian Telecom! New mobile accessories are arriving shortly. Stay tuned!</div>`;
+                return;
+            }
+
             grid.innerHTML = items.map(item => `
                 <div class="product-card">
                     <div class="img-container">
                         <span class="save-tag">Save ₹${item.price - item.discountPrice}</span>
-                        <div style="font-size: 54px;">${item.icon}</div>
+                        ${item.asset ? `<img src="${item.asset}" style="width:100%;height:100%;object-fit:cover;border-radius:14px;">` : `<div style="font-size: 54px;">📱</div>`}
                     </div>
                     <div class="product-info">
-                        <p>${item.category}</p>
+                        <p>${item.category || 'Accessory'}</p>
                         <h4>${item.name}</h4>
                         <div class="price-row">
                             <span class="disc-price">₹${item.discountPrice}</span>
@@ -250,7 +263,7 @@
             
             container.innerHTML = cart.map(i => `
                 <div class="cart-item">
-                    <div class="cart-item-img" style="font-size:24px;">${i.icon}</div>
+                    <div class="cart-item-img" style="font-size:24px;">${i.asset ? `<img src="${i.asset}" style="width:100%;height:100%;object-fit:cover;border-radius:10px;">` : '📱'}</div>
                     <div style="flex:1;">
                         <h5 style="font-size:14px;font-weight:700;">${i.name}</h5>
                         <p style="font-size:12px;color:#64748b;">₹${i.discountPrice} × ${i.qty}</p>
@@ -295,24 +308,55 @@
             }
         }
 
-        function submitOrder(e) {
+        async function submitOrder(e) {
             e.preventDefault();
             const mode = document.querySelector('input[name="mop"]:checked').value;
-            if(mode === 'ONLINE' && document.getElementById("pay-utr").value.trim().length < 6) {
+            const utrNum = document.getElementById("pay-utr").value.trim();
+            
+            if(mode === 'ONLINE' && utrNum.length < 6) {
                 alert("Please enter a valid banking UTR reference number.");
                 return;
             }
-            alert("Order Registered Successfully!\nProprietor Team (Nadim Ahmad) will review database arrays.");
-            cart = [];
-            updateCartUI();
-            closeCheckout();
-            toggleCart(false);
-            document.getElementById("order-form").reset();
-            togglePaymentMode('COD');
+
+            const freshCheckoutOrder = {
+                id: "ORD-" + Math.floor(1000 + Math.random() * 9000),
+                name: document.getElementById("cust-name").value,
+                phone: document.getElementById("cust-phone").value,
+                address: document.getElementById("cust-address").value,
+                mop: mode,
+                utr: mode === 'ONLINE' ? utrNum : 'N/A'
+            };
+
+            try {
+                const existingOrdersResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=orders`);
+                let existingOrdersList = [];
+                if (existingOrdersResponse.ok) {
+                    existingOrdersList = await existingOrdersResponse.json();
+                }
+
+                existingOrdersList.push(freshCheckoutOrder);
+
+                await fetch(`${API_BASE_ENDPOINT}/admin?type=orders`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(existingOrdersList)
+                });
+
+                alert("Order Registered Successfully! Nadim Ahmad will review your verification parameters.");
+                cart = [];
+                updateCartUI();
+                closeCheckout();
+                toggleCart(false);
+                document.getElementById("order-form").reset();
+                togglePaymentMode('COD');
+            } catch (networkError) {
+                alert("Checkout connection failed. Try resubmitting parameters.");
+            }
         }
 
-        window.onload = () => renderProducts(productsList);
+        window.onload = () => fetchLiveInventory();
     </script>
 </body>
 </html>
+
 
