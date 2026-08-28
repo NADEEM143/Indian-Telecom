@@ -315,16 +315,18 @@ module.exports = async (req, res) => {
             <div class="form-group">
                 <label>Initial Available Stock Quantity</label>
                 <input type="number" id="stockCount" class="input-box" value="50" min="0" required>
-           </div>
+         </div>
             <div class="form-group">
                 <label>Product Image Asset</label>
+                <!-- Hidden native picker input element moved safely outside to kill looping bugs -->
+                <input type="file" id="fileInp" style="display:none;" accept="image/*" multiple>
+                
                 <div class="dropzone-box" onclick="document.getElementById('fileInp').click()">
                     <i class="fas fa-images" style="font-size:24px; color:#64748b; margin-bottom:6px;"></i>
                     <p id="upload-prompt" style="margin:0; font-size:12px; color:#64748b;">Click to upload product image file</p>
-                    <input type="file" id="fileInp" style="display:none;" accept="image/*" multiple>
                     
                     <!-- Fixed Multi-Image Preview Container Zone Grid Allocation -->
-                    <div id="gallery-preview-strip" class="gallery-preview-strip"></div>
+                    <div id="gallery-preview-strip" class="gallery-preview-strip" onclick="event.stopPropagation();"></div>
                 </div>
             </div>
             <button type="submit" id="submit-btn" class="submit-trigger"><i class="fas fa-plus"></i> Synchronize Item</button>
@@ -353,8 +355,8 @@ module.exports = async (req, res) => {
         }
     }
 
-    // 🌟 FULLY ESCAPED MULTI-FILE CANVAS COMPRESSION: Process multiple gallery assets concurrently
-    document.getElementById('fileInp').onchange = function() {
+        // 🌟 COMPLETE REPLACE: Put this exact block over your old fileInp.onchange function
+    document.getElementById('fileInp').addEventListener('change', function(event) {
         if (!this.files || this.files.length === 0) return;
         
         const files = Array.from(this.files);
@@ -363,7 +365,7 @@ module.exports = async (req, res) => {
         const previewStrip = document.getElementById('gallery-preview-strip');
         const promptText = document.getElementById('upload-prompt');
         
-        // Clear previous selections safely
+        // Wipe pre-existing layouts clean to start fresh
         previewStrip.innerHTML = '';
         trackingGalleryArray = [];
 
@@ -387,17 +389,18 @@ module.exports = async (req, res) => {
                     
                     const itemIndex = trackingGalleryArray.length - 1;
                     
-                    // 🔒 ESCAPED STRINGS: Properly bypassed backticks to protect Vercel engine compilation loops
+                    // Escaped HTML block to bypass Vercel string interpolation server crashes
                     const nodePreviewHtml = 
                         '<div class="preview-thumbnail-container" id="gallery-node-' + itemIndex + '">' +
                             '<img src="' + singleBase64 + '" class="preview-thumbnail" style="display:block;">' +
-                            '<button type="button" class="remove-asset-node" onclick="removeNodeFromUpload(' + itemIndex + ')">✕</button>' +
+                            '<button type="button" class="remove-asset-node" onclick="removeNodeFromUpload(' + itemIndex + '); event.stopPropagation();">✕</button>' +
                         '</div>';
                         
                     previewStrip.insertAdjacentHTML('beforeend', nodePreviewHtml);
                     
                     countProcessed++;
                     if(countProcessed === files.length) {
+                        // Merges multiple pictures into base64ImagePayload for the form submit handler
                         base64ImagePayload = trackingGalleryArray.filter(Boolean).join('|||');
                         promptText.innerText = files.length + " Gallery Assets Uploaded!";
                     }
@@ -406,7 +409,7 @@ module.exports = async (req, res) => {
             reader.readAsDataURL(file);
         });
         promptText.style.display = 'none';
-    };
+    });
 
     function removeNodeFromUpload(index) {
         const node = document.getElementById('gallery-node-' + index);
