@@ -261,9 +261,6 @@ module.exports = async (req, res) => {
     </style>
 </head>
 <body>
-// =========================================================================
-// 🧩 PIECE 7 OF 11: TOP HEADER METRICS STRIP AND FORMS BLOCK LAYOUT
-// =========================================================================
 <div style="max-width:1450px; margin:0 auto 28px auto; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
     <div>
         <h1 style="margin:0; font-size:26px; font-weight:900;">Master System Control Terminal</h1>
@@ -316,7 +313,6 @@ module.exports = async (req, res) => {
             </div>
             <div class="form-group">
                 <label>Product Image Asset</label>
-                <!-- Hidden input placed outside to prevent double clicking looping selection bugs -->
                 <input type="file" id="fileInp" style="display:none;" accept="image/*" multiple>
                 
                 <div class="dropzone-box" onclick="document.getElementById('fileInp').click()">
@@ -330,9 +326,7 @@ module.exports = async (req, res) => {
             <button type="button" id="cancel-edit-btn" onclick="resetFormState()" style="display:none; width:100%; margin-top:8px; padding:12px; background:#64748b; color:white; border:none; border-radius:12px; font-weight:700; cursor:pointer; text-transform:uppercase; font-size:13px;">Cancel Edit</button>
         </form>
     </div>
-// =========================================================================
-// 🧩 PIECE 8 OF 11: DATA TABLES ALLOCATIONS AND LAYOUT SHEETS WRAPPER
-// =========================================================================
+
     <div style="display:flex; flex-direction:column; width:100%; min-width:0;">
         <div class="table-card">
             <h3 style="margin-top:0; text-transform:uppercase; font-size:13px; color:#475569; letter-spacing:0.5px;">Live Catalog Inventory Array</h3>
@@ -350,8 +344,7 @@ module.exports = async (req, res) => {
             <table>
                 <thead>
                     <tr><th>Order Code</th><th>Customer Shipping Particulars</th><th>Items Staged</th><th>Total Payable</th><th>Status</th><th style="text-align:center;">Fulfillment Switch</th></tr>
-                </thead>
-                <tbody id="orders-table-body">
+                               <tbody id="orders-table-body">
                     <tr><td colspan="6" style="text-align:center; padding:30px; color:#64748b;">Loading active data streams...</td></tr>
                 </tbody>
             </table>
@@ -359,7 +352,8 @@ module.exports = async (req, res) => {
     </div>
 </div>
 `);
-        }
+        } // 🔒 Correctly closes the HTML GET method block only
+
         // =========================================================================
         // 🧩 PIECE 9 OF 11: SCRIPT MATRIX INITIALIZER & MULTI-IMAGE CANVAS CODE
         // =========================================================================
