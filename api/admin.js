@@ -404,8 +404,7 @@ module.exports = async (req, res) => {
                     const ctx = canvas.getContext('2d');
                     let width = img.width; 
                     let height = img.height;
-                    
-                    if (width > 800) { height *= 800 / width; width = 800; }
+                                       if (width > 800) { height *= 800 / width; width = 800; }
                     canvas.width = width; canvas.height = height;
                     ctx.drawImage(img, 0, 0, width, height);
                     
@@ -426,6 +425,7 @@ module.exports = async (req, res) => {
                     countProcessed++;
                     if(countProcessed === files.length) {
                         base64ImagePayload = trackingGalleryArray.filter(Boolean).join('|||');
+                        promptText.style.display = 'block'; // 🌟 THE VISIBILITY FIX: Forces the prompt layout block text container back to visible display modes
                         promptText.innerText = files.length + " Gallery Assets Uploaded!";
                     }
                 };
@@ -434,7 +434,6 @@ module.exports = async (req, res) => {
         });
         promptText.style.display = 'none';
     };
-
     function removeNodeFromUpload(index) {
         const node = document.getElementById('gallery-node-' + index);
         if(node) node.remove();
@@ -449,7 +448,7 @@ module.exports = async (req, res) => {
     // =========================================================================
     // 🧩 PIECE 10 OF 12: PRODUCTS DISPLAY CONCAT MATRIX ENGINE LOOKUPS
     // =========================================================================
-    function renderProductsTable(products) {
+        function renderProductsTable(products) {
         const tbody = document.getElementById('products-table-body');
         if(!products || products.length === 0) {
             tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:40px; color:#64748b;">No inventory data records active.</td></tr>';
@@ -459,7 +458,9 @@ module.exports = async (req, res) => {
             const count = p.stockCount || 0;
             const status = p.stockStatus || 'OUTOFSTOCK';
             let path = p.imageUrl || p.imageAsset || '';
-            let finalThumb = path.includes('|||') ? path.split('|||') : path;
+            
+            // 🌟 SELECT FIRST IMAGE EXTRACTOR: Extracts the primary image reference token out of the string bundle sequence accurately
+            let finalThumb = path.includes('|||') ? path.split('|||')[0] : path;
 
             return '<tr>' +
                 '<td><img src="' + finalThumb + '" style="width:44px; height:44px; object-fit:contain; border-radius:6px; border:1px solid #e2e8f0; background:#fafafa;"></td>' +
@@ -501,7 +502,7 @@ module.exports = async (req, res) => {
     // =========================================================================
     // 🧩 PIECE 12 OF 12: METRIC EMITTERS, EXPORTERS, & SERVERLESS RUNTIME CLOSURES
     // =========================================================================
-    function triggerLocalEdit(targetId) {
+       function triggerLocalEdit(targetId) {
         const product = localProductCacheMemory.find(item => item.id === targetId);
         if(!product) return;
 
@@ -518,6 +519,8 @@ module.exports = async (req, res) => {
         
         const previewStrip = document.getElementById('gallery-preview-strip');
         previewStrip.innerHTML = '';
+        
+        // 🌟 THE HOOK FIX: Unpacks multi-image sequences cleanly back into individual preview arrays
         trackingGalleryArray = base64ImagePayload.includes('|||') ? base64ImagePayload.split('|||') : [base64ImagePayload];
 
         if(base64ImagePayload) {
@@ -526,7 +529,7 @@ module.exports = async (req, res) => {
                 previewStrip.innerHTML += 
                     '<div class="preview-thumbnail-container" id="gallery-node-' + idx + '">' +
                         '<img src="' + src + '" class="preview-thumbnail" style="display:block;">' +
-                        '<button type="button" class="remove-asset-node" onclick="removeNodeFromUpload(' + idx + ')">✕</button>' +
+                        '<button type="button" class="remove-asset-node" onclick="removeNodeFromUpload(' + idx + '); event.stopPropagation();">✕</button>' +
                     '</div>';
             });
             document.getElementById('upload-prompt').style.display = 'none';
@@ -540,7 +543,6 @@ module.exports = async (req, res) => {
         document.getElementById('cancel-edit-btn').style.display = "block";
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-
     function resetFormState() {
         document.getElementById('itemDeployForm').reset();
         document.getElementById('edit-id').value = "";
