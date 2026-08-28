@@ -211,11 +211,51 @@ module.exports = async (req, res) => {
         .input-box { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; box-sizing: border-box; font-size: 14px; }
         .dropzone-box { border: 2px dashed #94a3b8; border-radius: 12px; padding: 20px; text-align: center; cursor: pointer; background: #f8fafc; position: relative; }
         
-        /* Multi-Image Gallery Asset Render Strip Palette Grid Layout */
-        .gallery-preview-strip { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; justify-content: center; }
-        .preview-thumbnail-container { width: 72px; height: 72px; position: relative; border: 1px solid var(--border); border-radius: 8px; background: white; overflow: hidden; }
-        .preview-thumbnail { width: 100%; height: 100%; object-fit: contain; }
-        .remove-asset-node { position: absolute; top: 2px; right: 2px; background: var(--danger); color: white; border: none; border-radius: 50%; width: 16px; height: 16px; font-size: 9px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 900; }
+                /* Multi-Image Gallery Asset Render Strip Palette Grid Layout */
+        .gallery-preview-strip { 
+            display: flex !important; 
+            gap: 8px !important; 
+            flex-wrap: wrap !important; 
+            margin-top: 12px !important; 
+            justify-content: center !important; 
+            width: 100% !important;
+            box-sizing: border-box !important;
+        }
+        .preview-thumbnail-container { 
+            width: 72px !important; 
+            height: 72px !important; 
+            position: relative !important; 
+            border: 1px solid var(--border) !important; 
+            border-radius: 8px !important; 
+            background: white !important; 
+            overflow: hidden !important; 
+            display: inline-block !important;
+        }
+        .preview-thumbnail { 
+            width: 100% !important; 
+            height: 100% !important; 
+            object-fit: contain !important; 
+            display: block !important;
+        }
+        .remove-asset-node { 
+            position: absolute !important; 
+            top: 2px !important; 
+            right: 2px !important; 
+            background: var(--danger) !important; 
+            color: white !important; 
+            border: none !important; 
+            border-radius: 50% !important; 
+            width: 16px !important; 
+            height: 16px !important; 
+            font-size: 9px !important; 
+            cursor: pointer !important; 
+            display: flex !important; 
+            align-items: center !important; 
+            justify-content: center !important; 
+            font-weight: 900 !important; 
+            padding: 0 !important;
+            z-index: 10 !important;
+        }
         
         .submit-trigger { background: var(--dark); color: white; width: 100%; border: none; padding: 14px; border-radius: 12px; font-weight: 700; cursor: pointer; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 13px; width:100%; }
         .table-card { background: white; padding: 32px; border-radius: 16px; border: 1px solid #e2e8f0; overflow-x: auto; margin-bottom: 32px; }
