@@ -312,18 +312,17 @@ module.exports = async (req, res) => {
                 <input type="number" id="stockCount" class="input-box" value="50" min="0" required>
             </div>
                        <div class="form-group">
-                <label>Product Image Asset</label>
-                <!-- Native device picker input element moved safely outside box layout container handles -->
-                <input type="file" id="fileInp" style="display:none;" accept="image/*" multiple>
-                
-                <div class="dropzone-box" onclick="document.getElementById('fileInp').click()">
-                    <i class="fas fa-images" style="font-size:24px; color:#64748b; margin-bottom:6px;"></i>
-                    <p id="upload-prompt" style="margin:0; font-size:12px; color:#64748b;">Click to upload product image file</p>
-                    
-                    <!-- Fixed Multi-Image Preview Wrapper Section -->
-                    <div id="gallery-preview-strip" class="gallery-preview-strip" onclick="event.stopPropagation();"></div>
-                </div>
-            </div>
+    <label>Product Image Asset</label>
+    <!-- Hidden selector input node explicitly isolated out of clickable container bounds -->
+    <input type="file" id="fileInp" style="display:none;" accept="image/*" multiple>
+    
+    <div class="dropzone-box" onclick="document.getElementById('fileInp').click()">
+        <i class="fas fa-images" style="font-size:24px; color:#64748b; margin-bottom:6px;"></i>
+        <p id="upload-prompt" style="margin:0; font-size:12px; color:#64748b;">Click to upload product image file</p>
+        
+        <div id="gallery-preview-strip" class="gallery-preview-strip" onclick="event.stopPropagation();"></div>
+    </div>
+</div>
             <button type="submit" id="submit-btn" class="submit-trigger"><i class="fas fa-plus"></i> Synchronize Item</button>
             <button type="button" id="cancel-edit-btn" onclick="resetFormState()" style="display:none; width:100%; margin-top:8px; padding:12px; background:#64748b; color:white; border:none; border-radius:12px; font-weight:700; cursor:pointer; text-transform:uppercase; font-size:13px;">Cancel Edit</button>
         </form>
@@ -383,61 +382,58 @@ module.exports = async (req, res) => {
     }
 
     // 🌟 PRODUCTION STABLE ADDEVENTLISTENER HOOK: Captures, scales, and renders gallery files smoothly
-    document.getElementById('fileInp').addEventListener('change', function(event) {
-        if (!this.files || this.files.length === 0) return;
-        
-        const files = Array.from(this.files);
-        let countProcessed = 0;
-        
-        const previewStrip = document.getElementById('gallery-preview-strip');
-        const promptText = document.getElementById('upload-prompt');
-        
-        // Reset local state memories clean before processing
-        previewStrip.innerHTML = '';
-        trackingGalleryArray = [];
-        base64ImagePayload = "";
+   // Paste this directly inside your script tags
+document.getElementById('fileInp').addEventListener('change', function(event) {
+    if (!this.files || this.files.length === 0) return;
+    
+    const filesList = Array.from(this.files);
+    let countDone = 0;
+    
+    const previewContainer = document.getElementById('gallery-preview-strip');
+    const statusText = document.getElementById('upload-prompt');
+    
+    previewContainer.innerHTML = '';
+    trackingGalleryArray = [];
+    base64ImagePayload = "";
 
-        files.forEach(file => {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const img = new Image();
-                img.src = e.target.result;
-                img.onload = function() {
-                    const canvas = document.createElement('canvas');
-                    const ctx = canvas.getContext('2d');
-                    let width = img.width; 
-                    let height = img.height;
+    filesList.forEach(file => {
+        const fileReader = new FileReader();
+        fileReader.onload = function(e) {
+            const imgElement = new Image();
+            imgElement.src = e.target.result;
+            imgElement.onload = function() {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                let width = imgElement.width; 
+                let height = imgElement.height;
+                
+                if (width > 800) { height *= 800 / width; width = 800; }
+                canvas.width = width; canvas.height = height;
+                ctx.drawImage(imgElement, 0, 0, width, height);
+                
+                const compressionBase64 = canvas.toDataURL('image/jpeg', 0.6);
+                trackingGalleryArray.push(compressionBase64);
+                
+                const nodeIndex = trackingGalleryArray.length - 1;
+                const thumbnailHtml = 
+                    '<div class="preview-thumbnail-container" id="gallery-node-' + nodeIndex + '">' +
+                        '<img src="' + compressionBase64 + '" class="preview-thumbnail" style="display:block;">' +
+                        '<button type="button" class="remove-asset-node" onclick="removeNodeFromUpload(' + nodeIndex + '); event.stopPropagation();">✕</button>' +
+                    '</div>';
                     
-                    if (width > 800) { height *= 800 / width; width = 800; }
-                    canvas.width = width; canvas.height = height;
-                    ctx.drawImage(img, 0, 0, width, height);
-                    
-                    const singleBase64 = canvas.toDataURL('image/jpeg', 0.6);
-                    trackingGalleryArray.push(singleBase64);
-                    
-                    const itemIndex = trackingGalleryArray.length - 1;
-                    
-                    // Concat using standard escaped variables to safely bypass any backend Vercel crashes
-                    const nodePreviewHtml = 
-                        '<div class="preview-thumbnail-container" id="gallery-node-' + itemIndex + '">' +
-                            '<img src="' + singleBase64 + '" class="preview-thumbnail" style="display:block;">' +
-                            '<button type="button" class="remove-asset-node" onclick="removeNodeFromUpload(' + itemIndex + '); event.stopPropagation();">✕</button>' +
-                        '</div>';
-                        
-                    previewStrip.insertAdjacentHTML('beforeend', nodePreviewHtml);
-                    
-                    countProcessed++;
-                    if(countProcessed === files.length) {
-                        base64ImagePayload = trackingGalleryArray.filter(Boolean).join('|||');
-                        promptText.style.display = 'block';
-                        promptText.innerText = files.length + " Gallery Assets Uploaded!";
-                    }
-                };
+                previewContainer.insertAdjacentHTML('beforeend', thumbnailHtml);
+                
+                countDone++;
+                if(countDone === filesList.length) {
+                    base64ImagePayload = trackingGalleryArray.filter(Boolean).join('|||');
+                    statusText.innerText = filesList.length + " Gallery Assets Uploaded!";
+                }
             };
-            reader.readAsDataURL(file);
-        });
-        promptText.style.display = 'none';
+        };
+        fileReader.readAsDataURL(file);
     });
+    statusText.style.display = 'none';
+});
 
     function removeNodeFromUpload(index) {
         const node = document.getElementById('gallery-node-' + index);
