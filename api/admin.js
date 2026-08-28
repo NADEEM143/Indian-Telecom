@@ -311,14 +311,16 @@ module.exports = async (req, res) => {
                 <label>Initial Available Stock Quantity</label>
                 <input type="number" id="stockCount" class="input-box" value="50" min="0" required>
             </div>
-            <div class="form-group">
+                       <div class="form-group">
                 <label>Product Image Asset</label>
+                <!-- Native device picker input element moved safely outside box layout container handles -->
                 <input type="file" id="fileInp" style="display:none;" accept="image/*" multiple>
                 
                 <div class="dropzone-box" onclick="document.getElementById('fileInp').click()">
                     <i class="fas fa-images" style="font-size:24px; color:#64748b; margin-bottom:6px;"></i>
                     <p id="upload-prompt" style="margin:0; font-size:12px; color:#64748b;">Click to upload product image file</p>
                     
+                    <!-- Fixed Multi-Image Preview Wrapper Section -->
                     <div id="gallery-preview-strip" class="gallery-preview-strip" onclick="event.stopPropagation();"></div>
                 </div>
             </div>
@@ -380,8 +382,8 @@ module.exports = async (req, res) => {
         }
     }
 
-    // 🌟 THE ASYNC ACTION: Processes multiple files accurately without Vercel backend string interpretation bugs
-    document.getElementById('fileInp').onchange = function() {
+    // 🌟 PRODUCTION STABLE ADDEVENTLISTENER HOOK: Captures, scales, and renders gallery files smoothly
+    document.getElementById('fileInp').addEventListener('change', function(event) {
         if (!this.files || this.files.length === 0) return;
         
         const files = Array.from(this.files);
@@ -390,6 +392,7 @@ module.exports = async (req, res) => {
         const previewStrip = document.getElementById('gallery-preview-strip');
         const promptText = document.getElementById('upload-prompt');
         
+        // Reset local state memories clean before processing
         previewStrip.innerHTML = '';
         trackingGalleryArray = [];
         base64ImagePayload = "";
@@ -414,7 +417,7 @@ module.exports = async (req, res) => {
                     
                     const itemIndex = trackingGalleryArray.length - 1;
                     
-                    // Fixed escaped concat logic to bypass hidden template literal backend crashes
+                    // Concat using standard escaped variables to safely bypass any backend Vercel crashes
                     const nodePreviewHtml = 
                         '<div class="preview-thumbnail-container" id="gallery-node-' + itemIndex + '">' +
                             '<img src="' + singleBase64 + '" class="preview-thumbnail" style="display:block;">' +
@@ -426,6 +429,7 @@ module.exports = async (req, res) => {
                     countProcessed++;
                     if(countProcessed === files.length) {
                         base64ImagePayload = trackingGalleryArray.filter(Boolean).join('|||');
+                        promptText.style.display = 'block';
                         promptText.innerText = files.length + " Gallery Assets Uploaded!";
                     }
                 };
@@ -433,7 +437,7 @@ module.exports = async (req, res) => {
             reader.readAsDataURL(file);
         });
         promptText.style.display = 'none';
-    };
+    });
 
     function removeNodeFromUpload(index) {
         const node = document.getElementById('gallery-node-' + index);
@@ -552,10 +556,22 @@ module.exports = async (req, res) => {
         document.getElementById('cancel-edit-btn').style.display = "none";
     }
 
+        // 🌟 PRODUCTION STABLE SUBMIT INTERCEPTOR: Secures payload mapping and prevents page reload cycles
     document.getElementById('itemDeployForm').onsubmit = async function(e) {
+        // Halt native form browser submission page refresh loops instantly
         e.preventDefault();
-        if(!base64ImagePayload) { alert("Attach image gallery files."); return; }
+        
+        if(!base64ImagePayload) { 
+            alert("Attach image gallery files."); 
+            return; 
+        }
+        
         const editId = document.getElementById('edit-id').value;
+        const submitButton = document.getElementById('submit-btn');
+        
+        // Prevent accidental multiple submissions while uploading
+        submitButton.disabled = true;
+        submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Synchronizing Assets...';
         
         const payload = {
             title: document.getElementById('title').value,
@@ -569,13 +585,25 @@ module.exports = async (req, res) => {
         };
         if(editId) payload.customEditId = editId;
 
-        const res = await fetch(TARGET_GATEWAY_URL + '?action=create-product', { 
-            method: 'POST', 
-            headers: { 'Content-Type': 'application/json' }, 
-            body: JSON.stringify(payload) 
-        });
-        const data = await res.json();
-        if(data.success) { alert('Done!'); resetFormState(); loadDashboardData(); }
+        try {
+            const res = await fetch(TARGET_GATEWAY_URL + '?action=create-product', { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' }, 
+                body: JSON.stringify(payload) 
+            });
+            const data = await res.json();
+            if(data.success) { 
+                alert('Done!'); 
+                resetFormState(); 
+                loadDashboardData(); 
+            }
+        } catch(err) {
+            console.error("Upstash synchronization pipeline interrupted:", err);
+            alert("Database tracking transaction delayed.");
+        } finally {
+            submitButton.disabled = false;
+            submitButton.innerHTML = '<i class="fas fa-plus"></i> Synchronize Item';
+        }
     };
 
     async function processFulfillment(orderId) {
@@ -590,9 +618,9 @@ module.exports = async (req, res) => {
     }
 
     function downloadInventoryCSV() {
-        let csv = "ID,Title,Category,Price,Stock\\r\\n";
+        let csv = "ID,Title,Category,Price,Stock\r\n";
         const items = localProductCacheMemory || [];
-        items.forEach(p => csv += p.id + ',' + p.title.replace(/,/g,'') + ',' + p.category + ',' + p.currentPrice + ',' + p.stockCount + '\\r\\n');
+        items.forEach(p => csv += p.id + ',' + p.title.replace(/,/g,'') + ',' + p.category + ',' + p.currentPrice + ',' + p.stockCount + '\r\n');
         triggerDownload(csv, "Products_Report.csv");
     }
 
