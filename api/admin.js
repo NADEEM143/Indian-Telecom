@@ -315,7 +315,7 @@ module.exports = async (req, res) => {
             <div class="form-group">
                 <label>Initial Available Stock Quantity</label>
                 <input type="number" id="stockCount" class="input-box" value="50" min="0" required>
-            </div>
+           </div>
             <div class="form-group">
                 <label>Product Image Asset</label>
                 <div class="dropzone-box" onclick="document.getElementById('fileInp').click()">
