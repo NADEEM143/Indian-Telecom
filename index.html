@@ -152,7 +152,7 @@
                     </div>
                 </div>
 
-                <!-- DYNAMIC SECURE ONLINE UPI HUB CONTAINER -->
+              <!-- DYNAMIC SECURE NPCI-COMPLIANT UPI HUB CONTAINER -->
                 <div id="qr-section">
                     <!-- TARGET CONTAINER AREA FOR YOUR GEN ENGINE LIBRARY -->
                     <div id="qrcode-canvas" style="background:white; width:140px; height:140px; margin:0 auto 12px auto; padding:5px; border-radius:12px; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 10px rgba(0,0,0,0.02);"></div>
@@ -160,24 +160,11 @@
                     <!-- LOAD THE SYSTEM SCRIPT CDN ENGINE LAYER -->
                     <script src="https://cdn.jsdelivr.net/npm/easyqrcodejs@4.6.2/dist/easy.qrcode.min.js"></script>
                     
-                    <script>
-                        // Safely compile and execute image builder matrix on execution cycles
-                        window.addEventListener('DOMContentLoaded', () => {
-                            const canvasBox = document.getElementById("qrcode-canvas");
-                            if(canvasBox) {
-                                new QRCode(canvasBox, {
-                                    text: "upi://pay?pa=exple@ybl&pn=INDIAN_TELECOM&tn=Order_Payment",
-                                    width: 130,
-                                    height: 130,
-                                    colorDark: "#0f172a",
-                                    colorLight: "#ffffff",
-                                    correctLevel: QRCode.CorrectLevel.H
-                                });
-                            }
-                        });
-                    </script>
-
-                    <p style="font-size: 13px; font-weight: 700; color: #2563eb; margin-bottom: 12px;">Merchant ID: exple@ybl</p>
+                    <p style="font-size: 14px; font-weight: 800; color: #1e293b; margin: 4px 0 12px 0; text-align: center;">
+                        Scan to Pay: <span id="qr-amount-display" style="color: #2563eb;">₹0.00</span>
+                    </p>
+                    <p style="font-size: 11px; font-weight: 700; color: #94a3b8; margin-bottom: 12px; text-align: center; text-transform: uppercase; letter-spacing: 0.5px;">Merchant ID: exple@ybl</p>
+                    
                     <div class="form-group" style="text-align: left;">
                         <label>Enter 12-Digit Bank UTR Number</label>
                         <input type="text" id="pay-utr" placeholder="Enter Reference ID after paying">
@@ -336,12 +323,39 @@
         
         function closeCheckout() { document.getElementById("checkout-modal").style.display = "none"; }
 
-        function togglePaymentMode(mode) {
+                function togglePaymentMode(mode) {
             const qrSection = document.getElementById("qr-section");
             const utrInput = document.getElementById("pay-utr");
-            if(mode === 'ONLINE') {
+            
+            if (mode === 'ONLINE') {
                 qrSection.style.display = "block";
                 utrInput.setAttribute("required", "required");
+
+                // 1. Calculate live basket total sum
+                const rawTotal = cart.reduce((acc, current) => acc + (current.discountPrice * current.qty), 0);
+                
+                // 2. Strict NPCI Formatter: Forces integer values into a 2-decimal financial string (e.g. 1199 -> 1199.00)
+                const npciFormattedAmount = Number(rawTotal).toFixed(2);
+                
+                // Update your front-end text layout counter view
+                document.getElementById("qr-amount-display").innerText = `₹${npciFormattedAmount}`;
+
+                const canvasBox = document.getElementById("qrcode-canvas");
+                if (canvasBox) {
+                    canvasBox.innerHTML = ""; // Clear out previous cache boxes to avoid rendering bugs
+                    
+                    // 3. Strict NPCI URL Encoded String Mapping Block
+                    const strictNpciUpiString = `upi://pay?pa=exple@ybl&pn=INDIAN%20TELECOM&am=${npciFormattedAmount}&cu=INR&tn=Shopping%20Payment`;
+                    
+                    qrCodeInstance = new QRCode(canvasBox, {
+                        text: strictNpciUpiString,
+                        width: 130,
+                        height: 130,
+                        colorDark: "#0f172a",
+                        colorLight: "#ffffff",
+                        correctLevel: QRCode.CorrectLevel.M // NPCI optimization parameter for fluid camera scans
+                    });
+                }
             } else {
                 qrSection.style.display = "none";
                 utrInput.removeAttribute("required");
