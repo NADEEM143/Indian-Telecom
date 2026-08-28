@@ -292,6 +292,7 @@ module.exports = async (req, res) => {
         </form>
     </div>
 <script>
+    <script>
     let localProductCacheMemory = [];
     let base64ImagePayload = "";
     let trackingGalleryArray = [];
@@ -312,7 +313,7 @@ module.exports = async (req, res) => {
         }
     }
 
-    // 🌟 MULTI-FILE CANVAS COMPRESSION: Process multiple gallery assets concurrently
+    // 🌟 FULLY ESCAPED MULTI-FILE CANVAS COMPRESSION: Process multiple gallery assets concurrently
     document.getElementById('fileInp').onchange = function() {
         if (!this.files || this.files.length === 0) return;
         
@@ -345,16 +346,18 @@ module.exports = async (req, res) => {
                     trackingGalleryArray.push(singleBase64);
                     
                     const itemIndex = trackingGalleryArray.length - 1;
-                    const nodePreviewHtml = `
-                        <div class="preview-thumbnail-container" id="gallery-node-${itemIndex}">
-                            <img src="${singleBase64}" class="preview-thumbnail" style="display:block;">
-                            <button type="button" class="remove-asset-node" onclick="removeNodeFromUpload(${itemIndex})">✕</button>
-                        </div>`;
+                    
+                    // 🔒 ESCAPED STRINGS: Properly bypassed backticks to protect Vercel engine compilation loops
+                    const nodePreviewHtml = 
+                        '<div class="preview-thumbnail-container" id="gallery-node-' + itemIndex + '">' +
+                            '<img src="' + singleBase64 + '" class="preview-thumbnail" style="display:block;">' +
+                            '<button type="button" class="remove-asset-node" onclick="removeNodeFromUpload(' + itemIndex + ')">✕</button>' +
+                        '</div>';
+                        
                     previewStrip.insertAdjacentHTML('beforeend', nodePreviewHtml);
                     
                     countProcessed++;
                     if(countProcessed === files.length) {
-                        // Crucial Link: Syncs the multi-string segment to base64ImagePayload for submission execution
                         base64ImagePayload = trackingGalleryArray.filter(Boolean).join('|||');
                         promptText.innerText = files.length + " Gallery Assets Uploaded!";
                     }
@@ -366,18 +369,18 @@ module.exports = async (req, res) => {
     };
 
     function removeNodeFromUpload(index) {
-        const node = document.getElementById(`gallery-node-${index}`);
+        const node = document.getElementById('gallery-node-' + index);
         if(node) node.remove();
         trackingGalleryArray[index] = null;
         
-        // Refresh base payload string allocations instantly
         base64ImagePayload = trackingGalleryArray.filter(Boolean).join('|||');
         if(trackingGalleryArray.filter(Boolean).length === 0) {
             document.getElementById('upload-prompt').style.display = 'block';
             document.getElementById('upload-prompt').innerText = "Click to upload product image file";
         }
     }
-    function renderProductsTable(products) {
+
+        function renderProductsTable(products) {
         const tbody = document.getElementById('products-table-body');
         if(!products || products.length === 0) {
             tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:40px; color:#64748b;">No inventory data records active.</td></tr>';
@@ -387,8 +390,6 @@ module.exports = async (req, res) => {
             const count = p.stockCount || 0;
             const status = p.stockStatus || 'OUTOFSTOCK';
             let path = p.imageUrl || p.imageAsset || '';
-            
-            // Safely extracts the first thumbnail image if stored in multi-sequence format
             let finalThumb = path.includes('|||') ? path.split('|||')[0] : path;
 
             return '<tr>' +
@@ -449,11 +450,11 @@ module.exports = async (req, res) => {
         if(base64ImagePayload) {
             trackingGalleryArray.forEach((src, idx) => {
                 if(!src) return;
-                previewStrip.innerHTML += `
-                    <div class="preview-thumbnail-container" id="gallery-node-${idx}">
-                        <img src="${src}" class="preview-thumbnail" style="display:block;">
-                        <button type="button" class="remove-asset-node" onclick="removeNodeFromUpload(${idx})">✕</button>
-                    </div>`;
+                previewStrip.innerHTML += 
+                    '<div class="preview-thumbnail-container" id="gallery-node-' + idx + '">' +
+                        '<img src="' + src + '" class="preview-thumbnail" style="display:block;">' +
+                        '<button type="button" class="remove-asset-node" onclick="removeNodeFromUpload(' + idx + ')">✕</button>' +
+                    '</div>';
             });
             document.getElementById('upload-prompt').style.display = 'none';
         } else {
