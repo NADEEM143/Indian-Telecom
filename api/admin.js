@@ -1,5 +1,7 @@
 // api/admin.js
-// 🌟 PRODUCTION FIXED IMPORT: Auto-resolves package constructor issues under Vercel runtimes
+// =========================================================================
+// 🧩 PIECE 1 OF 11: SDK IMPORTS, VARIABLE BOUNDARIES, & UPSTASH INSTANCE
+// =========================================================================
 const UpstashPackage = require('@upstash/redis');
 const Redis = UpstashPackage.Redis || UpstashPackage.default?.Redis;
 
@@ -7,13 +9,13 @@ if (!Redis) {
     throw new Error("Critical System Error: Upstash Redis constructor mapping layer failed.");
 }
 
-// Initialize structural connection parameters straight to Upstash Redis REST Node
+// Establish your high-utility live connection parameter rules to Upstash
 const upstash = new Redis({
   url: process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL,
   token: process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN,
 });
 
-// Configure proper commonJS size limits for large base64 string buffers
+// Configure proper commonJS size limits for large base64 image data strings
 module.exports.config = {
     api: {
         bodyParser: {
@@ -21,25 +23,21 @@ module.exports.config = {
         }
     }
 };
-
 // =========================================================================
-// 🧩 PIECE 2 OF 8: CORE SERVERLESS HANDLER & REQUEST ROUTING
+// 🧩 PIECE 2 OF 11: CORE HANDLER SWITCH MATRIX & DATA LOADER
 // =========================================================================
 module.exports = async (req, res) => {
     const { method, query, body } = req;
-    
-    // Rest of your Piece 2 code continues exactly the same way here...
 
     try {
         // =========================================================================
-        // 🧩 PIECE 3 OF 8: ENDPOINT ?action=loadData (UNIFIED API MATRIX)
+        // 🧩 PIECE 3 OF 8: ENDPOINT ?action=loadData (UNIFIED API LAYER)
         // =========================================================================
         if (method === 'GET' && query.action === 'loadData') {
             const keys = await upstash.keys('telecom_item:*');
             let products = [];
             
             if (keys && keys.length > 0) {
-                // High-speed atomic batch execution pipeline
                 const pipeline = upstash.pipeline();
                 keys.forEach(key => pipeline.get(key));
                 const pipelineResult = await pipeline.exec();
@@ -49,17 +47,14 @@ module.exports = async (req, res) => {
             const orders = (await upstash.get('telecom_orders_log')) || [];
             return res.status(200).json({ success: true, products, orders });
         }
-
         // =========================================================================
-        // 🧩 PIECE 4 OF 8: ENDPOINT ?action=create-product (PRODUCT SAVE/EDIT NODE)
+        // 🧩 PIECE 3 OF 11: ENDPOINT ?action=create-product (UPSERT DATA MATRIX)
         // =========================================================================
         if (method === 'POST' && query.action === 'create-product') {
             const { customEditId, title, tag, category, badge, currentPrice, strikePrice, stockCount, imageUrl } = body;
             
-            // Safety: Preserves original ID if editing; creates unified item format if new
             const finalProductId = customEditId ? customEditId : 'item_' + Date.now();
             const targetKey = `telecom_item:${finalProductId}`;
-            
             const stockInitial = parseInt(stockCount) || 0;
 
             const productPayload = {
@@ -71,7 +66,7 @@ module.exports = async (req, res) => {
                 currentPrice: parseInt(currentPrice) || 0,
                 strikePrice: strikePrice ? parseInt(strikePrice) : null,
                 imageUrl: imageUrl || "",
-                imageAsset: imageUrl || "", // Backend schema alignment fallback preserved intact
+                imageAsset: imageUrl || "", 
                 stockCount: stockInitial,
                 stockStatus: stockInitial > 0 ? 'INSTOCK' : 'OUTOFSTOCK',
                 updatedAt: new Date().toISOString()
@@ -80,8 +75,9 @@ module.exports = async (req, res) => {
             await upstash.set(targetKey, productPayload);
             return res.status(200).json({ success: true, item: productPayload });
         }
+
         // =========================================================================
-        // 🧩 PIECE 5 OF 8: ENDPOINTS ?action=delete-product & ?action=fulfill-order
+        // 🧩 PIECE 4 OF 11: ENDPOINT ?action=delete-product (CATALOG ENTRIES PURGE)
         // =========================================================================
         if (method === 'DELETE' && query.action === 'delete-product') {
             const { id } = query;
@@ -91,7 +87,9 @@ module.exports = async (req, res) => {
             await upstash.del(targetKey);
             return res.status(200).json({ success: true, message: 'Product record permanently purged.' });
         }
-
+        // =========================================================================
+        // 🧩 PIECE 4 OF 11: ENDPOINT ?action=fulfill-order (REAL-TIME DEDUCTION LOGIC)
+        // =========================================================================
         if (method === 'POST' && query.action === 'fulfill-order') {
             const { orderId } = body;
             let currentOrders = await upstash.get('telecom_orders_log');
@@ -101,7 +99,6 @@ module.exports = async (req, res) => {
             if (!targetOrder) return res.status(404).json({ success: false, message: 'Order reference mismatch.' });
             if (targetOrder.status === 'FULFILLED') return res.status(400).json({ success: false, message: 'Transaction already completed.' });
 
-            // Fetch product lookup maps to protect against blank or unmapped frontend IDs
             const allProductKeys = await upstash.keys('telecom_item:*');
             let dynamicProductCache = [];
             if (allProductKeys && allProductKeys.length > 0) {
@@ -119,7 +116,6 @@ module.exports = async (req, res) => {
                     targetProduct = await upstash.get(targetKey);
                 }
 
-                // Fallback: If ID isn't found, track item matching by title string name
                 if (!targetProduct && item.name) {
                     const matchedCacheItem = dynamicProductCache.find(p => p.title === item.name);
                     if (matchedCacheItem) {
@@ -140,9 +136,8 @@ module.exports = async (req, res) => {
             await upstash.set('telecom_orders_log', currentOrders);
             return res.status(200).json({ success: true, message: 'Order systems marked FULFILLED and stock structural balances updated!' });
         }
-
         // =========================================================================
-        // 🧩 PIECE 6 OF 8: ENDPOINTS ?action=place-order & ?action=public-products
+        // 🧩 PIECE 5 OF 11: ENDPOINTS ?action=place-order & ?action=public-products
         // =========================================================================
         if (method === 'POST' && query.action === 'place-order') {
             const { name, mobile, address, mode, total, totalBill, items } = body;
@@ -185,12 +180,12 @@ module.exports = async (req, res) => {
                     imageUrl: item.imageUrl || item.imageAsset || ''
                 }));
                 
-                sortedProducts = cleanList.sort((a, b) => parseInt(b.id?.split('_')[1] || 0) - parseInt(a.id?.split('_')[1] || 0));
+                sortedProducts = cleanList.sort((a, b) => parseInt(b.id?.split('_') || 0) - parseInt(a.id?.split('_') || 0));
             }
             return res.status(200).json(sortedProducts);
         }
         // =========================================================================
-        // 🧩 PIECE 7 OF 8: CORE UI DOCUMENT SURFACE PRESENTATION SHELL
+        // 🧩 PIECE 6 OF 11: HTML PRESENTATION HEADER DOCUMENT RENDER SLOTS
         // =========================================================================
         if (method === 'GET') {
             res.setHeader('Content-Type', 'text/html');
@@ -211,7 +206,7 @@ module.exports = async (req, res) => {
         .input-box { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; box-sizing: border-box; font-size: 14px; }
         .dropzone-box { border: 2px dashed #94a3b8; border-radius: 12px; padding: 20px; text-align: center; cursor: pointer; background: #f8fafc; position: relative; }
         
-                /* Multi-Image Gallery Asset Render Strip Palette Grid Layout */
+        /* Multi-Image Gallery Asset Render Strip Palette Grid Layout Styles */
         .gallery-preview-strip { 
             display: flex !important; 
             gap: 8px !important; 
@@ -266,6 +261,9 @@ module.exports = async (req, res) => {
     </style>
 </head>
 <body>
+// =========================================================================
+// 🧩 PIECE 7 OF 11: TOP HEADER METRICS STRIP AND FORMS BLOCK LAYOUT
+// =========================================================================
 <div style="max-width:1450px; margin:0 auto 28px auto; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
     <div>
         <h1 style="margin:0; font-size:26px; font-weight:900;">Master System Control Terminal</h1>
@@ -315,17 +313,16 @@ module.exports = async (req, res) => {
             <div class="form-group">
                 <label>Initial Available Stock Quantity</label>
                 <input type="number" id="stockCount" class="input-box" value="50" min="0" required>
-         </div>
+            </div>
             <div class="form-group">
                 <label>Product Image Asset</label>
-                <!-- Hidden native picker input element moved safely outside to kill looping bugs -->
+                <!-- Hidden input placed outside to prevent double clicking looping selection bugs -->
                 <input type="file" id="fileInp" style="display:none;" accept="image/*" multiple>
                 
                 <div class="dropzone-box" onclick="document.getElementById('fileInp').click()">
                     <i class="fas fa-images" style="font-size:24px; color:#64748b; margin-bottom:6px;"></i>
                     <p id="upload-prompt" style="margin:0; font-size:12px; color:#64748b;">Click to upload product image file</p>
                     
-                    <!-- Fixed Multi-Image Preview Container Zone Grid Allocation -->
                     <div id="gallery-preview-strip" class="gallery-preview-strip" onclick="event.stopPropagation();"></div>
                 </div>
             </div>
@@ -333,8 +330,42 @@ module.exports = async (req, res) => {
             <button type="button" id="cancel-edit-btn" onclick="resetFormState()" style="display:none; width:100%; margin-top:8px; padding:12px; background:#64748b; color:white; border:none; border-radius:12px; font-weight:700; cursor:pointer; text-transform:uppercase; font-size:13px;">Cancel Edit</button>
         </form>
     </div>
+// =========================================================================
+// 🧩 PIECE 8 OF 11: DATA TABLES ALLOCATIONS AND LAYOUT SHEETS WRAPPER
+// =========================================================================
+    <div style="display:flex; flex-direction:column; width:100%; min-width:0;">
+        <div class="table-card">
+            <h3 style="margin-top:0; text-transform:uppercase; font-size:13px; color:#475569; letter-spacing:0.5px;">Live Catalog Inventory Array</h3>
+            <table>
+                <thead>
+                    <tr><th>Asset</th><th>Product Context</th><th>Target Tab</th><th>Price Vector</th><th>Stock Matrix</th><th style="text-align:center;">Action Options</th></tr>
+                </thead>
+                <tbody id="products-table-body">
+                    <tr><td colspan="6" style="text-align:center; padding:30px; color:#64748b;">Loading active data streams...</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="table-card">
+            <h3 style="margin-top:0; text-transform:uppercase; font-size:13px; color:#1e3a8a; letter-spacing:0.5px;">Live Sales Verification Order Book</h3>
+            <table>
+                <thead>
+                    <tr><th>Order Code</th><th>Customer Shipping Particulars</th><th>Items Staged</th><th>Total Payable</th><th>Status</th><th style="text-align:center;">Fulfillment Switch</th></tr>
+                </thead>
+                <tbody id="orders-table-body">
+                    <tr><td colspan="6" style="text-align:center; padding:30px; color:#64748b;">Loading active data streams...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+`);
+        }
+        // =========================================================================
+        // 🧩 PIECE 9 OF 11: SCRIPT MATRIX INITIALIZER & MULTI-IMAGE CANVAS CODE
+        // =========================================================================
+        if (method === 'GET') {
+            return res.status(200).send(`
 <script>
-    <script>
     let localProductCacheMemory = [];
     let base64ImagePayload = "";
     let trackingGalleryArray = [];
@@ -355,8 +386,8 @@ module.exports = async (req, res) => {
         }
     }
 
-        // 🌟 COMPLETE REPLACE: Put this exact block over your old fileInp.onchange function
-    document.getElementById('fileInp').addEventListener('change', function(event) {
+    // 🌟 THE ASYNC ACTION: Processes multiple files accurately without Vercel backend string interpretation bugs
+    document.getElementById('fileInp').onchange = function() {
         if (!this.files || this.files.length === 0) return;
         
         const files = Array.from(this.files);
@@ -365,9 +396,9 @@ module.exports = async (req, res) => {
         const previewStrip = document.getElementById('gallery-preview-strip');
         const promptText = document.getElementById('upload-prompt');
         
-        // Wipe pre-existing layouts clean to start fresh
         previewStrip.innerHTML = '';
         trackingGalleryArray = [];
+        base64ImagePayload = "";
 
         files.forEach(file => {
             const reader = new FileReader();
@@ -389,7 +420,7 @@ module.exports = async (req, res) => {
                     
                     const itemIndex = trackingGalleryArray.length - 1;
                     
-                    // Escaped HTML block to bypass Vercel string interpolation server crashes
+                    // Fixed escaped concat logic to bypass hidden template literal backend crashes
                     const nodePreviewHtml = 
                         '<div class="preview-thumbnail-container" id="gallery-node-' + itemIndex + '">' +
                             '<img src="' + singleBase64 + '" class="preview-thumbnail" style="display:block;">' +
@@ -400,7 +431,6 @@ module.exports = async (req, res) => {
                     
                     countProcessed++;
                     if(countProcessed === files.length) {
-                        // Merges multiple pictures into base64ImagePayload for the form submit handler
                         base64ImagePayload = trackingGalleryArray.filter(Boolean).join('|||');
                         promptText.innerText = files.length + " Gallery Assets Uploaded!";
                     }
@@ -409,7 +439,7 @@ module.exports = async (req, res) => {
             reader.readAsDataURL(file);
         });
         promptText.style.display = 'none';
-    });
+    };
 
     function removeNodeFromUpload(index) {
         const node = document.getElementById('gallery-node-' + index);
@@ -422,8 +452,10 @@ module.exports = async (req, res) => {
             document.getElementById('upload-prompt').innerText = "Click to upload product image file";
         }
     }
-
-        function renderProductsTable(products) {
+    // =========================================================================
+    // 🧩 PIECE 10 OF 11: DATA TABLE ROW CONCAT MATRIX ENGINE LOOKUPS
+    // =========================================================================
+    function renderProductsTable(products) {
         const tbody = document.getElementById('products-table-body');
         if(!products || products.length === 0) {
             tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:40px; color:#64748b;">No inventory data records active.</td></tr>';
@@ -433,7 +465,7 @@ module.exports = async (req, res) => {
             const count = p.stockCount || 0;
             const status = p.stockStatus || 'OUTOFSTOCK';
             let path = p.imageUrl || p.imageAsset || '';
-            let finalThumb = path.includes('|||') ? path.split('|||')[0] : path;
+            let finalThumb = path.includes('|||') ? path.split('|||') : path;
 
             return '<tr>' +
                 '<td><img src="' + finalThumb + '" style="width:44px; height:44px; object-fit:contain; border-radius:6px; border:1px solid #e2e8f0; background:#fafafa;"></td>' +
@@ -470,7 +502,9 @@ module.exports = async (req, res) => {
             '</tr>';
         }).join('');
     }
-
+    // =========================================================================
+    // 🧩 PIECE 11 OF 11: FORM EMITTERS, EXPORTERS, & GLOBAL STATE SYSTEM CLOSURES
+    // =========================================================================
     function triggerLocalEdit(targetId) {
         const product = localProductCacheMemory.find(item => item.id === targetId);
         if(!product) return;
@@ -510,6 +544,7 @@ module.exports = async (req, res) => {
         document.getElementById('cancel-edit-btn').style.display = "block";
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
+
     function resetFormState() {
         document.getElementById('itemDeployForm').reset();
         document.getElementById('edit-id').value = "";
@@ -561,18 +596,18 @@ module.exports = async (req, res) => {
     }
 
     function downloadInventoryCSV() {
-        let csv = "ID,Title,Category,Price,Stock\r\n";
+        let csv = "ID,Title,Category,Price,Stock\\r\\n";
         const items = localProductCacheMemory || [];
-        items.forEach(p => csv += p.id + ',' + p.title.replace(/,/g,'') + ',' + p.category + ',' + p.currentPrice + ',' + p.stockCount + '\r\n');
+        items.forEach(p => csv += p.id + ',' + p.title.replace(/,/g,'') + ',' + p.category + ',' + p.currentPrice + ',' + p.stockCount + '\\r\\n');
         triggerDownload(csv, "Products_Report.csv");
     }
 
     function downloadOrdersCSV() {
-        let csv = "OrderID,Total,Status\r\n";
+        let csv = "OrderID,Total,Status\\r\\n";
         const rows = document.querySelectorAll("#orders-table-body tr");
         rows.forEach(row => {
             if(row.querySelector("td") && row.querySelector("td strong")) {
-                csv += row.querySelector("td strong").innerText + ',' + row.querySelector("td:nth-child(4) strong").innerText.replace('₹','').replace(/,/g,'') + ',' + row.querySelector("td:nth-child(5) span").innerText + '\r\n';
+                csv += row.querySelector("td strong").innerText + ',' + row.querySelector("td:nth-child(4) strong").innerText.replace('₹','').replace(/,/g,'') + ',' + row.querySelector("td:nth-child(5) span").innerText + '\\r\\n';
             }
         });
         triggerDownload(csv, "Orders_Report.csv");
