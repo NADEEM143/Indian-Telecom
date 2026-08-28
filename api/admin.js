@@ -1,10 +1,16 @@
 // api/admin.js
-const { Redis } = require('@upstash/redis');
+// 🌟 PRODUCTION FIXED IMPORT: Auto-resolves package constructor issues under Vercel runtimes
+const UpstashPackage = require('@upstash/redis');
+const Redis = UpstashPackage.Redis || UpstashPackage.default?.Redis;
 
-// 1. Establish your high-utility live connection parameter rules to Upstash
+if (!Redis) {
+    throw new Error("Critical System Error: Upstash Redis constructor mapping layer failed.");
+}
+
+// Initialize structural connection parameters straight to Upstash Redis REST Node
 const upstash = new Redis({
-  url: process.env.UPSTASH_REDIS_REST_URL,
-  token: process.env.UPSTASH_REDIS_REST_TOKEN,
+  url: process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN,
 });
 
 // Configure proper commonJS size limits for large base64 string buffers
@@ -21,6 +27,8 @@ module.exports.config = {
 // =========================================================================
 module.exports = async (req, res) => {
     const { method, query, body } = req;
+    
+    // Rest of your Piece 2 code continues exactly the same way here...
 
     try {
         // =========================================================================
