@@ -188,9 +188,10 @@
             } catch (err) { console.error("Cloud data writing exception:", err); }
         }
 
+               // 🌟 ADD THIS EXACT PIECE TO FIXED SYSTEM GALLERY UPLOADS
         function generateImagePreview(inputElement) {
             const preview = document.getElementById("upload-preview");
-            if (inputElement.files && inputElement.files) {
+            if (inputElement.files && inputElement.files[0]) {
                 const fileReaderEngine = new FileReader();
                 fileReaderEngine.onload = function (e) {
                     temporaryImageBase64 = e.target.result;
@@ -199,7 +200,7 @@
                         preview.style.display = "block";
                     }
                 };
-                fileReaderEngine.readAsDataURL(inputElement.files);
+                fileReaderEngine.readAsDataURL(inputElement.files[0]);
             }
         }
 
@@ -313,7 +314,7 @@
                 isLive: true
             };
 
-            liveInventoryState.push(newProductItem);
+                       liveInventoryState.push(newProductItem);
             await pushInventoryStateToCloud();
             await renderAdminInventory();
             
@@ -347,6 +348,22 @@
                 });
             } catch (e) { console.error(e); }
             renderAdminOrders();
+        }
+
+        // DYNAMIC PREVIEW CONTROLLER MODULE HOOK
+        function generateImagePreview(inputElement) {
+            const preview = document.getElementById("upload-preview");
+            if (inputElement.files && inputElement.files[0]) {
+                const fileReaderEngine = new FileReader();
+                fileReaderEngine.onload = function (e) {
+                    temporaryImageBase64 = e.target.result;
+                    if (preview) {
+                        preview.src = temporaryImageBase64;
+                        preview.style.display = "block";
+                    }
+                };
+                fileReaderEngine.readAsDataURL(inputElement.files[0]);
+            }
         }
 
         window.onload = function() {
