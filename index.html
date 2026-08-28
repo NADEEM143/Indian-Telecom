@@ -140,7 +140,7 @@
                     <label>Complete Address</label>
                     <textarea id="cust-address" rows="3" required></textarea>
                 </div>
-                <div class="form-group">
+               <div class="form-group">
                     <label>Mode of Payment (MOP)</label>
                     <div class="radio-grid">
                         <label class="radio-label">
@@ -152,10 +152,31 @@
                     </div>
                 </div>
 
+                <!-- DYNAMIC SECURE ONLINE UPI HUB CONTAINER -->
                 <div id="qr-section">
-                    <div class="qr-placeholder">
-                        <img src="https://qrserver.com" alt="UPI QR">
-                    </div>
+                    <!-- TARGET CONTAINER AREA FOR YOUR GEN ENGINE LIBRARY -->
+                    <div id="qrcode-canvas" style="background:white; width:140px; height:140px; margin:0 auto 12px auto; padding:5px; border-radius:12px; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 10px rgba(0,0,0,0.02);"></div>
+                    
+                    <!-- LOAD THE SYSTEM SCRIPT CDN ENGINE LAYER -->
+                    <script src="https://cdn.jsdelivr.net/npm/easyqrcodejs@4.6.2/dist/easy.qrcode.min.js"></script>
+                    
+                    <script>
+                        // Safely compile and execute image builder matrix on execution cycles
+                        window.addEventListener('DOMContentLoaded', () => {
+                            const canvasBox = document.getElementById("qrcode-canvas");
+                            if(canvasBox) {
+                                new QRCode(canvasBox, {
+                                    text: "upi://pay?pa=exple@ybl&pn=INDIAN_TELECOM&tn=Order_Payment",
+                                    width: 130,
+                                    height: 130,
+                                    colorDark: "#0f172a",
+                                    colorLight: "#ffffff",
+                                    correctLevel: QRCode.CorrectLevel.H
+                                });
+                            }
+                        });
+                    </script>
+
                     <p style="font-size: 13px; font-weight: 700; color: #2563eb; margin-bottom: 12px;">Merchant ID: exple@ybl</p>
                     <div class="form-group" style="text-align: left;">
                         <label>Enter 12-Digit Bank UTR Number</label>
