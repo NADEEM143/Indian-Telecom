@@ -310,68 +310,104 @@ module.exports = async (req, res) => {
     let localProductCacheMemory = [];
     let base64ImagePayload = "";
 
+    // Safely evaluate target workspace endpoints matching execution nodes
     const TARGET_GATEWAY_URL = window.location.origin + window.location.pathname;
+
+    // Secure persistent storage for administration checks
+    let adminPassphraseToken = localStorage.getItem('telecom_admin_token') || "";
+    if (!adminPassphraseToken) {
+        adminPassphraseToken = prompt("Enter Master Gateway Administration Handshake Token Key:") || "";
+        if (adminPassphraseToken) {
+            localStorage.setItem('telecom_admin_token', adminPassphraseToken);
+        }
+    }
+
+    // Dynamic initial page configuration loop load check
+    window.addEventListener('DOMContentLoaded', loadDashboardData);
 
     async function loadDashboardData() {
         try {
-            const response = await fetch(TARGET_GATEWAY_URL + "?action=loadData");
+            const queryParams = new URLSearchParams({ action: 'loadData' });
+            // FIXED: Passed token to GET requests to ensure structural logging clearance
+            const response = await fetch(`${TARGET_GATEWAY_URL}?${queryParams.toString()}`, {
+                headers: { 'X-Admin-Token': adminPassphraseToken }
+            });
+            
+            if (!response.ok) {
+                if (response.status === 401) {
+                    alert("Handshake authorization failed. Clearing bad key token mapping.");
+                    localStorage.removeItem('telecom_admin_token');
+                }
+                throw new Error(`HTTP network error node status: ${response.status}`);
+            }
+
             const data = await response.json();
             if(data.success) {
                 localProductCacheMemory = data.products || [];
                 renderProductsTable(localProductCacheMemory);
                 renderOrdersTable(data.orders || []);
+            } else {
+                console.error("Endpoint data transmission rejected: ", data.message);
             }
         } catch(e) {
             console.error("Data tracking pipeline broken:", e);
+            document.getElementById('products-table-body').innerHTML = 
+                `<tr><td colspan="6" style="text-align:center; padding:30px; color:#ef4444; font-weight:700;"><i class="fas fa-exclamation-triangle"></i> Data Sync Broken: ${e.message}</td></tr>`;
         }
     }
-
     function renderProductsTable(products) {
         const tbody = document.getElementById('products-table-body');
+        if(!tbody) return;
+        
         if(!products || products.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:40px; color:#64748b;">No inventory data records active.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:40px; color:#64748b; font-weight:600;"><i class="fas fa-box-open" style="font-size:20px; display:block; margin-bottom:8px;"></i> No active item assets deployed yet.</td></tr>';
             return;
         }
+
         tbody.innerHTML = products.map(p => {
-            const count = p.stockCount || 0;
-            const status = p.stockStatus || 'OUTOFSTOCK';
+            const count = parseInt(p.stockCount) || 0;
+            const status = p.stockStatus || (count > 0 ? 'INSTOCK' : 'OUTOFSTOCK');
             const imgPath = p.imageUrl || p.imageAsset || '';
-            return '<tr>' +
-                '<td><img src="' + imgPath + '" style="width:44px; height:44px; object-fit:contain; border-radius:6px; border:1px solid #e2e8f0; background:#fafafa;"></td>' +
-                '<td><strong style="display:block;">' + p.title + '</strong><span style="font-size:11px; color:#64748b;">' + p.tag + '</span></td>' +
-                '<td><span style="background:#e2e8f0; padding:4px 8px; border-radius:12px; font-size:11px; font-weight:700; text-transform:uppercase;">' + p.category + '</span></td>' +
-                '<td><strong>₹' + p.currentPrice + '</strong></td>' +
-                '<td><span style="font-weight:800; color:' + (count > 0 ? '#10b981' : '#ef4444') + '; background:' + (count > 0 ? '#ecfdf5' : '#fef2f2') + '; padding:4px 8px; border-radius:8px; font-size:12px;">' + count + ' Pcs (' + status + ')</span></td>' +
-                '<td>' +
-                    '<div style="display:flex; gap:6px; justify-content:center;">' +
-                        '<button onclick="triggerLocalEdit(\'' + p.id + '\')" style="background:#2563eb; color:white; border:none; padding:6px 12px; border-radius:6px; cursor:pointer; font-weight:700; font-size:12px;"><i class="fas fa-edit"></i> Edit</button>' +
-                        '<button onclick="purgeItem(\'' + p.id + '\')" style="background:#ef4444; color:white; border:none; padding:6px 12px; border-radius:6px; cursor:pointer; font-weight:700; font-size:12px;"><i class="fas fa-trash-alt"></i> Del</button>' +
-                    '</div>' +
-                '</td>' +
-            '</tr>';
+            
+            return `<tr>
+                <td><img src="${imgPath}" style="width:44px; height:44px; object-fit:contain; border-radius:6px; border:1px solid #e2e8f0; background:#fafafa;" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://w3.org width=%2224%22 height=%2224%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23cbd5e1%22 stroke-width=%222%22><rect x=%223%22 y=%223%22 width=%2218%22 height=%2218%22 rx=%222%22/><circle cx=%228.5%22 cy=%228.5%22 r=%221.5%22/><path d=%22M21 15l-5-5L5 21%22/></svg>'"></td>
+                <td><strong style="display:block; color:var(--dark);">${p.title || 'Untitled item'}</strong><span style="font-size:11px; color:#64748b;">${p.tag || 'No descriptive tag'}</span></td>
+                <td><span style="background:#e2e8f0; padding:4px 8px; border-radius:12px; font-size:11px; font-weight:700; text-transform:uppercase; color:#475569;">${p.category || 'general'}</span></td>
+                <td><strong style="color:var(--primary);">₹${(p.currentPrice || 0).toLocaleString('en-IN')}</strong></td>
+                <td><span style="font-weight:800; color:${count > 0 ? '#10b981' : '#ef4444'}; background:${count > 0 ? '#ecfdf5' : '#fef2f2'}; padding:4px 8px; border-radius:8px; font-size:11px;">${count} Pcs (${status})</span></td>
+                <td>
+                    <div style="display:flex; gap:6px; justify-content:center;">
+                        <button type="button" onclick="triggerLocalEdit('${p.id}')" style="background:#2563eb; color:white; border:none; padding:6px 12px; border-radius:6px; cursor:pointer; font-weight:700; font-size:12px;"><i class="fas fa-edit"></i> Edit</button>
+                        <button type="button" onclick="purgeItem('${p.id}')" style="background:#ef4444; color:white; border:none; padding:6px 12px; border-radius:6px; cursor:pointer; font-weight:700; font-size:12px;"><i class="fas fa-trash-alt"></i> Del</button>
+                    </div>
+                </td>
+            </tr>`;
         }).join('');
     }
 
     function renderOrdersTable(orders) {
         const tbody = document.getElementById('orders-table-body');
+        if(!tbody) return;
+        
         if(!orders || orders.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:40px; color:#64748b;">No customer shopping logs recorded yet.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:40px; color:#64748b; font-weight:600;"><i class="fas fa-receipt" style="font-size:20px; display:block; margin-bottom:8px;"></i> No sales orders recorded yet.</td></tr>';
             return;
         }
+
         tbody.innerHTML = orders.map(o => {
-            const itemsStr = Array.isArray(o.items) ? o.items.map(i => i.name + ' (x' + i.qty + ')').join(', ') : '';
+            const itemsStr = Array.isArray(o.items) ? o.items.map(i => i.name + ' (x' + i.qty + ')').join(', ') : 'Empty manifest info';
             const isFulfilled = o.status === 'FULFILLED';
-            return '<tr style="background: ' + (isFulfilled ? '#f8fafc' : '#ffffff') + ';">' +
-                '<td><strong style="color:#2563eb; font-size:12px;">' + o.orderId + '</strong><br><span style="font-size:11px; color:#64748b;">' + (o.orderDate || '') + '</span></td>' +
-                '<td><strong style="display:block;">' + o.customerName + '</strong><span style="font-size:12px; color:#475569;"><i class="fas fa-phone"></i> ' + o.customerMobile + '</span><br><span style="font-size:11px; color:#64748b;"><i class="fas fa-map-marker-alt"></i> ' + o.customerAddress + '</span></td>' +
-                '<td style="font-size:13px; color:#334155;">' + itemsStr + '</td>' +
-                '<td><strong style="color:#10b981; font-size:15px;">₹' + o.totalBill + '</strong><br><span style="font-size:10px; font-weight:700; color:#64748b;">' + (o.paymentMode || 'COD') + '</span></td>' +
-                '<td><span style="font-weight:800; font-size:11px; padding:4px 8px; border-radius:12px; text-transform:uppercase; background:' + (isFulfilled ? '#d1fae5' : '#fef3c7') + '; color:' + (isFulfilled ? '#065f46' : '#92400e') + ';">' + o.status + '</span></td>' +
-                '<td style="text-align:center;">' + (isFulfilled ? '<span style="color:#10b981; font-weight:700;"><i class="fas fa-check-circle"></i> Fulfilling Done</span>' : '<button onclick="processFulfillment(\'' + o.orderId + '\')" style="background:#10b981; color:white; border:none; padding:6px 12px; border-radius:6px; cursor:pointer; font-weight:800; font-size:12px;"><i class="fas fa-shipping-fast"></i> Fulfill</button>') + '</td>' +
-            '</tr>';
+            return `<tr style="background: ${isFulfilled ? '#f8fafc' : '#ffffff'};">
+                <td><strong style="color:#2563eb; font-size:12px;">${o.orderId || 'N/A'}</strong><br><span style="font-size:11px; color:#64748b;">${o.orderDate || ''}</span></td>
+                <td><strong style="display:block; color:var(--dark);">${o.customerName || 'Unknown customer'}</strong><span style="font-size:12px; color:#475569;"><i class="fas fa-phone"></i> ${o.customerMobile || 'N/A'}</span><br><span style="font-size:11px; color:#64748b;"><i class="fas fa-map-marker-alt"></i> ${o.customerAddress || 'N/A'}</span></td>
+                <td style="font-size:13px; color:#334155; font-weight:500;">${itemsStr}</td>
+                <td><strong style="color:#10b981; font-size:15px;">₹${(o.totalBill || 0).toLocaleString('en-IN')}</strong><br><span style="font-size:10px; font-weight:700; color:#64748b; background:#f1f5f9; padding:2px 4px; border-radius:4px;">${o.paymentMode || 'COD'}</span></td>
+                <td><span style="font-weight:800; font-size:11px; padding:4px 8px; border-radius:12px; text-transform:uppercase; background:${isFulfilled ? '#d1fae5' : '#fef3c7'}; color:${isFulfilled ? '#065f46' : '#92400e'};">${o.status || 'PENDING'}</span></td>
+                <td style="text-align:center;">${isFulfilled ? '<span style="color:#10b981; font-weight:700; font-size:12px;"><i class="fas fa-check-circle"></i> Completed</span>' : `<button type="button" onclick="processFulfillment('${o.orderId}')" style="background:#10b981; color:white; border:none; padding:6px 12px; border-radius:6px; cursor:pointer; font-weight:800; font-size:12px;"><i class="fas fa-shipping-fast"></i> Fulfill</button>`}</td>
+            </tr>`;
         }).join('');
     }
-
+    // Downsample and process large multi-megabyte canvas buffers securely
     document.getElementById('fileInp').onchange = function() {
         const [file] = this.files;
         if (file) {
@@ -387,44 +423,15 @@ module.exports = async (req, res) => {
                     canvas.width = width; canvas.height = height;
                     ctx.drawImage(img, 0, 0, width, height);
                     base64ImagePayload = canvas.toDataURL('image/jpeg', 0.6);
+                    
                     const pv = document.getElementById('imagePreview');
                     pv.src = base64ImagePayload; pv.style.display = 'block';
-                    document.getElementById('upload-prompt').innerText = "Image Selected!";
+                    document.getElementById('upload-prompt').innerText = "Image Loaded Successfully!";
                 };
             };
             reader.readAsDataURL(file);
         }
     };
-    // =========================================================================
-    // 🧩 PIECE 8b OF 8: FORM MUTATORS, CSV EXPORTERS & GLOBAL CLOSURE
-    // =========================================================================
-    function triggerLocalEdit(targetId) {
-        const product = localProductCacheMemory.find(item => item.id === targetId);
-        if(!product) return;
-
-        document.getElementById('edit-id').value = product.id;
-        document.getElementById('title').value = product.title;
-        document.getElementById('tag').value = product.tag;
-        document.getElementById('category').value = product.category;
-        document.getElementById('badge').value = product.badge || "";
-        document.getElementById('currentPrice').value = product.currentPrice;
-        document.getElementById('strikePrice').value = product.strikePrice || "";
-        document.getElementById('stockCount').value = product.stockCount || 0;
-        
-        base64ImagePayload = product.imageUrl || product.imageAsset || "";
-        const pv = document.getElementById('imagePreview');
-        if(base64ImagePayload) {
-            pv.src = base64ImagePayload; pv.style.display = 'block';
-            document.getElementById('upload-prompt').innerText = "Image Loaded!";
-        } else {
-            pv.style.display = 'none';
-        }
-        
-        document.getElementById('panel-title').innerText = "Modify Existing Product";
-        document.getElementById('submit-btn').innerHTML = '<i class="fas fa-save"></i> Save Changes';
-        document.getElementById('cancel-edit-btn').style.display = "block";
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
 
     function resetFormState() {
         document.getElementById('itemDeployForm').reset();
@@ -439,57 +446,145 @@ module.exports = async (req, res) => {
 
     document.getElementById('itemDeployForm').onsubmit = async function(e) {
         e.preventDefault();
-        if(!base64ImagePayload) { alert("Attach image."); return; }
         const editId = document.getElementById('edit-id').value;
         
+        // Safety Fallback constraint check
+        if(!base64ImagePayload && !editId) { 
+            alert("A valid product image is mandatory for initial synchronization."); 
+            return; 
+        }
+        
         const payload = {
-            title: document.getElementById('title').value,
-            tag: document.getElementById('tag').value,
+            title: document.getElementById('title').value.trim(),
+            tag: document.getElementById('tag').value.trim(),
             category: document.getElementById('category').value,
-            badge: document.getElementById('badge').value,
-            currentPrice: document.getElementById('currentPrice').value,
-            strikePrice: document.getElementById('strikePrice').value,
-            stockCount: document.getElementById('stockCount').value,
+            badge: document.getElementById('badge').value.trim() || null,
+            currentPrice: parseInt(document.getElementById('currentPrice').value) || 0,
+            strikePrice: document.getElementById('strikePrice').value ? parseInt(document.getElementById('strikePrice').value) : null,
+            stockCount: parseInt(document.getElementById('stockCount').value) || 0,
             imageUrl: base64ImagePayload
         };
+        
         if(editId) payload.customEditId = editId;
 
-        const res = await fetch(TARGET_GATEWAY_URL + '?action=create-product', { 
-            method: 'POST', 
-            headers: { 'Content-Type': 'application/json' }, 
-            body: JSON.stringify(payload) 
-        });
-        const data = await res.json();
-        if(data.success) { alert('Done!'); resetFormState(); loadDashboardData(); }
+        try {
+            // FIXED: Embedded the verified master auth token variables safely in headers
+            const res = await fetch(TARGET_GATEWAY_URL + '?action=create-product', { 
+                method: 'POST', 
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'X-Admin-Token': adminPassphraseToken
+                }, 
+                body: JSON.stringify(payload) 
+            });
+            const data = await res.json();
+            if(data.success) { 
+                alert('Cloud inventory sync successful!'); 
+                resetFormState(); 
+                await loadDashboardData(); 
+            } else {
+                alert("Operation declined by database: " + data.message);
+            }
+        } catch(err) {
+            alert("Network data routing layer timed out.");
+        }
     };
+    function triggerLocalEdit(targetId) {
+        const product = localProductCacheMemory.find(item => item.id === targetId);
+        if(!product) return;
 
-    async function processFulfillment(orderId) {
-        if(!confirm('Fulfill order?')) return;
-        const res = await fetch(TARGET_GATEWAY_URL + '?action=fulfill-order', { 
-            method: 'POST', 
-            headers: { 'Content-Type': 'application/json' }, 
-            body: JSON.stringify({ orderId: orderId }) 
-        });
-        const data = await res.json();
-        if(data.success) { alert(data.message); loadDashboardData(); }
+        document.getElementById('edit-id').value = product.id;
+        document.getElementById('title').value = product.title || '';
+        document.getElementById('tag').value = product.tag || '';
+        document.getElementById('category').value = product.category || 'trending';
+        document.getElementById('badge').value = product.badge || "";
+        document.getElementById('currentPrice').value = product.currentPrice || '';
+        document.getElementById('strikePrice').value = product.strikePrice || "";
+        document.getElementById('stockCount').value = product.stockCount || 0;
+        
+        base64ImagePayload = product.imageUrl || product.imageAsset || "";
+        const pv = document.getElementById('imagePreview');
+        if(base64ImagePayload) {
+            pv.src = base64ImagePayload; pv.style.display = 'block';
+            document.getElementById('upload-prompt').innerText = "Image Asset Verified!";
+        } else {
+            pv.style.display = 'none';
+        }
+        
+        document.getElementById('panel-title').innerText = "Modify Existing Product Matrix";
+        document.getElementById('submit-btn').innerHTML = '<i class="fas fa-save"></i> Save System Changes';
+        document.getElementById('cancel-edit-btn').style.display = "block";
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
+    async function processFulfillment(orderId) {
+        if(!confirm('Fulfill order transaction? Stock counts will automatically subtract.')) return;
+        try {
+            const res = await fetch(TARGET_GATEWAY_URL + '?action=fulfill-order', { 
+                method: 'POST', 
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'X-Admin-Token': adminPassphraseToken
+                }, 
+                body: JSON.stringify({ orderId: orderId }) 
+            });
+            const data = await res.json();
+            if(data.success) { 
+                alert("Transaction closed out successfully."); 
+                await loadDashboardData(); 
+            } else {
+                alert("Fulfillment error: " + data.message);
+            }
+        } catch(e) {
+            alert("Failed to compile order fulfillment endpoint block.");
+        }
+    }
+
+    async function purgeItem(id) {
+        if(!confirm('Permanently delete this product record from the datastore cluster?')) return;
+        try {
+            const queryParams = new URLSearchParams({ action: 'delete-product', id: id });
+            const res = await fetch(`${TARGET_GATEWAY_URL}?${queryParams.toString()}`, { 
+                method: 'DELETE',
+                headers: { 'X-Admin-Token': adminPassphraseToken }
+            });
+            const data = await res.json();
+            if(data.success) { 
+                await loadDashboardData(); 
+            } else {
+                alert("Deletion rejected: " + data.message);
+            }
+        } catch(e) {
+            alert("Database connection node unreachable.");
+        }
+    }
+
+    // CSV report formatting layers cleaned from break characters 
     function downloadInventoryCSV() {
-        let csv = "ID,Title,Category,Price,Stock\\r\\n";
-        const items = localProductCacheMemory || [];
-        items.forEach(p => csv += p.id + ',' + p.title.replace(/,/g,'') + ',' + p.category + ',' + p.currentPrice + ',' + p.stockCount + '\\r\\n');
-        triggerDownload(csv, "Products_Report.csv");
+        if(localProductCacheMemory.length === 0) return alert("Inventory log cache memory is currently empty.");
+        let csv = "ID,Title,Category,Price,Stock\r\n";
+        localProductCacheMemory.forEach(p => {
+            const safetyTitle = (p.title || '').replace(/,/g, ' ');
+            csv += `${p.id},${safetyTitle},${p.category || 'general'},${p.currentPrice || 0},${p.stockCount || 0}\r\n`;
+        });
+        triggerDownload(csv, `Products_Ledger_Dump_${Date.now()}.csv`);
     }
 
     function downloadOrdersCSV() {
-        let csv = "OrderID,Total,Status\\r\\n";
+        let csv = "OrderID,Total Bill,Status\r\n";
         const rows = document.querySelectorAll("#orders-table-body tr");
+        if(rows.length === 0 || rows.innerText.includes("No customer")) return alert("No order history logs found to translate.");
+        
         rows.forEach(row => {
-            if(row.querySelector("td") && row.querySelector("td strong")) {
-                csv += row.querySelector("td strong").innerText + ',' + row.querySelector("td:nth-child(4) strong").innerText.replace('₹','') + ',' + row.querySelector("td:nth-child(5) span").innerText + '\\r\\n';
+            const orderIdNode = row.querySelector("td strong");
+            const billNode = row.querySelector("td:nth-child(4) strong");
+            const statusNode = row.querySelector("td:nth-child(5) span");
+            
+            if(orderIdNode && billNode && statusNode) {
+                csv += `${orderIdNode.innerText.trim()},${billNode.innerText.replace(/[₹,]/g, '').trim()},${statusNode.innerText.trim()}\r\n`;
             }
         });
-        triggerDownload(csv, "Orders_Report.csv");
+        triggerDownload(csv, `Orders_Report_Dump_${Date.now()}.csv`);
     }
 
     function triggerDownload(content, file) {
@@ -497,26 +592,10 @@ module.exports = async (req, res) => {
         const link = document.createElement("a");
         link.href = URL.createObjectURL(blob);
         link.setAttribute("download", file);
-        document.body.appendChild(link); link.click(); document.body.removeChild(link);
+        document.body.appendChild(link); 
+        link.click(); 
+        document.body.removeChild(link);
     }
-
-    async function purgeItem(id) {
-        if(!confirm('Delete?')) return;
-        const res = await fetch(TARGET_GATEWAY_URL + '?action=delete-product&id=' + id, { method: 'DELETE' });
-        const data = await res.json();
-        if(data.success) { loadDashboardData(); }
-    }
-
-    loadDashboardData();
 </script>
 </body>
-</html>`);
-        }
-
-        return res.status(404).json({ success: false, message: 'Resource matching route path not found.' });
-
-    } catch (globalError) {
-        console.error("Monolithic Core Crash Log:", globalError);
-        return res.status(500).json({ success: false, message: "Internal application handling crash error." });
-    }
-};
+</html>
