@@ -1,65 +1,88 @@
-// 1. GLOBAL STATE MATRIX CONFIGURATION
-let liveInventoryState = JSON.parse(localStorage.getItem('IT_INVENTORY')) || [
-    { id: "p1", name: "Premium Carbon MagSafe Shield", category: "Cases", price: 1899, discountPrice: 1199, isLive: true, mediaType: 'icon', asset: "📱" },
-    { id: "p2", name: "65W GaN Super Fast Charger", category: "Chargers", price: 2499, discountPrice: 1649, isLive: true, mediaType: 'icon', asset: "🔌" }
-];
-
-let liveOrdersState = JSON.parse(localStorage.getItem('IT_ORDERS')) || [
-    { id: "IT-8842", name: "Aman Verma", phone: "9810452391", address: "H-42, Pocket 3, Sector 15, Rohini, New Delhi", mop: "ONLINE", utr: "349102847561" },
-    { id: "IT-8843", name: "Rahul Sharma", phone: "8800124956", address: "Flat 204, Royal Apartments, Indirapuram, Ghaziabad", mop: "COD", utr: "N/A" }
-];
-
+// =========================================================================
+// MODULE 1: GLOBAL CONSTANTS & API CLOUD STORAGE BRIDGE INTERFACE LAYER
+// =========================================================================
+const API_BASE_ENDPOINT = '/api';
+let liveInventoryState = [];
+let liveOrdersState = [];
 let temporaryImageBase64 = "";
 
-// 2. STATE PERSISTENCE HARDENING HASH
-function commitStateToStorage() {
-    localStorage.setItem('IT_INVENTORY', JSON.stringify(liveInventoryState));
-    localStorage.setItem('IT_ORDERS', JSON.stringify(liveOrdersState));
+/**
+ * Robust asynchronous coordinator pulling production matrices from backend KV layers 
+ */
+async function pullMasterDatabaseArrays() {
+    try {
+        // Fetch active live products inventory list from unified API endpoints
+        const productResponse = await fetch(`${API_BASE_ENDPOINT}/products`);
+        if (productResponse.ok) {
+            liveInventoryState = await productResponse.json();
+        }
+
+        // Fetch pending customer checkout order logs queue tracking hashes
+        const orderResponse = await fetch(`${API_BASE_ENDPOINT}/orders`);
+        if (orderResponse.ok) {
+            liveOrdersState = await orderResponse.json();
+        }
+
+        // Process data state layers dynamically across visible admin viewport DOMs
+        renderAdminInventory();
+        renderAdminOrders();
+
+    } catch (networkError) {
+        console.error("Critical Cloud State Pull Synchronization Pipeline Interrupted:", networkError.message);
+    }
 }
-// 3. SECURE LOCAL DEVICE FILE READER STREAM
+
+/**
+ * Pushes local state updates back to your secure Vercel database instance 
+ */
+async function pushInventoryStateToCloud() {
+    try {
+        const response = await fetch(`${API_BASE_ENDPOINT}/products`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(liveInventoryState)
+        });
+        if (!response.ok) throw new Error("Cloud write operations failed.");
+    } catch (networkError) {
+        alert("Warning: Synchronization failed. Review dashboard parameters.");
+    }
+}
+// =========================================================================
+// MODULE 2: PREMIUM HIGH-SCALE HARDWARE DEVICE MEDIA ASSET INGESTION CORE
+// =========================================================================
+
+/**
+ * Processes physical files selected on the client phone/laptop to convert into base64 storage blocks
+ * @param {HTMLInputElement} inputElement - Native HTML image upload selector matrix tracking
+ */
 function generateImagePreview(inputElement) {
     const preview = document.getElementById("upload-preview");
+    
     if (inputElement.files && inputElement.files[0]) {
         const fileReaderEngine = new FileReader();
         
         fileReaderEngine.onload = function (eventResult) {
+            // Assign complete string stream to network configuration data block cache
             temporaryImageBase64 = eventResult.target.result;
+            
             if (preview) {
                 preview.src = temporaryImageBase64;
                 preview.style.display = "block";
             }
         };
+        
+        // Execute conversion algorithm matching local storage configurations
         fileReaderEngine.readAsDataURL(inputElement.files[0]);
     }
 }
+// =========================================================================
+// MODULE 4: OPERATIONS CONSOLE AND USER LIFECYCLE EVENT CONTROLLERS
+// =========================================================================
 
-// 4. INVENTORY RENDER DOM MATRIX
-function renderAdminInventory() {
-    const targetTableBody = document.getElementById("inventory-list-target");
-    if (!targetTableBody) return;
-    
-    targetTableBody.innerHTML = liveInventoryState.map((item, index) => `
-        <tr>
-            <td>
-                <div class="row-item-meta">
-                    <div class="row-thumb">${item.mediaType === 'icon' ? item.asset : `<img src="${item.asset}" style="width:100%;height:100%;object-fit:cover;border-radius:6px;">`}</div>
-                    <div style="font-weight: 700;">${item.name}</div>
-                </div>
-            </td>
-            <td>${item.category}</td>
-            <td><strong>₹${item.discountPrice}</strong> <span style="font-size:12px; color:#64748b; text-decoration:line-through;">₹${item.price}</span></td>
-            <td>
-                <label class="toggle-switch">
-                    <input type="checkbox" ${item.isLive ? 'checked' : ''} onchange="toggleProductVisibility(${index})">
-                    <span class="slider"></span>
-                </label>
-            </td>
-            <td><button class="action-icon-btn" onclick="deleteInventoryItem(${index})">🗑️</button></td>
-        </tr>
-    `).join('');
-}
-// 5. PRODUCT PACKAGING AND INJECTION MANAGEMENT
-function processNewProduct(event) {
+/**
+ * Intercepts submission events to append new products and pushes data out to Vercel KV
+ */
+async function processNewProduct(event) {
     event.preventDefault();
     
     const name = document.getElementById("prod-name").value;
@@ -84,60 +107,76 @@ function processNewProduct(event) {
     };
 
     liveInventoryState.push(newProductItem);
-    commitStateToStorage();
+    
+    // Core cloud write pipeline block executions
+    await pushInventoryStateToCloud();
     renderAdminInventory();
     
-    alert(`SUCCESS:\n"${name}" compiled and initialized on live storefront metrics layout configuration successfully.`);
+    alert(`SUCCESS:\n"${name}" compiled and initialized on live storefront metrics layouts successfully.`);
     document.getElementById("product-upload-form").reset();
     document.getElementById("upload-preview").style.display = "none";
     temporaryImageBase64 = "";
 }
 
-// 6. ORDER QUEUE COMPILER MATRIX
+/**
+ * Compiles current customer orders and tracks verified banking reference strings
+ */
 function renderAdminOrders() {
     const targetTableBody = document.getElementById("orders-log-target");
     if (!targetTableBody) return;
     
+    if (liveOrdersState.length === 0) {
+        targetTableBody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#94a3b8; padding:30px;">All incoming transaction pipelines complete. Outstanding queues clear!</td></tr>`;
+        return;
+    }
+    
     targetTableBody.innerHTML = liveOrdersState.map((order, index) => `
         <tr>
-            <td style="font-weight: 700; color: #3b82f6;">#${order.id}</td>
+            <td style="font-weight: 700; color: #3b82f6;">#${order.id || 'IT-ORD'}</td>
             <td>
-                <div style="font-weight: 700;">${order.name}</div>
+                <div style="font-weight: 700; color:#ffffff;">${order.name}</div>
                 <div style="font-size: 12px; color: #94a3b8;">${order.phone}</div>
             </td>
             <td style="max-width: 220px; font-size: 13px; color: #cbd5e1;">${order.address}</td>
             <td><span class="badge ${order.mop === 'ONLINE' ? 'badge-success' : 'badge-warning'}">${order.mop}</span></td>
-            <td style="font-family: monospace; font-weight: 700; color: #f59e0b; letter-spacing: 0.5px;">${order.utr}</td>
-            <td><button class="action-icon-btn" onclick="fulfillOrder(${index})">✅ Ship</button></td>
+            <td style="font-family: monospace; font-weight: 700; color: #f59e0b; letter-spacing: 0.5px; font-size:13px;">${order.utr || 'N/A'}</td>
+            <td><button class="action-icon-btn" style="color:#10b981; font-weight:bold;" onclick="fulfillOrder(${index})">✅ Ship</button></td>
         </tr>
     `).join('');
 }
 
-// 7. INTERACTIVE SWITCH OPERATIONS LIFECYCLE
-function toggleProductVisibility(index) {
+async function toggleProductVisibility(index) {
     liveInventoryState[index].isLive = !liveInventoryState[index].isLive;
-    commitStateToStorage();
+    await pushInventoryStateToCloud();
 }
 
-function deleteInventoryItem(index) {
+async function deleteInventoryItem(index) {
     if (confirm("Confirm security pipeline action: Unlist and remove this component from active storefront matrices?")) {
         liveInventoryState.splice(index, 1);
-        commitStateToStorage();
+        await pushInventoryStateToCloud();
         renderAdminInventory();
     }
 }
 
-function fulfillOrder(index) {
+async function fulfillOrder(index) {
     alert("Order shipment logs synchronized. Generating digital invoicing tokens.");
     liveOrdersState.splice(index, 1);
-    commitStateToStorage();
+    
+    try {
+        await fetch(`${API_BASE_ENDPOINT}/orders`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(liveOrdersState)
+        });
+    } catch (e) {
+        console.error("Order sync logging operational failure:", e);
+    }
     renderAdminOrders();
 }
 
-// 8. AUTO-INITIALIZE ADMINISTRATIVE SYSTEM LAYERS
+// AUTO-INITIALIZE ADMINISTRATIVE SYSTEM LAYERS ON DOCUMENT RENDERING BOUNDS
 window.onload = function() {
-    renderAdminInventory();
-    renderAdminOrders();
+    pullMasterDatabaseArrays();
     
     const formElement = document.getElementById("product-upload-form");
     if (formElement) formElement.addEventListener("submit", processNewProduct);
