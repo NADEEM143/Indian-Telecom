@@ -15,7 +15,7 @@ export default async function handler(req, res) {
         // ==========================================
         // 📦 PRODUCT INVENTORY ENDPOINTS
         // ==========================================
-        if (dataType === 'products') {
+               if (dataType === 'products') {
             if (req.method === 'GET') {
                 const products = await kv.get('it_products') || [];
                 return res.status(200).json(products);
@@ -36,6 +36,20 @@ export default async function handler(req, res) {
             }
             if (req.method === 'POST') {
                 await kv.set('it_orders', req.body);
+                return res.status(200).json({ success: true });
+            }
+        }
+
+        // ==========================================
+        // 👥 NPCI COMPLIANT REGISTERED CUSTOMERS ENDPOINT
+        // ==========================================
+        if (dataType === 'users') {
+            if (req.method === 'GET') {
+                const users = await kv.get('it_users') || [];
+                return res.status(200).json(users);
+            }
+            if (req.method === 'POST') {
+                await kv.set('it_users', req.body);
                 return res.status(200).json({ success: true });
             }
         }
