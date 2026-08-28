@@ -246,7 +246,7 @@
             updateCartUI();
         }
 
-        function updateCartUI() {
+                function updateCartUI() {
             const badge = document.getElementById("cart-badge");
             const totalStr = document.getElementById("cart-total");
             const count = cart.reduce((acc, current) => acc + current.qty, 0);
@@ -263,7 +263,7 @@
             
             container.innerHTML = cart.map(i => `
                 <div class="cart-item">
-                    <div class="cart-item-img" style="font-size:24px;">${i.asset ? `<img src="${i.asset}" style="width:100%;height:100%;object-fit:cover;border-radius:10px;">` : '📱'}</div>
+                    <div class="cart-item-img">${i.asset ? `<img src="${i.asset}" style="width:100%;height:100%;object-fit:cover;border-radius:10px;">` : '📱'}</div>
                     <div style="flex:1;">
                         <h5 style="font-size:14px;font-weight:700;">${i.name}</h5>
                         <p style="font-size:12px;color:#64748b;">₹${i.discountPrice} × ${i.qty}</p>
