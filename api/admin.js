@@ -184,6 +184,9 @@ module.exports = async (req, res) => {
         // =========================================================================
         // 🧩 PIECE 6 OF 12: HTML RESPONSIVE USER INTERFACE FRAMEWORK CORES
         // =========================================================================
+               // =========================================================================
+        // 🧩 UNIFIED HTML presentation BLOCK: PIECES 6, 7, & 8 CLEANED COMBINED
+        // =========================================================================
         if (method === 'GET') {
             res.setHeader('Content-Type', 'text/html');
             return res.status(200).send(`<!DOCTYPE html>
@@ -257,9 +260,6 @@ module.exports = async (req, res) => {
     </style>
 </head>
 <body>
-// =========================================================================
-// 🧩 PIECE 7 OF 12: CORE INTERFACE HEADER MODULE AND FORMS STRUCT
-// =========================================================================
 <div style="max-width:1450px; margin:0 auto 28px auto; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
     <div>
         <h1 style="margin:0; font-size:26px; font-weight:900;">Master System Control Terminal</h1>
@@ -312,7 +312,6 @@ module.exports = async (req, res) => {
             </div>
             <div class="form-group">
                 <label>Product Image Asset</label>
-                <!-- Native file picker moved outside clickable area to resolve dialog-closing loops -->
                 <input type="file" id="fileInp" style="display:none;" accept="image/*" multiple>
                 
                 <div class="dropzone-box" onclick="document.getElementById('fileInp').click()">
@@ -326,9 +325,7 @@ module.exports = async (req, res) => {
             <button type="button" id="cancel-edit-btn" onclick="resetFormState()" style="display:none; width:100%; margin-top:8px; padding:12px; background:#64748b; color:white; border:none; border-radius:12px; font-weight:700; cursor:pointer; text-transform:uppercase; font-size:13px;">Cancel Edit</button>
         </form>
     </div>
-// =========================================================================
-// 🧩 PIECE 8 OF 12: TABLES CONTAINERS AND COLUMN RENDERS
-// =========================================================================
+
     <div style="display:flex; flex-direction:column; width:100%; min-width:0;">
         <div class="table-card">
             <h3 style="margin-top:0; text-transform:uppercase; font-size:13px; color:#475569; letter-spacing:0.5px;">Live Catalog Inventory Array</h3>
@@ -356,6 +353,7 @@ module.exports = async (req, res) => {
 </div>
 `);
         }
+
         // =========================================================================
         // 🧩 PIECE 9 OF 12: SCRIPTS INTERFACE AND ASYNC FILE CANVAS CONVERTERS
         // =========================================================================
