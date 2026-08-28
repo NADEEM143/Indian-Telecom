@@ -137,6 +137,23 @@
         </div>
     </div>
     <!-- SAFELY ENCAPSULATED CONTROLLER JAVASCRIPT BLOCK -->
+                <!-- REGISTERED CUSTOMERS MATRIX OVERVIEW LOGS -->
+            <section class="admin-card" style="margin-top: 30px;">
+                <div class="card-title">👥 Registered Store Customer Profiles</div>
+                <div class="data-table-wrapper">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>User Account ID</th>
+                                <th>Client Name</th>
+                                <th>Verified Mobile String</th>
+                                <th>Security Pass Key Reference</th>
+                            </tr>
+                        </thead>
+                        <tbody id="users-list-target"></tbody>
+                    </table>
+                </div>
+            </section>
     <script>
         const API_BASE_ENDPOINT = '/api';
         let liveInventoryState = [];
