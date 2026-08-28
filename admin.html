@@ -189,7 +189,7 @@
         }
 
                // 🌟 ADD THIS EXACT PIECE TO FIXED SYSTEM GALLERY UPLOADS
-        function generateImagePreview(inputElement) {
+               function generateImagePreview(inputElement) {
             const preview = document.getElementById("upload-preview");
             if (inputElement.files && inputElement.files[0]) {
                 const fileReaderEngine = new FileReader();
@@ -203,6 +203,9 @@
                 fileReaderEngine.readAsDataURL(inputElement.files[0]);
             }
         }
+
+        // GLOBAL TEMPORARY MEMORY TRACKER KEY FOR DYNAMIC EDITING STATE POINTERS
+        let activeEditingProductIndex = null;
 
         async function renderAdminInventory() {
             const targetTableBody = document.getElementById("inventory-list-target");
@@ -236,11 +239,31 @@
                                 <span class="slider"></span>
                             </label>
                         </td>
-                        <td><button class="action-icon-btn" onclick="deleteInventoryItem(${i})">🗑️ Remove</button></td>
+                        <td>
+                            <button class="action-icon-btn" style="color: #3b82f6; background: rgba(59,130,246,0.1); margin-right: 5px; font-weight: bold;" onclick="loadProductIntoEditorForm(${i})">📝 Edit</button>
+                            <button class="action-icon-btn" onclick="deleteInventoryItem(${i})">🗑️ Remove</button>
+                        </td>
                     </tr>
                 `;
             }
             targetTableBody.innerHTML = compiledRows;
+        }
+
+        // INLINE CATALOG EXTRACT ENGINE MAPPING DATA INTO ACTIVE PANEL INPUT FIELDS
+        function loadProductIntoEditorForm(index) {
+            activeEditingProductIndex = index;
+            const item = liveInventoryState[index];
+            
+            document.getElementById("prod-name").value = item.name;
+            document.getElementById("prod-cat").value = item.category;
+            document.getElementById("prod-price").value = item.price;
+            document.getElementById("prod-disc").value = item.discountPrice;
+            
+            const submitBtn = document.querySelector("#product-upload-form .submit-btn");
+            submitBtn.innerText = "💾 Save Dynamic Changes";
+            submitBtn.style.background = "#10b981"; // Shift theme profile safely to green
+            
+            document.getElementById("product-upload-form").scrollIntoView({ behavior: 'smooth' });
         }
 
         function renderAdminOrders() {
@@ -267,7 +290,7 @@
             `).join('');
         }
 
-              // LOCAL DEVICE STORAGE CONTROLLER - OPEN MEDIA DATABASE ENGINE
+        // LOCAL DEVICE STORAGE CONTROLLER - OPEN MEDIA DATABASE ENGINE
         function openIndexedDB() {
             return new Promise((resolve, reject) => {
                 const request = indexedDB.open("IndianTelecomMediaDB", 1);
@@ -298,32 +321,53 @@
             const price = parseInt(document.getElementById("prod-price").value);
             const discount = parseInt(document.getElementById("prod-disc").value);
 
-            const generatedId = "p_" + Date.now();
+            // DETECT INTERCEPT OPERATIONAL UPDATE PIPELINES VS FRESH INSERTS
+            if (activeEditingProductIndex !== null) {
+                const targetedItem = liveInventoryState[activeEditingProductIndex];
+                
+                targetedItem.name = name;
+                targetedItem.category = cat;
+                targetedItem.price = price;
+                targetedItem.discountPrice = discount;
+                
+                if (temporaryImageBase64) {
+                    await saveImageLocally(targetedItem.id, temporaryImageBase64);
+                }
 
-            // Secure the heavy binary image payload into the local browser sandbox cache first
-            if (temporaryImageBase64) {
-                await saveImageLocally(generatedId, temporaryImageBase64);
+                await pushInventoryStateToCloud();
+                activeEditingProductIndex = null;
+                
+                const submitBtn = document.querySelector("#product-upload-form .submit-btn");
+                submitBtn.innerText = "Publish to Live Storefront";
+                submitBtn.style.background = "#3b82f6";
+                
+                alert(`SUCCESS: "${name}" configurations updated live seamlessly!`);
+            } else {
+                const generatedId = "p_" + Date.now();
+
+                if (temporaryImageBase64) {
+                    await saveImageLocally(generatedId, temporaryImageBase64);
+                }
+
+                const newProductItem = {
+                    id: generatedId,
+                    name: name,
+                    category: cat,
+                    price: price,
+                    discountPrice: discount,
+                    isLive: true
+                };
+
+                liveInventoryState.push(newProductItem);
+                await pushInventoryStateToCloud();
+                alert(`Success: "${name}" uploaded with high-res media storage locked successfully!`);
             }
 
-            const newProductItem = {
-                id: generatedId,
-                name: name,
-                category: cat,
-                price: price,
-                discountPrice: discount,
-                isLive: true
-            };
-
-                       liveInventoryState.push(newProductItem);
-            await pushInventoryStateToCloud();
             await renderAdminInventory();
-            
-            alert(`Success: "${name}" uploaded with high-res media storage locked successfully!`);
             document.getElementById("product-upload-form").reset();
             document.getElementById("upload-preview").style.display = "none";
             temporaryImageBase64 = "";
         }
-
         async function toggleProductVisibility(index) {
             liveInventoryState[index].isLive = !liveInventoryState[index].isLive;
             await pushInventoryStateToCloud();
