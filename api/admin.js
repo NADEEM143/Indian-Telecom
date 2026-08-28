@@ -1,45 +1,262 @@
-<!DOCTYPE html>
+// api/admin.js
+// =========================================================================
+// 🧩 PIECE 1 OF 12: SDK IMPORTS, VARIABLE BOUNDARIES, & UPSTASH INSTANCE
+// =========================================================================
+const UpstashPackage = require('@upstash/redis');
+const Redis = UpstashPackage.Redis || UpstashPackage.default?.Redis;
+
+if (!Redis) {
+    throw new Error("Critical System Error: Upstash Redis constructor mapping layer failed.");
+}
+
+// Establish your secure REST engine connection parameters straight to Upstash Node
+const upstash = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN,
+});
+
+// Configure proper commonJS size limits for large base64 image data strings
+module.exports.config = {
+    api: {
+        bodyParser: {
+            sizeLimit: '4.5mb'
+        }
+    }
+};
+// =========================================================================
+// 🧩 PIECE 2 OF 12: SERVERLESS ENTRY POINT & DATA SYNC CHANNELS
+// =========================================================================
+module.exports = async (req, res) => {
+    const { method, query, body } = req;
+
+    try {
+        // =========================================================================
+        // 🧩 PIECE 3 OF 12: ACTION ENDPOINT MATCHING ?action=loadData
+        // =========================================================================
+        if (method === 'GET' && query.action === 'loadData') {
+            const keys = await upstash.keys('telecom_item:*');
+            let products = [];
+            
+            if (keys && keys.length > 0) {
+                const pipeline = upstash.pipeline();
+                keys.forEach(key => pipeline.get(key));
+                const pipelineResult = await pipeline.exec();
+                products = pipelineResult.filter(Boolean);
+            }
+            
+            const orders = (await upstash.get('telecom_orders_log')) || [];
+            return res.status(200).json({ success: true, products, orders });
+        }
+        // =========================================================================
+        // 🧩 PIECE 3 OF 12: ACTION ENDPOINT MATCHING ?action=create-product
+        // =========================================================================
+        if (method === 'POST' && query.action === 'create-product') {
+            const { customEditId, title, tag, category, badge, currentPrice, strikePrice, stockCount, imageUrl } = body;
+            
+            const finalProductId = customEditId ? customEditId : 'item_' + Date.now();
+            const targetKey = `telecom_item:${finalProductId}`;
+            const stockInitial = parseInt(stockCount) || 0;
+
+            const productPayload = {
+                id: finalProductId,
+                title,
+                tag,
+                category: String(category || '').trim(),
+                badge: badge || null,
+                currentPrice: parseInt(currentPrice) || 0,
+                strikePrice: strikePrice ? parseInt(strikePrice) : null,
+                imageUrl: imageUrl || "",
+                imageAsset: imageUrl || "", 
+                stockCount: stockInitial,
+                stockStatus: stockInitial > 0 ? 'INSTOCK' : 'OUTOFSTOCK',
+                updatedAt: new Date().toISOString()
+            };
+
+            await upstash.set(targetKey, productPayload);
+            return res.status(200).json({ success: true, item: productPayload });
+        }
+        // =========================================================================
+        // 🧩 PIECE 4 OF 12: ENDPOINTS ?action=delete-product & ?action=fulfill-order
+        // =========================================================================
+        if (method === 'DELETE' && query.action === 'delete-product') {
+            const { id } = query;
+            if (!id) return res.status(400).json({ success: false, message: 'Missing product identifier key.' });
+            
+            const targetKey = id.startsWith('telecom_item:') ? id : `telecom_item:${id}`;
+            await upstash.del(targetKey);
+            return res.status(200).json({ success: true, message: 'Product record permanently purged.' });
+        }
+
+        if (method === 'POST' && query.action === 'fulfill-order') {
+            const { orderId } = body;
+            let currentOrders = await upstash.get('telecom_orders_log');
+            if (!currentOrders) return res.status(404).json({ success: false, message: 'No orders log data found.' });
+
+            const targetOrder = currentOrders.find(o => o.orderId === orderId);
+            if (!targetOrder) return res.status(404).json({ success: false, message: 'Order reference mismatch.' });
+            if (targetOrder.status === 'FULFILLED') return res.status(400).json({ success: false, message: 'Transaction already completed.' });
+
+            const allProductKeys = await upstash.keys('telecom_item:*');
+            let dynamicProductCache = [];
+            if (allProductKeys && allProductKeys.length > 0) {
+                const pipeline = upstash.pipeline();
+                allProductKeys.forEach(key => pipeline.get(key));
+                dynamicProductCache = (await pipeline.exec()).filter(Boolean);
+            }
+
+            for (const item of targetOrder.items) {
+                let targetProduct = null;
+                let targetKey = null;
+
+                if (item.id && item.id !== 'prod_unknown') {
+                    targetKey = item.id.startsWith('telecom_item:') ? item.id : `telecom_item:${item.id}`;
+                    targetProduct = await upstash.get(targetKey);
+                }
+
+                if (!targetProduct && item.name) {
+                    const matchedCacheItem = dynamicProductCache.find(p => p.title === item.name);
+                    if (matchedCacheItem) {
+                        targetProduct = matchedCacheItem;
+                        targetKey = `telecom_item:${matchedCacheItem.id}`;
+                    }
+                }
+
+                if (targetProduct && targetKey) {
+                    let newStock = (parseInt(targetProduct.stockCount) || 0) - (parseInt(item.qty) || 1);
+                    targetProduct.stockCount = newStock < 0 ? 0 : newStock;
+                    targetProduct.stockStatus = targetProduct.stockCount > 0 ? 'INSTOCK' : 'OUTOFSTOCK';
+                    await upstash.set(targetKey, targetProduct);
+                }
+            }
+
+            targetOrder.status = 'FULFILLED';
+            await upstash.set('telecom_orders_log', currentOrders);
+            return res.status(200).json({ success: true, message: 'Order systems marked FULFILLED and stock structural balances updated!' });
+        }
+        // =========================================================================
+        // 🧩 PIECE 5 OF 12: ENDPOINTS ?action=place-order & ?action=public-products
+        // =========================================================================
+        if (method === 'POST' && query.action === 'place-order') {
+            const { name, mobile, address, mode, total, totalBill, items } = body;
+            let currentOrders = (await upstash.get('telecom_orders_log')) || [];
+
+            const newOrderRecord = {
+                orderId: 'ORD_' + Date.now(),
+                customerName: String(name || '').trim(),
+                customerMobile: String(mobile || '').trim(),
+                customerAddress: String(address || 'Store Pickup Node').trim(),
+                paymentMode: String(mode || 'COD').toUpperCase(),
+                items: items || [],
+                totalBill: Number(total || totalBill || 0),
+                orderDate: new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }),
+                status: 'PENDING'
+            };
+
+            currentOrders.unshift(newOrderRecord);
+            await upstash.set('telecom_orders_log', currentOrders);
+            return res.status(200).json({ success: true, orderId: newOrderRecord.orderId });
+        }
+
+        if (method === 'GET' && query.action === 'public-products') {
+            const keys = await upstash.keys('telecom_item:*');
+            let sortedProducts = [];
+            
+            if (keys && keys.length > 0) {
+                const pipeline = upstash.pipeline();
+                keys.forEach(key => pipeline.get(key));
+                const resList = await pipeline.exec();
+                
+                const cleanList = resList.filter(Boolean).map(item => ({
+                    id: item.id,
+                    title: item.title,
+                    tag: item.tag,
+                    category: String(item.category || '').trim(),
+                    badge: item.badge,
+                    currentPrice: item.currentPrice,
+                    strikePrice: item.strikePrice,
+                    imageUrl: item.imageUrl || item.imageAsset || ''
+                }));
+                
+                sortedProducts = cleanList.sort((a, b) => parseInt(b.id?.split('_') || 0) - parseInt(a.id?.split('_') || 0));
+            }
+            return res.status(200).json(sortedProducts);
+        }
+        // =========================================================================
+        // 🧩 PIECE 6 OF 12: HTML RESPONSIVE USER INTERFACE FRAMEWORK CORES
+        // =========================================================================
+               // =========================================================================
+        // 🧩 UNIFIED HTML presentation BLOCK: PIECES 6, 7, & 8 CLEANED COMBINED
+        // =========================================================================
+        if (method === 'GET') {
+            res.setHeader('Content-Type', 'text/html');
+            return res.status(200).send(`<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>INDIAN TELECOM - Master System Control Room</title>
+    <title>Indian Telecom - Master Control Desk</title>
     <link rel="stylesheet" href="https://cloudflare.com">
     <style>
-        :root {
-            --primary: #2563eb;
-            --primary-hover: #1d4ed8;
-            --dark: #090d16;
-            --text-muted: #64748b;
-            --card-border: #e2e8f0;
-            --bg-light: #f8fafc;
-            --success: #10b981;
-            --danger: #ef4444;
-            --border: #cbd5e1;
-        }
-        body { font-family: system-ui, -apple-system, sans-serif; background-color: var(--bg-light); margin: 0; padding: 40px 20px; color: var(--dark); }
-        .dashboard-container { max-width: 1450px; margin: 0 auto; display: grid; grid-template-columns: 1fr; gap: 40px; }
-        @media (min-width: 1150px) { .dashboard-container { grid-template-columns: 420px 1fr; } }
-        .control-panel, .table-card { background: white; padding: 32px; border-radius: 16px; border: 1px solid var(--card-border); box-shadow: 0 4px 12px rgba(9,13,22,0.02); height: max-content; }
+        :root { --dark: #090d16; --border: #cbd5e1; --danger: #ef4444; --primary: #2563eb; }
+        body { font-family: system-ui, -apple-system, sans-serif; background: #f8fafc; padding: 40px 20px; margin: 0; color: var(--dark); }
+        .master-layout { max-width: 1450px; margin: 0 auto; display: grid; grid-template-columns: 1fr; gap: 40px; }
+        @media (min-width: 1150px) { .master-layout { grid-template-columns: 420px 1fr; } }
+        .control-panel { background: white; padding: 32px; border-radius: 16px; border: 1px solid #e2e8f0; height: max-content; }
         .form-group { margin-bottom: 18px; }
         label { display: block; font-weight: 700; font-size: 11px; text-transform: uppercase; margin-bottom: 6px; color: #475569; letter-spacing: 0.5px; }
         .input-box { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; box-sizing: border-box; font-size: 14px; }
-        .input-box:focus { outline: none; border-color: var(--primary); }
+        .dropzone-box { border: 2px dashed #94a3b8; border-radius: 12px; padding: 20px; text-align: center; cursor: pointer; background: #f8fafc; position: relative; }
         
-        /* 📸 MULTI-GALLERY PREVIEW GRID OVERRIDES */
-        .dropzone-box { border: 2px dashed #94a3b8; border-radius: 12px; padding: 24px; text-align: center; cursor: pointer; background: var(--bg-light); transition: border-color 0.2s; }
-        .dropzone-box:hover { border-color: var(--primary); }
-        .gallery-preview-strip { display: flex !important; gap: 8px !important; flex-wrap: wrap !important; margin-top: 12px !important; justify-content: center !important; width: 100% !important; box-sizing: border-box !important; }
-        .preview-thumbnail-container { width: 72px !important; height: 72px !important; position: relative !important; border: 1px solid var(--card-border) !important; border-radius: 8px !important; background: white !important; overflow: hidden !important; display: inline-block !important; }
-        .preview-thumbnail { width: 100% !important; height: 100% !important; object-fit: contain !important; display: block !important; }
-        .remove-asset-node { position: absolute !important; top: 2px !important; right: 2px !important; background: var(--danger) !important; color: white !important; border: none !important; border-radius: 50% !important; width: 16px !important; height: 16px !important; font-size: 9px !important; cursor: pointer !important; display: flex !important; align-items: center !important; justify-content: center !important; font-weight: 900 !important; padding: 0 !important; z-index: 10 !important; }
+        .gallery-preview-strip { 
+            display: flex !important; 
+            gap: 8px !important; 
+            flex-wrap: wrap !important; 
+            margin-top: 12px !important; 
+            justify-content: center !important; 
+            width: 100% !important;
+            box-sizing: border-box !important;
+        }
+        .preview-thumbnail-container { 
+            width: 72px !important; 
+            height: 72px !important; 
+            position: relative !important; 
+            border: 1px solid var(--border) !important; 
+            border-radius: 8px !important; 
+            background: white !important; 
+            overflow: hidden !important; 
+            display: inline-block !important;
+        }
+        .preview-thumbnail { 
+            width: 100% !important; 
+            height: 100% !important; 
+            object-fit: contain !important; 
+            display: block !important;
+        }
+        .remove-asset-node { 
+            position: absolute !important; 
+            top: 2px !important; 
+            right: 2px !important; 
+            background: var(--danger) !important; 
+            color: white !important; 
+            border: none !important; 
+            border-radius: 50% !important; 
+            width: 16px !important; 
+            height: 16px !important; 
+            font-size: 9px !important; 
+            cursor: pointer !important; 
+            display: flex !important; 
+            align-items: center !important; 
+            justify-content: center !important; 
+            font-weight: 900 !important; 
+            padding: 0 !important;
+            z-index: 10 !important;
+        }
         
-        .submit-trigger { background: var(--dark); color: white; width: 100%; border: none; padding: 14px; border-radius: 12px; font-weight: 700; cursor: pointer; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 13px; }
-        .submit-trigger:hover { background: var(--primary); }
-        .table-card { overflow-x: auto; margin-bottom: 32px; }
+        .submit-trigger { background: var(--dark); color: white; width: 100%; border: none; padding: 14px; border-radius: 12px; font-weight: 700; cursor: pointer; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 13px; width:100%; }
+        .table-card { background: white; padding: 32px; border-radius: 16px; border: 1px solid #e2e8f0; overflow-x: auto; margin-bottom: 32px; }
         table { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 850px; }
-        th { text-align: left; padding: 12px; background: #f1f5f9; font-size: 11px; text-transform: uppercase; color: #475569; border-bottom: 1px solid var(--card-border); }
+        th { text-align: left; padding: 12px; background: #f1f5f9; font-size: 11px; text-transform: uppercase; color: #475569; border-bottom: 1px solid #e2e8f0; }
         td { padding: 14px 12px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+        .export-btn { background: #065f46; color: white; border: none; padding: 10px 16px; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; text-transform: uppercase; }
     </style>
 </head>
 <body>
@@ -48,21 +265,23 @@
         <h1 style="margin:0; font-size:26px; font-weight:900;">Master System Control Terminal</h1>
         <p style="margin:4px 0 0 0; color:#64748b; font-size:14px;">Operational Enterprise Matrix for Indian Telecom Hub</p>
     </div>
-    <div style="font-weight: 700; font-size: 13px; color: var(--success);"><i class="fas fa-circle"></i> Pipeline Live Connected</div>
+    <div style="display:flex; gap:12px;">
+        <button onclick="downloadInventoryCSV()" class="export-btn"><i class="fas fa-file-excel"></i> Download Products CSV</button>
+        <button onclick="downloadOrdersCSV()" class="export-btn" style="background:#1e3a8a;"><i class="fas fa-download"></i> Download Orders CSV</button>
+    </div>
 </div>
-
-<div class="dashboard-container">
+<div class="master-layout">
     <div class="control-panel">
         <h3 id="panel-title" style="margin-top:0; text-transform:uppercase; font-size:13px; color:var(--primary); letter-spacing:0.5px;">Inject Dynamic Inventory</h3>
-        <form id="standaloneForm">
+        <form id="itemDeployForm">
             <input type="hidden" id="edit-id" value="">
             <div class="form-group">
                 <label>Product Display Title</label>
-                <input type="text" id="title" class="input-box" required placeholder="e.g., OnePlus Nord 4 Silicone Case">
+                <input type="text" id="title" class="input-box" required>
             </div>
             <div class="form-group">
                 <label>Mini Content Tag</label>
-                <input type="text" id="tag" class="input-box" required placeholder="e.g., SLIM FIT">
+                <input type="text" id="tag" class="input-box" required>
             </div>
             <div class="form-group">
                 <label>Active Display Target Tab</label>
@@ -75,38 +294,38 @@
             </div>
             <div class="form-group">
                 <label>Promo Ribbon Text</label>
-                <input type="text" id="badge" class="input-box" placeholder="e.g., 20% OFF (Optional)">
+                <input type="text" id="badge" class="input-box">
             </div>
             <div style="display:flex; gap:16px;">
                 <div class="form-group" style="flex:1;">
                     <label>Selling Price (₹)</label>
-                    <input type="number" id="currentPrice" class="input-box" required placeholder="499">
+                    <input type="number" id="currentPrice" class="input-box" required>
                 </div>
                 <div class="form-group" style="flex:1;">
                     <label>Strike Price (₹)</label>
-                    <input type="number" id="strikePrice" class="input-box" placeholder="999">
+                    <input type="number" id="strikePrice" class="input-box">
                 </div>
             </div>
             <div class="form-group">
                 <label>Initial Available Stock Quantity</label>
                 <input type="number" id="stockCount" class="input-box" value="50" min="0" required>
             </div>
-            
             <div class="form-group">
-                <label>Product Image Asset Gallery</label>
-                <!-- Input field is safely isolated outside the dropzone box to prevent infinite clicking loops -->
-                <input type="file" id="galleryFileInput" style="display:none;" accept="image/*" multiple>
-                <div class="dropzone-box" onclick="document.getElementById('galleryFileInput').click()">
+                <label>Product Image Asset</label>
+                <input type="file" id="fileInp" style="display:none;" accept="image/*" multiple>
+                
+                <div class="dropzone-box" onclick="document.getElementById('fileInp').click()">
                     <i class="fas fa-images" style="font-size:24px; color:#64748b; margin-bottom:6px;"></i>
-                    <p id="upload-prompt" style="margin:0; font-size:12px; color:#64748b;">Click to upload product image files</p>
+                    <p id="upload-prompt" style="margin:0; font-size:12px; color:#64748b;">Click to upload product image file</p>
+                    
                     <div id="gallery-preview-strip" class="gallery-preview-strip" onclick="event.stopPropagation();"></div>
                 </div>
             </div>
-            
             <button type="submit" id="submit-btn" class="submit-trigger"><i class="fas fa-plus"></i> Synchronize Item</button>
-            <button type="button" id="cancel-edit-btn" onclick="resetPortalForm()" style="display:none; width:100%; margin-top:8px; padding:12px; background:#64748b; color:white; border:none; border-radius:12px; font-weight:700; cursor:pointer; text-transform:uppercase; font-size:13px;">Cancel Edit</button>
+            <button type="button" id="cancel-edit-btn" onclick="resetFormState()" style="display:none; width:100%; margin-top:8px; padding:12px; background:#64748b; color:white; border:none; border-radius:12px; font-weight:700; cursor:pointer; text-transform:uppercase; font-size:13px;">Cancel Edit</button>
         </form>
     </div>
+
     <div style="display:flex; flex-direction:column; width:100%; min-width:0;">
         <div class="table-card">
             <h3 style="margin-top:0; text-transform:uppercase; font-size:13px; color:#475569; letter-spacing:0.5px;">Live Catalog Inventory Array</h3>
@@ -115,241 +334,320 @@
                     <tr><th>Asset</th><th>Product Context</th><th>Target Tab</th><th>Price Vector</th><th>Stock Matrix</th><th style="text-align:center;">Action Options</th></tr>
                 </thead>
                 <tbody id="products-table-body">
-                    <tr><td colspan="6" style="text-align:center; padding:30px; color:#64748b;">Loading active database streams...</td></tr>
+                    <tr><td colspan="6" style="text-align:center; padding:30px; color:#64748b;">Loading active data streams...</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="table-card">
+            <h3 style="margin-top:0; text-transform:uppercase; font-size:13px; color:#1e3a8a; letter-spacing:0.5px;">Live Sales Verification Order Book</h3>
+            <table>
+                <thead>
+                    <tr><th>Order Code</th><th>Customer Shipping Particulars</th><th>Items Staged</th><th>Total Payable</th><th>Status</th><th style="text-align:center;">Fulfillment Switch</th></tr>
+                </thead>
+                <tbody id="orders-table-body">
+                    <tr><td colspan="6" style="text-align:center; padding:30px; color:#64748b;">Loading active data streams...</td></tr>
                 </tbody>
             </table>
         </div>
     </div>
 </div>
+`);
+        }
 
+        // =========================================================================
+        // 🧩 PIECE 9 OF 12: SCRIPTS INTERFACE AND ASYNC FILE CANVAS CONVERTERS
+        // =========================================================================
+        if (method === 'GET') {
+            return res.status(200).send(`
 <script>
-    // ⚙️ UPSTASH REST CONFIGURATION: Insert your credentials from the Upstash Console Redis tab here
-    const UPSTASH_REST_URL = "https://upstash.io";
-    const UPSTASH_REST_TOKEN = "your_secure_rest_token_here";
+    let localProductCacheMemory = [];
+    let base64ImagePayload = "";
+    let trackingGalleryArray = [];
 
-    let localProductCache = [];
-    let compiledBase64Payload = "";
-    let temporaryGalleryStorage = [];
+    const TARGET_GATEWAY_URL = window.location.origin + window.location.pathname;
 
-    // Asynchronous Upstash Execution Wrapper Interface Pipeline
-    async function executeUpstashCommand(commandArray) {
-        const response = await fetch(`${UPSTASH_REST_URL}`, {
-            method: "POST",
-            headers: {
-                "Authorization": `Bearer ${UPSTASH_REST_TOKEN}`,
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(commandArray)
-        });
-        const resultData = await response.json();
-        return resultData.result;
-    }
-    async function loadPortalData() {
+    async function loadDashboardData() {
         try {
-            const masterKeys = await executeUpstashCommand(["KEYS", "telecom_item:*"]);
-            const tbody = document.getElementById('products-table-body');
-            
-            if(!masterKeys || masterKeys.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:40px; color:#64748b;">No active database records found.</td></tr>';
-                return;
+            const response = await fetch(TARGET_GATEWAY_URL + "?action=loadData");
+            const data = await response.json();
+            if(data.success) {
+                localProductCacheMemory = data.products || [];
+                renderProductsTable(localProductCacheMemory);
+                renderOrdersTable(data.orders || []);
             }
-
-            localProductCache = [];
-            tbody.innerHTML = '';
-
-            for(const key of masterKeys) {
-                const rawItem = await executeUpstashCommand(["GET", key]);
-                if(!rawItem) continue;
-                
-                const item = typeof rawItem === 'string' ? JSON.parse(rawItem) : rawItem;
-                localProductCache.push(item);
-
-                let imageSource = item.imageUrl || "";
-                let displayThumb = imageSource.includes('|||') ? imageSource.split('|||')[0] : imageSource;
-
-                tbody.innerHTML += `
-                    <tr>
-                        <td><img src="${displayThumb}" style="width:44px; height:44px; object-fit:contain; border-radius:6px; border:1px solid #e2e8f0; background:#fafafa;"></td>
-                        <td><strong style="display:block;">${item.title}</strong><span style="font-size:11px; color:#64748b;">${item.tag || ''}</span></td>
-                        <td><span style="background:#e2e8f0; padding:4px 8px; border-radius:12px; font-size:11px; font-weight:700; text-transform:uppercase;">${item.category}</span></td>
-                        <td><strong>₹${item.currentPrice}</strong></td>
-                        <td><span style="font-weight:800; color:${item.stockCount > 0 ? '#10b981' : '#ef4444'}">${item.stockCount} Pcs</span></td>
-                        <td style="text-align:center;">
-                            <button onclick="editProductField('${item.id}')" style="background:#2563eb; color:white; border:none; padding:6px 12px; border-radius:6px; cursor:pointer; font-weight:700; font-size:12px; margin-right:4px;"><i class="fas fa-edit"></i> Edit</button>
-                            <button onclick="purgeProductField('${item.id}')" style="background:#ef4444; color:white; border:none; padding:6px 12px; border-radius:6px; cursor:pointer; font-weight:700; font-size:12px;"><i class="fas fa-trash"></i> Del</button>
-                        </td>
-                    </tr>`;
-            }
-        } catch(err) {
-            console.error("Upstash Fetch Trace Crash:", err);
+        } catch(e) {
+            console.error("Data tracking pipeline broken:", e);
         }
     }
 
-    // 🌟 MULTI-IMAGE CONCURRENT CANVAS COMPRESSION GENERATOR
-    document.getElementById('galleryFileInput').addEventListener('change', function(event) {
+    // 🌟 THE ASYNC ACTION: Processes multiple files accurately without Vercel backend string interpretation bugs
+    document.getElementById('fileInp').onchange = function() {
         if (!this.files || this.files.length === 0) return;
         
-        const filesList = Array.from(this.files);
-        let completedFilesCount = 0;
+        const files = Array.from(this.files);
+        let countProcessed = 0;
         
         const previewStrip = document.getElementById('gallery-preview-strip');
-        const uploadPrompt = document.getElementById('upload-prompt');
+        const promptText = document.getElementById('upload-prompt');
         
         previewStrip.innerHTML = '';
-        temporaryGalleryStorage = [];
-        compiledBase64Payload = "";
+        trackingGalleryArray = [];
+        base64ImagePayload = "";
 
-        filesList.forEach(file => {
+        files.forEach(file => {
             const reader = new FileReader();
             reader.onload = function(e) {
-                const imgNode = new Image();
-                imgNode.src = e.target.result;
-                imgNode.onload = function() {
+                const img = new Image();
+                img.src = e.target.result;
+                img.onload = function() {
                     const canvas = document.createElement('canvas');
                     const ctx = canvas.getContext('2d');
-                    let width = imgNode.width; 
-                    let height = imgNode.height;
+                    let width = img.width; 
+                    let height = img.height;
                     
                     if (width > 800) { height *= 800 / width; width = 800; }
                     canvas.width = width; canvas.height = height;
-                    ctx.drawImage(imgNode, 0, 0, width, height);
+                    ctx.drawImage(img, 0, 0, width, height);
                     
-                    const singleBase64Str = canvas.toDataURL('image/jpeg', 0.6);
-                    temporaryGalleryStorage.push(singleBase64Str);
+                    const singleBase64 = canvas.toDataURL('image/jpeg', 0.6);
+                    trackingGalleryArray.push(singleBase64);
                     
-                    const currentIndex = temporaryGalleryStorage.length - 1;
+                    const itemIndex = trackingGalleryArray.length - 1;
                     
-                    previewStrip.innerHTML += `
-                        <div class="preview-thumbnail-container" id="node-asset-${currentIndex}">
-                            <img src="${singleBase64Str}" class="preview-thumbnail">
-                            <button type="button" class="remove-asset-node" onclick="removeNodeFromUploader(${currentIndex}); event.stopPropagation();">✕</button>
-                        </div>`;
+                    // Fixed escaped concat logic to bypass hidden template literal backend crashes
+                    const nodePreviewHtml = 
+                        '<div class="preview-thumbnail-container" id="gallery-node-' + itemIndex + '">' +
+                            '<img src="' + singleBase64 + '" class="preview-thumbnail" style="display:block;">' +
+                            '<button type="button" class="remove-asset-node" onclick="removeNodeFromUpload(' + itemIndex + '); event.stopPropagation();">✕</button>' +
+                        '</div>';
+                        
+                    previewStrip.insertAdjacentHTML('beforeend', nodePreviewHtml);
                     
-                    completedFilesCount++;
-                    if(completedFilesCount === filesList.length) {
-                        compiledBase64Payload = temporaryGalleryStorage.filter(Boolean).join('|||');
-                        uploadPrompt.innerText = filesList.length + " Gallery Images Selected!";
+                    countProcessed++;
+                    if(countProcessed === files.length) {
+                        base64ImagePayload = trackingGalleryArray.filter(Boolean).join('|||');
+                        promptText.innerText = files.length + " Gallery Assets Uploaded!";
                     }
                 };
             };
             reader.readAsDataURL(file);
         });
-        uploadPrompt.style.display = 'none';
-    });
+        promptText.style.display = 'none';
+    };
 
-    function removeNodeFromUploader(index) {
-        const targetElement = document.getElementById(`node-asset-${index}`);
-        if(targetElement) targetElement.remove();
+    function removeNodeFromUpload(index) {
+        const node = document.getElementById('gallery-node-' + index);
+        if(node) node.remove();
+        trackingGalleryArray[index] = null;
         
-        temporaryGalleryStorage[index] = null;
-        compiledBase64Payload = temporaryGalleryStorage.filter(Boolean).join('|||');
-        
-        if(temporaryGalleryStorage.filter(Boolean).length === 0) {
+        base64ImagePayload = trackingGalleryArray.filter(Boolean).join('|||');
+        if(trackingGalleryArray.filter(Boolean).length === 0) {
             document.getElementById('upload-prompt').style.display = 'block';
-            document.getElementById('upload-prompt').innerText = "Click to upload product image files";
+            document.getElementById('upload-prompt').innerText = "Click to upload product image file";
         }
     }
-    // 🌟 ANTI-REFRESH SUBMIT HANDLER: Prevents form reload bugs completely
-    document.getElementById('standaloneForm').addEventListener('submit', async function(e) {
-        // Halt native form web browser page refresh loops instantly
-        e.preventDefault(); 
-
-        if(!compiledBase64Payload) {
-            alert("Please pick product images from your system gallery.");
+    // =========================================================================
+    // 🧩 PIECE 10 OF 12: PRODUCTS DISPLAY CONCAT MATRIX ENGINE LOOKUPS
+    // =========================================================================
+    function renderProductsTable(products) {
+        const tbody = document.getElementById('products-table-body');
+        if(!products || products.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:40px; color:#64748b;">No inventory data records active.</td></tr>';
             return;
         }
+        tbody.innerHTML = products.map(p => {
+            const count = p.stockCount || 0;
+            const status = p.stockStatus || 'OUTOFSTOCK';
+            let path = p.imageUrl || p.imageAsset || '';
+            let finalThumb = path.includes('|||') ? path.split('|||') : path;
 
+            return '<tr>' +
+                '<td><img src="' + finalThumb + '" style="width:44px; height:44px; object-fit:contain; border-radius:6px; border:1px solid #e2e8f0; background:#fafafa;"></td>' +
+                '<td><strong style="display:block;">' + p.title + '</strong><span style="font-size:11px; color:#64748b;">' + (p.tag || '') + '</span></td>' +
+                '<td><span style="background:#e2e8f0; padding:4px 8px; border-radius:12px; font-size:11px; font-weight:700; text-transform:uppercase;">' + p.category + '</span></td>' +
+                '<td><strong>₹' + p.currentPrice + '</strong></td>' +
+                '<td><span style="font-weight:800; color:' + (count > 0 ? '#10b981' : '#ef4444') + '; background:' + (count > 0 ? '#ecfdf5' : '#fef2f2') + '; padding:4px 8px; border-radius:8px; font-size:12px;">' + count + ' Pcs (' + status + ')</span></td>' +
+                '<td>' +
+                    '<div style="display:flex; gap:6px; justify-content:center;">' +
+                        '<button onclick="triggerLocalEdit(\'' + p.id + '\')" style="background:#2563eb; color:white; border:none; padding:6px 12px; border-radius:6px; cursor:pointer; font-weight:700; font-size:12px;"><i class="fas fa-edit"></i> Edit</button>' +
+                        '<button onclick="purgeItem(\'' + p.id + '\')" style="background:#ef4444; color:white; border:none; padding:6px 12px; border-radius:6px; cursor:pointer; font-weight:700; font-size:12px;"><i class="fas fa-trash-alt"></i> Del</button>' +
+                    '</div>' +
+                '</td>' +
+            '</tr>';
+        }).join('');
+    }
+    // =========================================================================
+    // 🧩 PIECE 11 OF 12: CUSTOMER ORDERS TABLE CONCAT MATRIX MAPPINGS
+    // =========================================================================
+    function renderOrdersTable(orders) {
+        const tbody = document.getElementById('orders-table-body');
+        if(!orders || orders.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:40px; color:#64748b;">No customer shopping logs recorded yet.</td></tr>';
+            return;
+        }
+        tbody.innerHTML = orders.map(o => {
+            const itemsStr = Array.isArray(o.items) ? o.items.map(i => i.name + ' (x' + i.qty + ')').join(', ') : '';
+            const isFulfilled = o.status === 'FULFILLED';
+            return '<tr style="background: ' + (isFulfilled ? '#f8fafc' : '#ffffff') + ';">' +
+                '<td><strong style="color:#2563eb; font-size:12px;">' + o.orderId + '</strong><br><span style="font-size:11px; color:#64748b;">' + (o.orderDate || '') + '</span></td>' +
+                '<td><strong style="display:block;">' + o.customerName + '</strong><span style="font-size:12px; color:#475569;"><i class="fas fa-phone"></i> ' + o.customerMobile + '</span><br><span style="font-size:11px; color:#64748b;"><i class="fas fa-map-marker-alt"></i> ' + o.customerAddress + '</span></td>' +
+                '<td style="font-size:13px; color:#334155;">' + itemsStr + '</td>' +
+                '<td><strong style="color:#10b981; font-size:15px;">₹' + (o.totalBill || o.total || 0) + '</strong><br><span style="font-size:10px; font-weight:700; color:#64748b;">' + (o.paymentMode || 'COD') + '</span></td>' +
+                '<td><span style="font-weight:800; font-size:11px; padding:4px 8px; border-radius:12px; text-transform:uppercase; background:' + (isFulfilled ? '#d1fae5' : '#fef3c7') + '; color:' + (isFulfilled ? '#065f46' : '#92400e') + ';">' + o.status + '</span></td>' +
+                '<td style="text-align:center;">' + (isFulfilled ? '<span style="color:#10b981; font-weight:700;"><i class="fas fa-check-circle"></i> Fulfilling Done</span>' : '<button onclick="processFulfillment(\'' + o.orderId + '\')" style="background:#10b981; color:white; border:none; padding:6px 12px; border-radius:6px; cursor:pointer; font-weight:800; font-size:12px;"><i class="fas fa-shipping-fast"></i> Fulfill</button>') + '</td>' +
+            '</tr>';
+        }).join('');
+    }
+    // =========================================================================
+    // 🧩 PIECE 12 OF 12: METRIC EMITTERS, EXPORTERS, & SERVERLESS RUNTIME CLOSURES
+    // =========================================================================
+    function triggerLocalEdit(targetId) {
+        const product = localProductCacheMemory.find(item => item.id === targetId);
+        if(!product) return;
+
+        document.getElementById('edit-id').value = product.id;
+        document.getElementById('title').value = product.title;
+        document.getElementById('tag').value = product.tag;
+        document.getElementById('category').value = product.category;
+        document.getElementById('badge').value = product.badge || "";
+        document.getElementById('currentPrice').value = product.currentPrice;
+        document.getElementById('strikePrice').value = product.strikePrice || "";
+        document.getElementById('stockCount').value = product.stockCount || 0;
+        
+        base64ImagePayload = product.imageUrl || product.imageAsset || "";
+        
+        const previewStrip = document.getElementById('gallery-preview-strip');
+        previewStrip.innerHTML = '';
+        trackingGalleryArray = base64ImagePayload.includes('|||') ? base64ImagePayload.split('|||') : [base64ImagePayload];
+
+        if(base64ImagePayload) {
+            trackingGalleryArray.forEach((src, idx) => {
+                if(!src) return;
+                previewStrip.innerHTML += 
+                    '<div class="preview-thumbnail-container" id="gallery-node-' + idx + '">' +
+                        '<img src="' + src + '" class="preview-thumbnail" style="display:block;">' +
+                        '<button type="button" class="remove-asset-node" onclick="removeNodeFromUpload(' + idx + ')">✕</button>' +
+                    '</div>';
+            });
+            document.getElementById('upload-prompt').style.display = 'none';
+        } else {
+            document.getElementById('upload-prompt').style.display = 'block';
+            document.getElementById('upload-prompt').innerText = "Click to upload product image file";
+        }
+        
+        document.getElementById('panel-title').innerText = "Modify Existing Product";
+        document.getElementById('submit-btn').innerHTML = '<i class="fas fa-save"></i> Save Changes';
+        document.getElementById('cancel-edit-btn').style.display = "block";
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function resetFormState() {
+        document.getElementById('itemDeployForm').reset();
+        document.getElementById('edit-id').value = "";
+        base64ImagePayload = "";
+        trackingGalleryArray = [];
+        document.getElementById('gallery-preview-strip').innerHTML = '';
+        document.getElementById('upload-prompt').style.display = "block";
+        document.getElementById('upload-prompt').innerText = "Click to upload product image file";
+        document.getElementById('panel-title').innerText = "Inject Dynamic Inventory";
+        document.getElementById('submit-btn').innerHTML = "<i class='fas fa-plus'></i> Synchronize Item";
+        document.getElementById('cancel-edit-btn').style.display = "none";
+    }
+
+    // 🌟 ACTIVE INTERCEPTOR: Attached directly to eliminate double click loops and halt page refreshes
+    document.getElementById('itemDeployForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        if(!base64ImagePayload) { alert("Attach image gallery files."); return; }
+        
         const editId = document.getElementById('edit-id').value;
-        const finalizedId = editId ? editId : 'item_' + Date.now();
-        const upstashKey = `telecom_item:${finalizedId}`;
+        const syncButton = document.getElementById('submit-btn');
+        
+        syncButton.disabled = true;
+        syncButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Synchronizing...';
         
         const payload = {
-            id: finalizedId,
-            title: document.getElementById('title').value.trim(),
-            tag: document.getElementById('tag').value.trim(),
+            title: document.getElementById('title').value,
+            tag: document.getElementById('tag').value,
             category: document.getElementById('category').value,
-            badge: document.getElementById('badge').value.trim() || null,
-            currentPrice: parseInt(document.getElementById('currentPrice').value) || 0,
-            strikePrice: document.getElementById('strikePrice').value ? parseInt(document.getElementById('strikePrice').value) : null,
-            stockCount: document.getElementById('stockCount').value || 0,
-            imageUrl: compiledBase64Payload,
-            updatedAt: new Date().toISOString()
+            badge: document.getElementById('badge').value,
+            currentPrice: document.getElementById('currentPrice').value,
+            strikePrice: document.getElementById('strikePrice').value,
+            stockCount: document.getElementById('stockCount').value,
+            imageUrl: base64ImagePayload
         };
-
-        const actionBtn = document.getElementById('submit-btn');
-        actionBtn.disabled = true;
-        actionBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Syncing to Upstash Redis...`;
+        if(editId) payload.customEditId = editId;
 
         try {
-            // Write payload strings directly into your Upstash Redis database hash maps
-            await executeUpstashCommand(["SET", upstashKey, JSON.stringify(payload)]);
-            alert("Database synchronized perfectly across active server clusters!");
-            resetPortalForm();
-            loadPortalData();
-        } catch(error) {
-            alert("Network pipeline exception intercepted: " + error.message);
+            const res = await fetch(TARGET_GATEWAY_URL + '?action=create-product', { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' }, 
+                body: JSON.stringify(payload) 
+            });
+            const data = await res.json();
+            if(data.success) { alert('Done!'); resetFormState(); loadDashboardData(); }
+        } catch(err) {
+            console.error(err);
+            alert("Upstash transaction failed.");
         } finally {
-            actionBtn.disabled = false;
-            actionBtn.innerHTML = `<i class="fas fa-plus"></i> Synchronize Item`;
+            syncButton.disabled = false;
+            syncButton.innerHTML = "<i class='fas fa-plus'></i> Synchronize Item";
         }
     });
 
-    function editProductField(id) {
-        const item = localProductCache.find(p => p.id === id);
-        if(!item) return;
-
-        document.getElementById('edit-id').value = item.id;
-        document.getElementById('title').value = item.title;
-        document.getElementById('tag').value = item.tag;
-        document.getElementById('category').value = item.category;
-        document.getElementById('badge').value = item.badge || "";
-        document.getElementById('currentPrice').value = item.currentPrice;
-        document.getElementById('strikePrice').value = item.strikePrice || "";
-        document.getElementById('stockCount').value = item.stockCount || 0;
-
-        compiledBase64Payload = item.imageUrl || "";
-        const previewStrip = document.getElementById('gallery-preview-strip');
-        previewStrip.innerHTML = '';
-        temporaryGalleryStorage = compiledBase64Payload.includes('|||') ? compiledBase64Payload.split('|||') : [compiledBase64Payload];
-
-        if(compiledBase64Payload) {
-            temporaryGalleryStorage.forEach((src, idx) => {
-                if(!src) return;
-                previewStrip.innerHTML += `
-                    <div class="preview-thumbnail-container" id="node-asset-${idx}">
-                        <img src="${src}" class="preview-thumbnail">
-                        <button type="button" class="remove-asset-node" onclick="removeNodeFromUploader(${idx}); event.stopPropagation();">✕</button>
-                    </div>`;
-            });
-            document.getElementById('upload-prompt').style.display = 'none';
-        }
-
-        document.getElementById('panel-title').innerText = "Modify Existing Listing Fields";
-        document.getElementById('submit-btn').innerHTML = `<i class="fas fa-save"></i> Save Changes`;
-        document.getElementById('cancel-edit-btn').style.display = "block";
+    async function processFulfillment(orderId) {
+        if(!confirm('Fulfill order?')) return;
+        const res = await fetch(TARGET_GATEWAY_URL + '?action=fulfill-order', { 
+            method: 'POST', 
+            headers: { 'Content-Type': 'application/json' }, 
+            body: JSON.stringify({ orderId: orderId }) 
+        });
+        const data = await res.json();
+        if(data.success) { alert(data.message); loadDashboardData(); }
     }
 
-    async function purgeProductField(id) {
-        if(confirm("Permanently remove this accessory from active catalog index streams?")) {
-            await executeUpstashCommand(["DEL", `telecom_item:${id}`]);
-            loadPortalData();
-        }
+    function downloadInventoryCSV() {
+        let csv = "ID,Title,Category,Price,Stock\\r\\n";
+        const items = localProductCacheMemory || [];
+        items.forEach(p => csv += p.id + ',' + p.title.replace(/,/g,'') + ',' + p.category + ',' + p.currentPrice + ',' + p.stockCount + '\\r\\n');
+        triggerDownload(csv, "Products_Report.csv");
     }
 
-    function resetPortalForm() {
-        document.getElementById('standaloneForm').reset();
-        document.getElementById('edit-id').value = "";
-        document.getElementById('gallery-preview-strip').innerHTML = '';
-        document.getElementById('upload-prompt').style.display = 'block';
-        document.getElementById('upload-prompt').innerText = "Click to upload product image files";
-        document.getElementById('panel-title').innerText = "Inject Dynamic Inventory";
-        document.getElementById('submit-btn').innerHTML = `<i class="fas fa-plus"></i> Synchronize Item`;
-        document.getElementById('cancel-edit-btn').style.display = "none";
-        compiledBase64Payload = "";
-        temporaryGalleryStorage = [];
+    function downloadOrdersCSV() {
+        let csv = "OrderID,Total,Status\\r\\n";
+        const rows = document.querySelectorAll("#orders-table-body tr");
+        rows.forEach(row => {
+            if(row.querySelector("td") && row.querySelector("td strong")) {
+                csv += row.querySelector("td strong").innerText + ',' + row.querySelector("td:nth-child(4) strong").innerText.replace('₹','').replace(/,/g,'') + ',' + row.querySelector("td:nth-child(5) span").innerText + '\\r\\n';
+            }
+        });
+        triggerDownload(csv, "Orders_Report.csv");
     }
 
-    window.onload = loadPortalData;
+    function triggerDownload(content, file) {
+        const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.setAttribute("download", file);
+        document.body.appendChild(link); link.click(); document.body.removeChild(link);
+    }
+
+    async function purgeItem(id) {
+        if(!confirm('Delete?')) return;
+        const res = await fetch(TARGET_GATEWAY_URL + '?action=delete-product&id=' + id, { method: 'DELETE' });
+        const data = await res.json();
+        if(data.success) { loadDashboardData(); }
+    }
+
+    loadDashboardData();
 </script>
 </body>
-</html>
+</html>`);
+        }
+
+        return res.status(404).json({ success: false, message: 'Resource matching route path not found.' });
+
+    } catch (globalError) {
+        console.error("Monolithic Core Crash Log:", globalError);
+        return res.status(500).json({ success: false, message: "Internal application handling crash error." });
+    }
+};
