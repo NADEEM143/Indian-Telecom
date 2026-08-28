@@ -1,6 +1,6 @@
 // api/admin.js
 // =========================================================================
-// 🧩 PIECE 1 OF 11: SDK IMPORTS, VARIABLE BOUNDARIES, & UPSTASH INSTANCE
+// 🧩 PIECE 1 OF 12: SDK IMPORTS, VARIABLE BOUNDARIES, & UPSTASH INSTANCE
 // =========================================================================
 const UpstashPackage = require('@upstash/redis');
 const Redis = UpstashPackage.Redis || UpstashPackage.default?.Redis;
@@ -9,7 +9,7 @@ if (!Redis) {
     throw new Error("Critical System Error: Upstash Redis constructor mapping layer failed.");
 }
 
-// Establish your high-utility live connection parameter rules to Upstash
+// Establish your secure REST engine connection parameters straight to Upstash Node
 const upstash = new Redis({
   url: process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL,
   token: process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN,
@@ -24,14 +24,14 @@ module.exports.config = {
     }
 };
 // =========================================================================
-// 🧩 PIECE 2 OF 11: CORE HANDLER SWITCH MATRIX & DATA LOADER
+// 🧩 PIECE 2 OF 12: SERVERLESS ENTRY POINT & DATA SYNC CHANNELS
 // =========================================================================
 module.exports = async (req, res) => {
     const { method, query, body } = req;
 
     try {
         // =========================================================================
-        // 🧩 PIECE 3 OF 8: ENDPOINT ?action=loadData (UNIFIED API LAYER)
+        // 🧩 PIECE 3 OF 12: ACTION ENDPOINT MATCHING ?action=loadData
         // =========================================================================
         if (method === 'GET' && query.action === 'loadData') {
             const keys = await upstash.keys('telecom_item:*');
@@ -48,7 +48,7 @@ module.exports = async (req, res) => {
             return res.status(200).json({ success: true, products, orders });
         }
         // =========================================================================
-        // 🧩 PIECE 3 OF 11: ENDPOINT ?action=create-product (UPSERT DATA MATRIX)
+        // 🧩 PIECE 3 OF 12: ACTION ENDPOINT MATCHING ?action=create-product
         // =========================================================================
         if (method === 'POST' && query.action === 'create-product') {
             const { customEditId, title, tag, category, badge, currentPrice, strikePrice, stockCount, imageUrl } = body;
@@ -75,9 +75,8 @@ module.exports = async (req, res) => {
             await upstash.set(targetKey, productPayload);
             return res.status(200).json({ success: true, item: productPayload });
         }
-
         // =========================================================================
-        // 🧩 PIECE 4 OF 11: ENDPOINT ?action=delete-product (CATALOG ENTRIES PURGE)
+        // 🧩 PIECE 4 OF 12: ENDPOINTS ?action=delete-product & ?action=fulfill-order
         // =========================================================================
         if (method === 'DELETE' && query.action === 'delete-product') {
             const { id } = query;
@@ -87,9 +86,7 @@ module.exports = async (req, res) => {
             await upstash.del(targetKey);
             return res.status(200).json({ success: true, message: 'Product record permanently purged.' });
         }
-        // =========================================================================
-        // 🧩 PIECE 4 OF 11: ENDPOINT ?action=fulfill-order (REAL-TIME DEDUCTION LOGIC)
-        // =========================================================================
+
         if (method === 'POST' && query.action === 'fulfill-order') {
             const { orderId } = body;
             let currentOrders = await upstash.get('telecom_orders_log');
@@ -137,7 +134,7 @@ module.exports = async (req, res) => {
             return res.status(200).json({ success: true, message: 'Order systems marked FULFILLED and stock structural balances updated!' });
         }
         // =========================================================================
-        // 🧩 PIECE 5 OF 11: ENDPOINTS ?action=place-order & ?action=public-products
+        // 🧩 PIECE 5 OF 12: ENDPOINTS ?action=place-order & ?action=public-products
         // =========================================================================
         if (method === 'POST' && query.action === 'place-order') {
             const { name, mobile, address, mode, total, totalBill, items } = body;
@@ -185,7 +182,7 @@ module.exports = async (req, res) => {
             return res.status(200).json(sortedProducts);
         }
         // =========================================================================
-        // 🧩 PIECE 6 OF 11: HTML PRESENTATION HEADER DOCUMENT RENDER SLOTS
+        // 🧩 PIECE 6 OF 12: HTML RESPONSIVE USER INTERFACE FRAMEWORK CORES
         // =========================================================================
         if (method === 'GET') {
             res.setHeader('Content-Type', 'text/html');
@@ -206,7 +203,6 @@ module.exports = async (req, res) => {
         .input-box { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; box-sizing: border-box; font-size: 14px; }
         .dropzone-box { border: 2px dashed #94a3b8; border-radius: 12px; padding: 20px; text-align: center; cursor: pointer; background: #f8fafc; position: relative; }
         
-        /* Multi-Image Gallery Asset Render Strip Palette Grid Layout Styles */
         .gallery-preview-strip { 
             display: flex !important; 
             gap: 8px !important; 
@@ -261,6 +257,9 @@ module.exports = async (req, res) => {
     </style>
 </head>
 <body>
+// =========================================================================
+// 🧩 PIECE 7 OF 12: CORE INTERFACE HEADER MODULE AND FORMS STRUCT
+// =========================================================================
 <div style="max-width:1450px; margin:0 auto 28px auto; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
     <div>
         <h1 style="margin:0; font-size:26px; font-weight:900;">Master System Control Terminal</h1>
@@ -311,23 +310,25 @@ module.exports = async (req, res) => {
                 <label>Initial Available Stock Quantity</label>
                 <input type="number" id="stockCount" class="input-box" value="50" min="0" required>
             </div>
-                       <div class="form-group">
-    <label>Product Image Asset</label>
-    <!-- Hidden selector input node explicitly isolated out of clickable container bounds -->
-    <input type="file" id="fileInp" style="display:none;" accept="image/*" multiple>
-    
-    <div class="dropzone-box" onclick="document.getElementById('fileInp').click()">
-        <i class="fas fa-images" style="font-size:24px; color:#64748b; margin-bottom:6px;"></i>
-        <p id="upload-prompt" style="margin:0; font-size:12px; color:#64748b;">Click to upload product image file</p>
-        
-        <div id="gallery-preview-strip" class="gallery-preview-strip" onclick="event.stopPropagation();"></div>
-    </div>
-</div>
+            <div class="form-group">
+                <label>Product Image Asset</label>
+                <!-- Native file picker moved outside clickable area to resolve dialog-closing loops -->
+                <input type="file" id="fileInp" style="display:none;" accept="image/*" multiple>
+                
+                <div class="dropzone-box" onclick="document.getElementById('fileInp').click()">
+                    <i class="fas fa-images" style="font-size:24px; color:#64748b; margin-bottom:6px;"></i>
+                    <p id="upload-prompt" style="margin:0; font-size:12px; color:#64748b;">Click to upload product image file</p>
+                    
+                    <div id="gallery-preview-strip" class="gallery-preview-strip" onclick="event.stopPropagation();"></div>
+                </div>
+            </div>
             <button type="submit" id="submit-btn" class="submit-trigger"><i class="fas fa-plus"></i> Synchronize Item</button>
             <button type="button" id="cancel-edit-btn" onclick="resetFormState()" style="display:none; width:100%; margin-top:8px; padding:12px; background:#64748b; color:white; border:none; border-radius:12px; font-weight:700; cursor:pointer; text-transform:uppercase; font-size:13px;">Cancel Edit</button>
         </form>
     </div>
-
+// =========================================================================
+// 🧩 PIECE 8 OF 12: TABLES CONTAINERS AND COLUMN RENDERS
+// =========================================================================
     <div style="display:flex; flex-direction:column; width:100%; min-width:0;">
         <div class="table-card">
             <h3 style="margin-top:0; text-transform:uppercase; font-size:13px; color:#475569; letter-spacing:0.5px;">Live Catalog Inventory Array</h3>
@@ -345,7 +346,8 @@ module.exports = async (req, res) => {
             <table>
                 <thead>
                     <tr><th>Order Code</th><th>Customer Shipping Particulars</th><th>Items Staged</th><th>Total Payable</th><th>Status</th><th style="text-align:center;">Fulfillment Switch</th></tr>
-                               <tbody id="orders-table-body">
+                </thead>
+                <tbody id="orders-table-body">
                     <tr><td colspan="6" style="text-align:center; padding:30px; color:#64748b;">Loading active data streams...</td></tr>
                 </tbody>
             </table>
@@ -353,10 +355,9 @@ module.exports = async (req, res) => {
     </div>
 </div>
 `);
-        } // 🔒 Correctly closes the HTML GET method block only
-
+        }
         // =========================================================================
-        // 🧩 PIECE 9 OF 11: SCRIPT MATRIX INITIALIZER & MULTI-IMAGE CANVAS CODE
+        // 🧩 PIECE 9 OF 12: SCRIPTS INTERFACE AND ASYNC FILE CANVAS CONVERTERS
         // =========================================================================
         if (method === 'GET') {
             return res.status(200).send(`
@@ -381,59 +382,60 @@ module.exports = async (req, res) => {
         }
     }
 
-    // 🌟 PRODUCTION STABLE ADDEVENTLISTENER HOOK: Captures, scales, and renders gallery files smoothly
-   // Paste this directly inside your script tags
-document.getElementById('fileInp').addEventListener('change', function(event) {
-    if (!this.files || this.files.length === 0) return;
-    
-    const filesList = Array.from(this.files);
-    let countDone = 0;
-    
-    const previewContainer = document.getElementById('gallery-preview-strip');
-    const statusText = document.getElementById('upload-prompt');
-    
-    previewContainer.innerHTML = '';
-    trackingGalleryArray = [];
-    base64ImagePayload = "";
+    // 🌟 THE ASYNC ACTION: Processes multiple files accurately without Vercel backend string interpretation bugs
+    document.getElementById('fileInp').onchange = function() {
+        if (!this.files || this.files.length === 0) return;
+        
+        const files = Array.from(this.files);
+        let countProcessed = 0;
+        
+        const previewStrip = document.getElementById('gallery-preview-strip');
+        const promptText = document.getElementById('upload-prompt');
+        
+        previewStrip.innerHTML = '';
+        trackingGalleryArray = [];
+        base64ImagePayload = "";
 
-    filesList.forEach(file => {
-        const fileReader = new FileReader();
-        fileReader.onload = function(e) {
-            const imgElement = new Image();
-            imgElement.src = e.target.result;
-            imgElement.onload = function() {
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-                let width = imgElement.width; 
-                let height = imgElement.height;
-                
-                if (width > 800) { height *= 800 / width; width = 800; }
-                canvas.width = width; canvas.height = height;
-                ctx.drawImage(imgElement, 0, 0, width, height);
-                
-                const compressionBase64 = canvas.toDataURL('image/jpeg', 0.6);
-                trackingGalleryArray.push(compressionBase64);
-                
-                const nodeIndex = trackingGalleryArray.length - 1;
-                const thumbnailHtml = 
-                    '<div class="preview-thumbnail-container" id="gallery-node-' + nodeIndex + '">' +
-                        '<img src="' + compressionBase64 + '" class="preview-thumbnail" style="display:block;">' +
-                        '<button type="button" class="remove-asset-node" onclick="removeNodeFromUpload(' + nodeIndex + '); event.stopPropagation();">✕</button>' +
-                    '</div>';
+        files.forEach(file => {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.src = e.target.result;
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    let width = img.width; 
+                    let height = img.height;
                     
-                previewContainer.insertAdjacentHTML('beforeend', thumbnailHtml);
-                
-                countDone++;
-                if(countDone === filesList.length) {
-                    base64ImagePayload = trackingGalleryArray.filter(Boolean).join('|||');
-                    statusText.innerText = filesList.length + " Gallery Assets Uploaded!";
-                }
+                    if (width > 800) { height *= 800 / width; width = 800; }
+                    canvas.width = width; canvas.height = height;
+                    ctx.drawImage(img, 0, 0, width, height);
+                    
+                    const singleBase64 = canvas.toDataURL('image/jpeg', 0.6);
+                    trackingGalleryArray.push(singleBase64);
+                    
+                    const itemIndex = trackingGalleryArray.length - 1;
+                    
+                    // Fixed escaped concat logic to bypass hidden template literal backend crashes
+                    const nodePreviewHtml = 
+                        '<div class="preview-thumbnail-container" id="gallery-node-' + itemIndex + '">' +
+                            '<img src="' + singleBase64 + '" class="preview-thumbnail" style="display:block;">' +
+                            '<button type="button" class="remove-asset-node" onclick="removeNodeFromUpload(' + itemIndex + '); event.stopPropagation();">✕</button>' +
+                        '</div>';
+                        
+                    previewStrip.insertAdjacentHTML('beforeend', nodePreviewHtml);
+                    
+                    countProcessed++;
+                    if(countProcessed === files.length) {
+                        base64ImagePayload = trackingGalleryArray.filter(Boolean).join('|||');
+                        promptText.innerText = files.length + " Gallery Assets Uploaded!";
+                    }
+                };
             };
-        };
-        fileReader.readAsDataURL(file);
-    });
-    statusText.style.display = 'none';
-});
+            reader.readAsDataURL(file);
+        });
+        promptText.style.display = 'none';
+    };
 
     function removeNodeFromUpload(index) {
         const node = document.getElementById('gallery-node-' + index);
@@ -447,7 +449,7 @@ document.getElementById('fileInp').addEventListener('change', function(event) {
         }
     }
     // =========================================================================
-    // 🧩 PIECE 10 OF 11: DATA TABLE ROW CONCAT MATRIX ENGINE LOOKUPS
+    // 🧩 PIECE 10 OF 12: PRODUCTS DISPLAY CONCAT MATRIX ENGINE LOOKUPS
     // =========================================================================
     function renderProductsTable(products) {
         const tbody = document.getElementById('products-table-body');
@@ -476,7 +478,9 @@ document.getElementById('fileInp').addEventListener('change', function(event) {
             '</tr>';
         }).join('');
     }
-
+    // =========================================================================
+    // 🧩 PIECE 11 OF 12: CUSTOMER ORDERS TABLE CONCAT MATRIX MAPPINGS
+    // =========================================================================
     function renderOrdersTable(orders) {
         const tbody = document.getElementById('orders-table-body');
         if(!orders || orders.length === 0) {
@@ -497,7 +501,7 @@ document.getElementById('fileInp').addEventListener('change', function(event) {
         }).join('');
     }
     // =========================================================================
-    // 🧩 PIECE 11 OF 11: FORM EMITTERS, EXPORTERS, & GLOBAL STATE SYSTEM CLOSURES
+    // 🧩 PIECE 12 OF 12: METRIC EMITTERS, EXPORTERS, & SERVERLESS RUNTIME CLOSURES
     // =========================================================================
     function triggerLocalEdit(targetId) {
         const product = localProductCacheMemory.find(item => item.id === targetId);
@@ -552,22 +556,16 @@ document.getElementById('fileInp').addEventListener('change', function(event) {
         document.getElementById('cancel-edit-btn').style.display = "none";
     }
 
-        // 🌟 PRODUCTION STABLE SUBMIT INTERCEPTOR: Secures payload mapping and prevents page reload cycles
-    document.getElementById('itemDeployForm').onsubmit = async function(e) {
-        // Halt native form browser submission page refresh loops instantly
+    // 🌟 ACTIVE INTERCEPTOR: Attached directly to eliminate double click loops and halt page refreshes
+    document.getElementById('itemDeployForm').addEventListener('submit', async function(e) {
         e.preventDefault();
-        
-        if(!base64ImagePayload) { 
-            alert("Attach image gallery files."); 
-            return; 
-        }
+        if(!base64ImagePayload) { alert("Attach image gallery files."); return; }
         
         const editId = document.getElementById('edit-id').value;
-        const submitButton = document.getElementById('submit-btn');
+        const syncButton = document.getElementById('submit-btn');
         
-        // Prevent accidental multiple submissions while uploading
-        submitButton.disabled = true;
-        submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Synchronizing Assets...';
+        syncButton.disabled = true;
+        syncButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Synchronizing...';
         
         const payload = {
             title: document.getElementById('title').value,
@@ -588,19 +586,15 @@ document.getElementById('fileInp').addEventListener('change', function(event) {
                 body: JSON.stringify(payload) 
             });
             const data = await res.json();
-            if(data.success) { 
-                alert('Done!'); 
-                resetFormState(); 
-                loadDashboardData(); 
-            }
+            if(data.success) { alert('Done!'); resetFormState(); loadDashboardData(); }
         } catch(err) {
-            console.error("Upstash synchronization pipeline interrupted:", err);
-            alert("Database tracking transaction delayed.");
+            console.error(err);
+            alert("Upstash transaction failed.");
         } finally {
-            submitButton.disabled = false;
-            submitButton.innerHTML = '<i class="fas fa-plus"></i> Synchronize Item';
+            syncButton.disabled = false;
+            syncButton.innerHTML = "<i class='fas fa-plus'></i> Synchronize Item";
         }
-    };
+    });
 
     async function processFulfillment(orderId) {
         if(!confirm('Fulfill order?')) return;
@@ -614,9 +608,9 @@ document.getElementById('fileInp').addEventListener('change', function(event) {
     }
 
     function downloadInventoryCSV() {
-        let csv = "ID,Title,Category,Price,Stock\r\n";
+        let csv = "ID,Title,Category,Price,Stock\\r\\n";
         const items = localProductCacheMemory || [];
-        items.forEach(p => csv += p.id + ',' + p.title.replace(/,/g,'') + ',' + p.category + ',' + p.currentPrice + ',' + p.stockCount + '\r\n');
+        items.forEach(p => csv += p.id + ',' + p.title.replace(/,/g,'') + ',' + p.category + ',' + p.currentPrice + ',' + p.stockCount + '\\r\\n');
         triggerDownload(csv, "Products_Report.csv");
     }
 
