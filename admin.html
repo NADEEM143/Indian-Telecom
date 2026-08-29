@@ -570,10 +570,10 @@
             if (!confirm(`Are you sure you want to push this new live message announcement to your store? \n\n"${inputFieldVal}"`)) return;
 
             try {
-                // Save updated text property string payload straight up to Vercel KV cloud cell parameters map
+                // 🟢 FIXED: Points exactly to the master API endpoint configuration path variable matching your data routines
                 const savePayload = { message: inputFieldVal };
                 
-                await fetch(`${API_BASE_ENDPOINT}/api/admin?type=banner_msg`, {
+                await fetch(`${API_BASE_ENDPOINT}/admin?type=banner_msg`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(savePayload)
