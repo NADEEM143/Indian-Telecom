@@ -255,7 +255,7 @@
             } catch (e) { return null; }
         }
 
-        async function renderProducts(items) {
+               function renderProducts(items) {
             const grid = document.getElementById("product-grid");
             if (!grid) return;
             
@@ -267,14 +267,13 @@
             let compiledGridHTML = "";
             for (let i = 0; i < items.length; i++) {
                 const item = items[i];
-                // Extract the image matching this specific product ID from local browser storage memory
-                const activeMediaAsset = await getImageLocally(item.id);
 
+                // 🟢 FIXED: Reads the base64 photo path straight from the server's cloud item loop instead of checking local computer hardware drives
                 compiledGridHTML += `
                     <div class="product-card">
                         <div class="img-container">
                             <span class="save-tag">Save ₹${item.price - item.discountPrice}</span>
-                            ${activeMediaAsset ? `<img src="${activeMediaAsset}" style="width:100%;height:100%;object-fit:cover;border-radius:14px;">` : `<div style="font-size: 54px;">📱</div>`}
+                            ${item.asset ? `<img src="${item.asset}" style="width:100%;height:100%;object-fit:cover;border-radius:14px;">` : `<div style="font-size: 54px;">📱</div>`}
                         </div>
                         <div class="product-info">
                             <p>${item.category || 'Accessory'}</p>
@@ -300,7 +299,7 @@
             renderProducts(productsList.filter(p => p.category === cat));
         }
 
-                function syncCartToBrowserLocalStorage() {
+        function syncCartToBrowserLocalStorage() {
             localStorage.setItem('IT_STOREFRONT_CART', JSON.stringify(cart));
         }
 
