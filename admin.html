@@ -138,7 +138,7 @@
     </div>
     <!-- SAFELY ENCAPSULATED CONTROLLER JAVASCRIPT BLOCK -->
                 <!-- REGISTERED CUSTOMERS MATRIX OVERVIEW LOGS -->
-           <section class="admin-card" style="margin-top: 30px;">
+          <section class="admin-card" style="margin-top: 30px;">
                 <div class="card-title">👥 Registered Store Customer Profiles</div>
                 <div class="data-table-wrapper">
                     <table class="admin-table">
@@ -148,6 +148,8 @@
                                 <th>Client Name</th>
                                 <th>Verified Mobile String</th>
                                 <th>Security Pass Key Reference</th>
+                                <!-- 🛠️ NEW WORKSPACE COLUMN ACTION ANCHOR -->
+                                <th style="text-align: right; padding-right: 24px;">Workspace Actions</th>
                             </tr>
                         </thead>
                         <tbody id="users-list-target"></tbody>
@@ -161,6 +163,15 @@
                 <div class="data-table-wrapper">
                     <table class="admin-table">
                         <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Customer Details</th>
+                                <th>Destination Address</th>
+                                <th>MOP Method</th>
+                                <th>Verified Bank UTR</th>
+                                <th>Status Badge</th>
+                            </tr>
+                        </thead>
                             <tr>
                                 <th>Order ID</th>
                                 <th>Customer Details</th>
@@ -224,15 +235,20 @@
                     // Clear previous blank items or hidden placeholders safely
                     userTableBody.innerHTML = ""; 
                     
-                    if (!databaseUsersList || databaseUsersList.length === 0) {
-                        userTableBody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#94a3b8; padding:30px; font-weight:700;">No data records found inside cloud store.</td></tr>`;
+                                        if (!databaseUsersList || databaseUsersList.length === 0) {
+                        userTableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#94a3b8; padding:30px; font-weight:700;">No data records found inside cloud store.</td></tr>`;
                     } else {
-                        userTableBody.innerHTML = databaseUsersList.map(u => `
+                        // 🟢 FIXED: Renders live interactive editing and suspension triggers for each customer account row
+                        userTableBody.innerHTML = databaseUsersList.map((u, idx) => `
                             <tr>
                                 <td style="font-weight:700; color:#3b82f6; padding:12px 8px;">#${u.id || 'U'}</td>
                                 <td style="color:#ffffff; font-weight:bold; padding:12px 8px;">${u.name || 'N/A'}</td>
                                 <td style="color:#cbd5e1; padding:12px 8px;">${u.phone || u.contact || 'N/A'}</td>
                                 <td style="font-family:monospace; color:#a1a1aa; padding:12px 8px;">${u.password || 'N/A'}</td>
+                                <td style="text-align: right; padding:12px 8px; white-space: nowrap;">
+                                    <button class="action-icon-btn" style="color: #f59e0b; background: rgba(245,158,11,0.1); margin-right: 5px; font-weight: bold;" onclick="triggerInlineUserEdit(${idx})">📝 Edit</button>
+                                    <button class="action-icon-btn" style="color: #ef4444; background: rgba(239,68,68,0.1); font-weight: bold;" onclick="suspendCustomerAccount(${idx})">🚫 Suspend</button>
+                                </td>
                             </tr>
                         `).join('');
                     }
@@ -244,6 +260,81 @@
                 renderAdminHistoryLog(); // Load permanent tracker rows onto the UI
             } catch (err) {
                 console.error("Cloud Master State Sync Error:", err.message);
+            }
+        }
+
+        // =========================================================================
+        // 👥 CUSTOMER COMPLIANCE AND PROFILE EDIT ENGINE MODULES
+        // =========================================================================
+        async function triggerInlineUserEdit(index) {
+            try {
+                // Download a temporary fresh array stack directly from the server to prevent editing stale rows
+                const response = await fetch(`${API_BASE_ENDPOINT}/admin?type=users&_t=${Date.now()}`);
+                if (!response.ok) return alert("Failed to fetch current user records stack.");
+                let currentUsersList = await response.json();
+                
+                const client = currentUsersList[index];
+                if (!client) return alert("Account record data trace missing.");
+
+                // Prompt management entries using clear, secure modal popups
+                const targetName = prompt("Modify Customer Full Name:", client.name);
+                if (targetName === null) return; // Action terminated by administrator
+                
+                const targetPhone = prompt("Modify Verified 10-Digit Mobile Number:", client.phone || client.contact);
+                if (targetPhone === null) return;
+                
+                const targetPass = prompt("Modify Security Password Key Reference:", client.password);
+                if (targetPass === null) return;
+
+                if (!targetName.trim() || !targetPhone.trim() || !targetPass.trim()) {
+                    alert("Operation Denied: Input validation fields cannot be empty parameters.");
+                    return;
+                }
+
+                // Inject modified values right back into target index parameters map
+                client.name = targetName.trim();
+                client.phone = targetPhone.trim();
+                client.contact = targetPhone.trim();
+                client.password = targetPass.trim();
+
+                // Save updated record matrix directly back up to your Vercel KV cloud cell
+                await fetch(`${API_BASE_ENDPOINT}/admin?type=users`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(currentUsersList)
+                });
+
+                alert(`SUCCESS: Profile metrics for "${client.name}" saved globally across database registers!`);
+                pullMasterDatabaseArrays(); // Force layout tables reload instantly
+            } catch (err) {
+                alert("Cloud updating verification pipeline crash error: " + err.message);
+            }
+        }
+
+        async function suspendCustomerAccount(index) {
+            if (!confirm("CRITICAL WARNING: Are you sure you want to permanently delete and suspend this customer account profile from the Indian Telecom network database? They will be signed out instantly and completely blocked from viewing checkout tracks.")) return;
+            
+            try {
+                const response = await fetch(`${API_BASE_ENDPOINT}/admin?type=users&_t=${Date.now()}`);
+                if (!response.ok) return alert("Failed to secure active profile logs stack.");
+                let currentUsersList = await response.json();
+                
+                const deadProfile = currentUsersList[index];
+                
+                // Splice row index data point cleanly from collection list
+                currentUsersList.splice(index, 1);
+
+                // Commit the truncated account array back to the cloud storage cell parameters map
+                await fetch(`${API_BASE_ENDPOINT}/admin?type=users`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(currentUsersList)
+                });
+
+                alert(`ACCOUNT DELETED: Profile reference track linked to "#${deadProfile.id}" removed successfully.`);
+                pullMasterDatabaseArrays(); // Refresh dashboard data instantly
+            } catch (err) {
+                alert("Account termination processing server exception: " + err.message);
             }
         }
 
