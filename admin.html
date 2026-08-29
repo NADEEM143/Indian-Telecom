@@ -189,22 +189,26 @@
             }
         }
 
-        async function pushInventoryStateToCloud() {
+                async function pushInventoryStateToCloud() {
             try {
-                // Strip massive asset fields to prevent Vercel KV text payload size limits crashes
-                const textOnlyInventory = liveInventoryState.map(item => ({
-                    id: item.id, name: item.name, category: item.category, 
-                    price: item.price, discountPrice: item.discountPrice, isLive: item.isLive
+                // 🟢 FIXED: Keeps the 'asset' parameter intact so images save globally to the cloud
+                const fullInventoryWithImages = liveInventoryState.map(item => ({
+                    id: item.id, 
+                    name: item.name, 
+                    category: item.category, 
+                    price: item.price, 
+                    discountPrice: item.discountPrice, 
+                    isLive: item.isLive,
+                    asset: item.asset // <-- Attaches the photo data globally
                 }));
                 
                 await fetch(`${API_BASE_ENDPOINT}/admin?type=products`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(textOnlyInventory)
+                    body: JSON.stringify(fullInventoryWithImages)
                 });
             } catch (err) { console.error("Cloud data writing exception:", err); }
         }
-
                // 🌟 ADD THIS EXACT PIECE TO FIXED SYSTEM GALLERY UPLOADS
                function generateImagePreview(inputElement) {
             const preview = document.getElementById("upload-preview");
@@ -366,14 +370,15 @@
                     await saveImageLocally(generatedId, temporaryImageBase64);
                 }
 
-                const newProductItem = {
-                    id: generatedId,
-                    name: name,
-                    category: cat,
-                    price: price,
-                    discountPrice: discount,
-                    isLive: true
-                };
+                            const newProductItem = {
+                id: generatedId,
+                name: name,
+                category: cat,
+                price: price,
+                discountPrice: discount,
+                isLive: true,
+                asset: temporaryImageBase64 || null // <-- MAKE SURE THIS LINE IS PRESENT
+            };
 
                 liveInventoryState.push(newProductItem);
                 await pushInventoryStateToCloud();
