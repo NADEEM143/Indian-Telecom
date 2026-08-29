@@ -174,18 +174,45 @@
             } catch (e) { return null; }
         }
 
-        async function pullMasterDatabaseArrays() {
+                async function pullMasterDatabaseArrays() {
             try {
+                // 1. Fetch live product catalog structures
                 const productResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=products`);
                 if (productResponse.ok) { liveInventoryState = await productResponse.json(); }
 
+                // 2. Fetch active checkout order records
                 const orderResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=orders`);
                 if (orderResponse.ok) { liveOrdersState = await orderResponse.json(); }
 
+                // 3. FETCH REGISTERED ACCOUNTS SAFELY FROM CLOUD DATA STORE
+                const usersResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=users`);
+                const userTableBody = document.getElementById("users-list-target");
+                
+                if (usersResponse.ok && userTableBody) {
+                    const databaseUsersList = await usersResponse.json();
+                    
+                    // Clear previous blank items or hidden placeholders safely
+                    userTableBody.innerHTML = ""; 
+                    
+                    if (!databaseUsersList || databaseUsersList.length === 0) {
+                        userTableBody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#94a3b8; padding:30px; font-weight:700;">No data records found inside cloud store.</td></tr>`;
+                    } else {
+                        userTableBody.innerHTML = databaseUsersList.map(u => `
+                            <tr>
+                                <td style="font-weight:700; color:#3b82f6; padding:12px 8px;">#${u.id || 'U'}</td>
+                                <td style="color:#ffffff; font-weight:bold; padding:12px 8px;">${u.name || 'N/A'}</td>
+                                <td style="color:#cbd5e1; padding:12px 8px;">${u.phone || 'N/A'}</td>
+                                <td style="font-family:monospace; color:#a1a1aa; padding:12px 8px;">${u.password || 'N/A'}</td>
+                            </tr>
+                        `).join('');
+                    }
+                }
+
+                // Render dynamic inventory arrays onto their target tables
                 await renderAdminInventory();
                 renderAdminOrders();
             } catch (err) {
-                console.error("Cloud State Sync Error:", err.message);
+                console.error("Cloud Master State Sync Error:", err.message);
             }
         }
 
