@@ -608,49 +608,44 @@
             }).join('');
         }
         // 🟢 MODERN ORDER SHIP CONTROLLER REDIRECTING PARAMETERS INTERNALLY
-               async function fulfillOrder(index) {
+                   // 🟢 MODERN ORDER SHIP CONTROLLER REDIRECTING PARAMETERS INTERNALLY
+        async function fulfillOrder(index) {
             if (!confirm("Are you sure you want to mark this package as shipped and archive it permanently?")) return;
             
-            // Extract the selected active order info matching your user click index trigger point
-            const rawOrderInfo = liveOrdersState[index];
-            if (!rawOrderInfo) return alert("Order data reference missing!");
+            const shippedOrderInfo = liveOrdersState[index];
+            if (!shippedOrderInfo) return alert("Order data reference missing!");
             
-            // 🟢 FIXED: Forcefully fallback matching properties to capture the true phone string reference safely
-            const trueCustomerPhone = rawOrderInfo.phone || rawOrderInfo.contact || "";
-            const trueCustomerAddress = rawOrderInfo.address || rawOrderInfo.location || "N/A";
+            const trueCustomerPhone = shippedOrderInfo.phone || shippedOrderInfo.contact || "";
+            const trueCustomerAddress = shippedOrderInfo.address || shippedOrderInfo.location || "N/A";
             
-            // Cleanly remap object properties to filter-safe parameter keys before archiving to the cloud
             const cleanArchivePayload = {
-                id: rawOrderInfo.id || 'ORD',
-                name: rawOrderInfo.name || 'N/A',
-                contact: String(trueCustomerPhone).trim(), // Forces unified clean string mapping tokens
+                id: shippedOrderInfo.id || 'ORD',
+                name: shippedOrderInfo.name || 'N/A',
+                contact: String(trueCustomerPhone).trim(),
                 location: String(trueCustomerAddress).trim(),
-                mop: rawOrderInfo.mop || 'N/A',
-                utr: rawOrderInfo.utr || 'N/A'
+                mop: shippedOrderInfo.mop || 'N/A',
+                utr: shippedOrderInfo.utr || 'N/A'
             };
             
-            // Push the clean, filter-safe text object directly into your archive collection array
             completedHistoryState.push(cleanArchivePayload);
-            
-            // Slice the row item completely out from your active waiting dashboard desk list
             liveOrdersState.splice(index, 1);
             
             try {
-                // Update your active waiting dashboard orders records list
+                // 1. Update active waiting dashboard orders records list
                 await fetch(`${API_BASE_ENDPOINT}/admin?type=orders`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(liveOrdersState)
                 });
                 
-                // Save your remapped, filter-safe order history directly inside your database records bucket
+                // 2. Save your remapped, filter-safe order history directly inside your database records bucket
                 await fetch(`${API_BASE_ENDPOINT}/admin?type=history`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(completedHistoryState)
                 });
                 
-                alert(`SUCCESS: Order #${rawOrderInfo.id} safely archived into permanent history database registries!`);
+                alert(`SUCCESS: Order #${shippedOrderInfo.id} safely archived into permanent history database registries!`);
                 renderAdminOrders();
                 renderAdminHistoryLog();
             } catch (e) { 
@@ -668,16 +663,16 @@
             if (!confirm(`Are you sure you want to push this new live message announcement to your store? \n\n"${inputFieldVal}"`)) return;
 
             try {
-                // 🟢 FIXED: Points exactly to the master API endpoint configuration path variable matching your data routines
                 const savePayload = { message: inputFieldVal };
                 
+                // 🟢 FIXED: Clean path targeting prevents route sandboxing crashes
                 await fetch(`${API_BASE_ENDPOINT}/admin?type=banner_msg`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(savePayload)
                 });
 
-                               alert("SUCCESS: Your brand-new storefront marquee message announcement text has been published live globally across database registries!");
+                alert("SUCCESS: Your brand-new storefront marquee message announcement text has been published live globally across database registries!");
                 pullMasterDatabaseArrays();
             } catch (err) {
                 alert("Server announcement sync mapping exception: " + err.message);
