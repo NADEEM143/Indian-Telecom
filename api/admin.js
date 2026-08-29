@@ -60,7 +60,7 @@ export default async function handler(req, res) {
                 // ==========================================
         // 📦 PERMANENT SHIPPED ORDER HISTORY ENDPOINTS
         // ==========================================
-        if (dataType === 'history') {
+               if (dataType === 'history') {
             if (req.method === 'GET') {
                 // 🟢 FIXED: Reads from the exact same storage key name used in your post updates
                 const history = await kv.get('it_order_history') || [];
@@ -69,6 +69,22 @@ export default async function handler(req, res) {
             if (req.method === 'POST') {
                 // 🟢 FIXED: Saves directly into the unified cloud transaction history table
                 await kv.set('it_order_history', req.body);
+                return res.status(200).json({ success: true });
+            }
+        }
+
+        // =========================================================================
+        // 📢 LIVE MARQUEE BANNER MESSAGE ANNOUNCEMENT ENDPOINTS
+        // =========================================================================
+        if (dataType === 'banner_msg') {
+            if (req.method === 'GET') {
+                // Downloads your active banner announcement data cleanly from the cloud database
+                const bannerData = await kv.get('it_live_banner_msg') || { message: "MEGA OFFER: FLAT 30% OFF ON PREMIUM CHARGERS & COVERS! LIMITED STOCK!" };
+                return res.status(200).json(bannerData);
+            }
+            if (req.method === 'POST') {
+                // Saves your newly typed custom marquee banner text string securely into Vercel KV
+                await kv.set('it_live_banner_msg', req.body);
                 return res.status(200).json({ success: true });
             }
         }
