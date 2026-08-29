@@ -138,7 +138,7 @@
     </div>
     <!-- SAFELY ENCAPSULATED CONTROLLER JAVASCRIPT BLOCK -->
                 <!-- REGISTERED CUSTOMERS MATRIX OVERVIEW LOGS -->
-            <section class="admin-card" style="margin-top: 30px;">
+           <section class="admin-card" style="margin-top: 30px;">
                 <div class="card-title">👥 Registered Store Customer Profiles</div>
                 <div class="data-table-wrapper">
                     <table class="admin-table">
@@ -154,16 +154,40 @@
                     </table>
                 </div>
             </section>
+
+            <!-- 📦 SECURE PANEL AREA 5: HISTORICAL COMPLETED SHIPPED ARCHIVES -->
+            <section class="admin-card" style="margin-top: 30px; border-top: 4px solid #10b981;">
+                <div class="card-title">📦 Completed & Shipped Order History</div>
+                <div class="data-table-wrapper">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Customer Details</th>
+                                <th>Destination Address</th>
+                                <th>MOP Method</th>
+                                <th>Verified Bank UTR</th>
+                                <th>Status Badge</th>
+                            </tr>
+                        </thead>
+                        <tbody id="history-log-target"></tbody>
+                    </table>
+                </div>
+            </section>
+
+    <!-- SAFELY ENCAPSULATED CONTROLLER JAVASCRIPT BLOCK -->
     <script>
-        const API_BASE_ENDPOINT = '/api';
+                const API_BASE_ENDPOINT = '/api';
         let liveInventoryState = [];
         let liveOrdersState = [];
+        let completedHistoryState = []; // <-- 🟢 FIXED: Safe array container initialization for order logs history
         let temporaryImageBase64 = "";
 
-              // EXTRACT STORAGE MEDIA BINARY CORES FROM LOCAL HARDWARE SANDBOXES
+        // EXTRACT STORAGE MEDIA BINARY CORES FROM LOCAL HARDWARE SANDBOXES
         async function getImageLocally(id) {
             try {
                 const db = await openIndexedDB();
+                if (!db) return null;
                 const tx = db.transaction("product_images", "readonly");
                 const store = tx.objectStore("product_images");
                 return new Promise((res) => {
@@ -173,18 +197,21 @@
                 });
             } catch (e) { return null; }
         }
-
-                async function pullMasterDatabaseArrays() {
+                        async function pullMasterDatabaseArrays() {
             try {
                 // 1. Fetch live product catalog structures
                 const productResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=products`);
                 if (productResponse.ok) { liveInventoryState = await productResponse.json(); }
 
-                // 2. Fetch active checkout order records
+                // 2. Fetch active checkout order records queue
                 const orderResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=orders`);
                 if (orderResponse.ok) { liveOrdersState = await orderResponse.json(); }
 
-                // 3. FETCH REGISTERED ACCOUNTS SAFELY FROM CLOUD DATA STORE
+                // 3. 🟢 SYNCED: Fetch completed shipped logs from permanent history database cluster
+                const historyResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=history`);
+                if (historyResponse.ok) { completedHistoryState = await historyResponse.json(); }
+
+                // 4. FETCH REGISTERED ACCOUNTS SAFELY FROM CLOUD DATA STORE
                 const usersResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=users`);
                 const userTableBody = document.getElementById("users-list-target");
                 
@@ -211,12 +238,13 @@
                 // Render dynamic inventory arrays onto their target tables
                 await renderAdminInventory();
                 renderAdminOrders();
+                renderAdminHistoryLog(); // 🟢 SYNCED: Load your permanent tracker rows onto the UI
             } catch (err) {
                 console.error("Cloud Master State Sync Error:", err.message);
             }
         }
 
-                async function pushInventoryStateToCloud() {
+        async function pushInventoryStateToCloud() {
             try {
                 // 🟢 FIXED: Keeps the 'asset' parameter intact so images save globally to the cloud
                 const fullInventoryWithImages = liveInventoryState.map(item => ({
@@ -236,8 +264,9 @@
                 });
             } catch (err) { console.error("Cloud data writing exception:", err); }
         }
-               // 🌟 ADD THIS EXACT PIECE TO FIXED SYSTEM GALLERY UPLOADS
-               function generateImagePreview(inputElement) {
+
+        // 🌟 ADD THIS EXACT PIECE TO FIXED SYSTEM GALLERY UPLOADS
+        function generateImagePreview(inputElement) {
             const preview = document.getElementById("upload-preview");
             if (inputElement.files && inputElement.files[0]) {
                 const fileReaderEngine = new FileReader();
@@ -251,7 +280,6 @@
                 fileReaderEngine.readAsDataURL(inputElement.files[0]);
             }
         }
-
         // GLOBAL TEMPORARY MEMORY TRACKER KEY FOR DYNAMIC EDITING STATE POINTERS
         let activeEditingProductIndex = null;
 
@@ -314,7 +342,7 @@
             document.getElementById("product-upload-form").scrollIntoView({ behavior: 'smooth' });
         }
 
-        function renderAdminOrders() {
+                function renderAdminOrders() {
             const targetTableBody = document.getElementById("orders-log-target");
             if (!targetTableBody) return;
             
@@ -336,6 +364,60 @@
                     <td><button class="action-icon-btn ship-btn" onclick="fulfillOrder(${index})">✅ Ship</button></td>
                 </tr>
             `).join('');
+        }
+
+        // 🟢 ARCHIVAL LOGGER MAPPING ENGINE DRAWING CELLS UNTO SCREEN VIEWS
+        function renderAdminHistoryLog() {
+            const targetTableBody = document.getElementById("history-log-target");
+            if (!targetTableBody) return;
+            
+            if (completedHistoryState.length === 0) {
+                targetTableBody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#64748b; padding:30px;">No historical shipped logs captured yet.</td></tr>`;
+                return;
+            }
+            
+            targetTableBody.innerHTML = completedHistoryState.map(order => `
+                <tr>
+                    <td style="font-weight: 700; color: #94a3b8;">#${order.id || 'ORD'}</td>
+                    <td>
+                        <div style="font-weight: 700; color:#cbd5e1;">${order.name}</div>
+                        <div style="font-size: 12px; color: #64748b;">${order.phone}</div>
+                    </td>
+                    <td style="max-width: 220px; font-size: 13px; color: #94a3b8;">${order.address}</td>
+                    <td><span class="badge" style="background: rgba(100,116,139,0.1); color:#94a3b8;">${order.mop}</span></td>
+                    <td style="font-family: monospace; color: #64748b;">${order.utr || 'N/A'}</td>
+                    <td><span class="badge" style="background: rgba(16,185,129,0.1); color: #10b981; font-weight: bold; border: 1px solid rgba(16,185,129,0.2);">📦 SHIPPED</span></td>
+                </tr>
+            `).join('');
+        }
+
+        // 🟢 MODERN ORDER SHIP CONTROLLER REDIRECTING PARAMETERS INTERNALLY
+        async function fulfillOrder(index) {
+            if (!confirm("Are you sure you want to mark this package as shipped and archive it permanently?")) return;
+            
+            const shippedOrderInfo = liveOrdersState[index];
+            completedHistoryState.push(shippedOrderInfo);
+            liveOrdersState.splice(index, 1);
+            
+            try {
+                await fetch(`${API_BASE_ENDPOINT}/admin?type=orders`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(liveOrdersState)
+                });
+                
+                await fetch(`${API_BASE_ENDPOINT}/admin?type=history`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(completedHistoryState)
+                });
+                
+                alert(`SUCCESS: Order #${shippedOrderInfo.id} archived into permanent shipped logs database registries!`);
+                renderAdminOrders();
+                renderAdminHistoryLog();
+            } catch (e) { 
+                console.error("Historical cluster syncing execution crash error:", e); 
+            }
         }
 
         // LOCAL DEVICE STORAGE CONTROLLER - OPEN MEDIA DATABASE ENGINE
