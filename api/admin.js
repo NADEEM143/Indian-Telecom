@@ -29,7 +29,7 @@ export default async function handler(req, res) {
         // ==========================================
         // 📥 CUSTOMER ORDER ENDPOINTS
         // ==========================================
-        if (dataType === 'orders') {
+               if (dataType === 'orders') {
             if (req.method === 'GET') {
                 const orders = await kv.get('it_orders') || [];
                 return res.status(200).json(orders);
@@ -43,9 +43,6 @@ export default async function handler(req, res) {
         // ==========================================
         // 👥 NPCI COMPLIANT REGISTERED CUSTOMERS ENDPOINT
         // ==========================================
-                // ==========================================
-        // 👥 NPCI COMPLIANT REGISTERED CUSTOMERS ENDPOINT
-        // ==========================================
         if (dataType === 'users') {
             if (req.method === 'GET') {
                 const users = await kv.get('it_users') || [];
@@ -57,7 +54,6 @@ export default async function handler(req, res) {
             }
         }
 
-        // 🟢 PASTE THE NEW DATA TYPE ROUTING CONTROL BLOCK DIRECTLY HERE!
         // ==========================================
         // 📦 PERMANENT SHIPPED ORDER HISTORY ENDPOINTS
         // ==========================================
@@ -72,7 +68,6 @@ export default async function handler(req, res) {
             }
         }
 
-        // This fallback error line is directly below your new block
         return res.status(400).json({ error: "Invalid parameters map selection specified." });
 
     } catch (error) {
