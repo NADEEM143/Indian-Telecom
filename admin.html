@@ -486,6 +486,95 @@
         }
 
                 // 🟢 ARCHIVAL LOGGER MAPPING ENGINE DRAWING CELLS UNTO SCREEN VIEWS
+                async function pullMasterDatabaseArrays() {
+            try {
+                // 🟢 CACHE BUSTER: Destroys browser and network cache blocks completely for real-time streaming
+                const cacheBusterToken = Date.now();
+
+                // 1. Fetch live product catalog structures
+                const productResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=products&_t=${cacheBusterToken}`);
+                if (productResponse.ok) { liveInventoryState = await productResponse.json(); }
+
+                // 2. Fetch active checkout order records queue
+                const orderResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=orders&_t=${cacheBusterToken}`);
+                if (orderResponse.ok) { liveOrdersState = await orderResponse.json(); }
+
+                // 3. 🟢 FIXED: Downloads history logs array and explicitly links it to the active memory tracker
+                const historyResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=history&_t=${cacheBusterToken}`);
+                if (historyResponse.ok) { 
+                    const historicalServerPayload = await historyResponse.json();
+                    // Forces conversion to a valid array structure under all conditions
+                    completedHistoryState = Array.isArray(historicalServerPayload) ? historicalServerPayload : [];
+                } else {
+                    completedHistoryState = [];
+                }
+
+                // 4. Fetch registered client credentials accounts safely
+                const usersResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=users&_t=${cacheBusterToken}`);
+                const userTableBody = document.getElementById("users-list-target");
+                
+                if (usersResponse.ok && userTableBody) {
+                    const databaseUsersList = await usersResponse.json();
+                    userTableBody.innerHTML = ""; 
+                    
+                    if (!databaseUsersList || databaseUsersList.length === 0) {
+                        userTableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#94a3b8; padding:30px; font-weight:700;">No data records found inside cloud store.</td></tr>`;
+                    } else {
+                        const activeClients = databaseUsersList.filter(u => !u.status || u.status !== 'SUSPENDED');
+                        const suspendedClients = databaseUsersList.filter(u => u.status === 'SUSPENDED');
+
+                        userTableBody.innerHTML = activeClients.length === 0 ? 
+                            `<tr><td colspan="5" style="text-align:center; color:#94a3b8; padding:30px;">No active customer profiles found.</td></tr>` :
+                            activeClients.map((u) => {
+                                const masterIdx = databaseUsersList.findIndex(masterUser => masterUser.id === u.id);
+                                return `
+                                    <tr>
+                                        <td style="font-weight:700; color:#3b82f6; padding:12px 8px;">#${u.id || 'U'}</td>
+                                        <td style="color:#ffffff; font-weight:bold; padding:12px 8px;">${u.name || 'N/A'}</td>
+                                        <td style="color:#cbd5e1; padding:12px 8px;">${u.phone || u.contact || 'N/A'}</td>
+                                        <td style="font-family:monospace; color:#a1a1aa; padding:12px 8px;">${u.password || 'N/A'}</td>
+                                        <td style="text-align: right; padding:12px 8px; white-space: nowrap;">
+                                            <button class="action-icon-btn" style="color: #f59e0b; background: rgba(245,158,11,0.1); margin-right: 5px; font-weight: bold;" onclick="triggerInlineUserEdit(${masterIdx})">📝 Edit</button>
+                                            <button class="action-icon-btn" style="color: #ef4444; background: rgba(239,68,68,0.1); font-weight: bold;" onclick="suspendCustomerAccount(${masterIdx})">🚫 Suspend</button>
+                                        </td>
+                                    </tr>
+                                `;
+                            }).join('');
+
+                        const suspendedTableBody = document.getElementById("suspended-users-list-target");
+                        if (suspendedTableBody) {
+                            suspendedTableBody.innerHTML = suspendedClients.length === 0 ?
+                                `<tr><td colspan="5" style="text-align:center; color:#64748b; padding:20px;">No permanently suspended account histories logged.</td></tr>` :
+                                suspendedClients.map((u) => {
+                                    const masterIdx = databaseUsersList.findIndex(masterUser => masterUser.id === u.id);
+                                    return `
+                                        <tr style="background: rgba(239,68,68,0.02);">
+                                            <td style="font-weight:700; color:#64748b; padding:12px 8px;">#${u.id || 'U'}</td>
+                                            <td style="color:#94a3b8; text-decoration: line-through; padding:12px 8px;">${u.name || 'N/A'}</td>
+                                            <td style="color:#64748b; padding:12px 8px;">${u.phone || u.contact || 'N/A'}</td>
+                                            <td style="font-family:monospace; color:#4b5563; padding:12px 8px;">${u.password || 'N/A'}</td>
+                                            <td style="text-align: right; padding:12px 8px; white-space: nowrap;">
+                                                <button class="action-icon-btn" style="color: #10b981; background: rgba(16,185,129,0.1); font-weight: bold;" onclick="reactivateCustomerAccount(${masterIdx})">🔄 Reactivate</button>
+                                            </td>
+                                        </tr>
+                                    `;
+                                }).join('');
+                        }
+                    }
+                }
+
+                // Render dynamic pipelines onto their target layout table views
+                await renderAdminInventory();
+                renderAdminOrders();
+                renderAdminHistoryLog();
+            } catch (err) {
+                console.error("Cloud Master State Sync Error:", err.message);
+            }
+        }
+
+        // =========================================================================
+        // 📦 FIXED: ARCHIVAL LOGGER MAPPING ENGINE MATCHING EXACT HTML DOM IDS
+        // =========================================================================
         function renderAdminHistoryLog() {
             const targetTableBody = document.getElementById("history-log-target");
             if (!targetTableBody) return;
@@ -496,7 +585,6 @@
             }
             
             targetTableBody.innerHTML = completedHistoryState.map(order => {
-                // Safely read properties supporting both original keys and new filter-safe tags
                 const orderId = order.id || 'ORD';
                 const clientName = order.name || 'N/A';
                 const clientContact = order.phone || order.contact || 'N/A';
@@ -505,16 +593,16 @@
                 const bankUtr = order.utr || 'N/A';
 
                 return `
-                    <tr>
-                        <td style="font-weight: 700; color: #94a3b8;">#${orderId}</td>
-                        <td>
+                    <tr style="border-bottom: 1px solid #334155;">
+                        <td style="font-weight: 700; color: #94a3b8; padding: 12px 8px;">#${orderId}</td>
+                        <td style="padding: 12px 8px;">
                             <div style="font-weight: 700; color:#cbd5e1;">${clientName}</div>
                             <div style="font-size: 12px; color: #64748b;">${clientContact}</div>
                         </td>
-                        <td style="max-width: 220px; font-size: 13px; color: #94a3b8;">${clientLocation}</td>
-                        <td><span class="badge" style="background: rgba(100,116,139,0.1); color:#94a3b8; padding: 4px 8px; border-radius: 4px;">${payMethod}</span></td>
-                        <td style="font-family: monospace; color: #64748b;">${bankUtr}</td>
-                        <td><span class="badge" style="background: rgba(16,185,129,0.1); color: #10b981; font-weight: bold; border: 1px solid rgba(16,185,129,0.2); padding: 4px 8px; border-radius: 4px;">📦 SHIPPED</span></td>
+                        <td style="max-width: 220px; font-size: 13px; color: #cbd5e1; padding: 12px 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${clientLocation}</td>
+                        <td style="padding: 12px 8px;"><span class="badge" style="background: rgba(100,116,139,0.1); color:#cbd5e1; padding: 4px 8px; border-radius: 4px; font-size: 12px;">${payMethod}</span></td>
+                        <td style="font-family: monospace; color: #f59e0b; padding: 12px 8px; font-weight: bold;">${bankUtr}</td>
+                        <td style="padding: 12px 8px;"><span class="badge" style="background: rgba(16,185,129,0.1); color: #10b981; font-weight: bold; border: 1px solid rgba(16,185,129,0.2); padding: 4px 8px; border-radius: 4px; font-size: 12px;">📦 SHIPPED</span></td>
                     </tr>
                 `;
             }).join('');
