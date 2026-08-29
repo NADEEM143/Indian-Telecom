@@ -44,11 +44,45 @@
         .action-icon-btn:hover { background: rgba(239,68,68,0.2); }
         .ship-btn { color: #10b981; background: rgba(16,185,129,0.1); }
         .ship-btn:hover { background: rgba(16,185,129,0.2); }
-        .row-item-meta { display: flex; align-items: center; gap: 12px; }
+                .row-item-meta { display: flex; align-items: center; gap: 12px; }
         .row-thumb { width: 40px; height: 40px; border-radius: 8px; background: #0f172a; object-fit: cover; display: flex; align-items: center; justify-content: center; border: 1px solid #334155; }
+
+        /* 📱 MOBILE-OPTIMIZED CUSTOM ON-SCREEN TOAST NOTIFICATIONS */
+        .custom-toast-container {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #1e293b;
+            border: 1px solid #3b82f6;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.5), 0 8px 10px -6px rgba(0,0,0,0.5);
+            padding: 16px 24px;
+            border-radius: 12px;
+            color: #ffffff;
+            font-weight: 600;
+            font-size: 14px;
+            z-index: 99999;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: calc(100% - 32px);
+            max-width: 400px;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-sizing: border-box;
+        }
+               .custom-toast-container.show {
+            transform: translateX(-50%) translateY(0);
+        }
+        .toast-icon { font-size: 18px; }
     </style>
 </head>
 <body>
+
+    <!-- Beautiful UI notification toast container anchor -->
+    <div id="ui-toast-notification" class="custom-toast-container">
+        <span class="toast-icon" id="ui-toast-icon">🚀</span>
+        <span id="ui-toast-message">Notification Message</span>
+    </div>
 
     <header>
         <div class="brand-meta">
@@ -199,12 +233,33 @@
 
     <!-- SAFELY ENCAPSULATED CONTROLLER JAVASCRIPT BLOCK -->
     <script>
-                const API_BASE_ENDPOINT = '/api';
+                        const API_BASE_ENDPOINT = '/api';
         let liveInventoryState = [];
         let liveOrdersState = [];
         let completedHistoryState = []; // <-- 🟢 FIXED: Safe array container initialization for order logs history
         let temporaryImageBase64 = "";
         let liveMarqueeOfferMessageStr = "";
+
+        // =========================================================================
+        // 🚀 CUSTOM NOTIFICATION ENGINE (REPLACES BROWSER ALERT POPUPS)
+        // =========================================================================
+        function showNotification(message, icon = "🚀") {
+            const toast = document.getElementById("ui-toast-notification");
+            const toastMsg = document.getElementById("ui-toast-message");
+            const toastIcon = document.getElementById("ui-toast-icon");
+            
+            if (!toast || !toastMsg || !toastIcon) return;
+            
+            toastMsg.innerText = message;
+            toastIcon.innerText = icon;
+            
+            toast.classList.add("show");
+            
+            // Slide away automatically after 3.5 seconds
+            setTimeout(() => {
+                toast.classList.remove("show");
+            }, 3500);
+        }
 
         // EXTRACT STORAGE MEDIA BINARY CORES FROM LOCAL HARDWARE SANDBOXES
         async function getImageLocally(id) {
