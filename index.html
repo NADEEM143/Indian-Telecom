@@ -675,7 +675,7 @@
             document.getElementById("product-grid").style.display = "grid";
             document.getElementById("customer-profile-dashboard").style.display = "none";
         }
-        async function fetchAndRenderCustomerOrderTracks() {
+               async function fetchAndRenderCustomerOrderTracks() {
             const activeTargetRows = document.getElementById("client-active-orders-rows");
             const historyTargetRows = document.getElementById("client-past-history-rows");
             const cacheBusterTimeToken = Date.now();
@@ -686,19 +686,34 @@
             historyTargetRows.innerHTML = `<tr><td colspan="5" style="text-align:center;color:#94a3b8;padding:15px;">Downloading past history entries...</td></tr>`;
             
             try {
+                // Helper helper function to strip any non-digit characters for fail-safe profile phone matching
+                const extractDigits = (val) => String(val || '').replace(/\D/g, '');
+                const sessionUserPhone = extractDigits(activeSessionUser.phone || activeSessionUser.contact);
+
+                if (!sessionUserPhone) {
+                    activeTargetRows.innerHTML = `<tr><td colspan="5" style="text-align:center;color:#ef4444;padding:15px;">Session error: No valid contact token found. Please relog.</td></tr>`;
+                    historyTargetRows.innerHTML = `<tr><td colspan="5" style="text-align:center;color:#ef4444;padding:15px;">Session error: No valid contact token found. Please relog.</td></tr>`;
+                    return;
+                }
+
                 // 1. Fetch active waiting pipeline lines matching user's phone token string
                 const ordersResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=orders&_t=${cacheBusterTimeToken}`);
                 if (ordersResponse.ok) {
                     const masterOrdersList = await ordersResponse.json();
-                    const matchingActiveTracks = masterOrdersList.filter(o => String(o.phone).trim() === String(activeSessionUser.phone).trim());
+                    
+                    // 🟢 FIXED: Fail-safe clean digit-only regex filtering pass
+                    const matchingActiveTracks = masterOrdersList.filter(o => {
+                        const orderPhone = extractDigits(o.phone || o.contact);
+                        return orderPhone === sessionUserPhone && orderPhone !== '';
+                    });
                     
                     activeTargetRows.innerHTML = matchingActiveTracks.length === 0 ?
                         `<tr><td colspan="5" style="text-align:center;color:#64748b;padding:20px;">No processing packages captured in queue right now.</td></tr>` :
                         matchingActiveTracks.map(o => `
                             <tr style="border-bottom: 1px solid #1e293b; color: #cbd5e1;">
-                                <td style="padding:12px 8px;font-weight:700;color:#3b82f6;">#${o.id}</td>
-                                <td style="padding:12px 8px;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${o.address}</td>
-                                <td style="padding:12px 8px;"><span style="background:rgba(245,158,11,0.1);color:#f59e0b;padding:2px 6px;border-radius:4px;font-size:11px;">${o.mop}</span></td>
+                                <td style="padding:12px 8px;font-weight:700;color:#3b82f6;">#${o.id || 'ORD'}</td>
+                                <td style="padding:12px 8px;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${o.address || o.location || 'N/A'}</td>
+                                <td style="padding:12px 8px;"><span style="background:rgba(245,158,11,0.1);color:#f59e0b;padding:2px 6px;border-radius:4px;font-size:11px;">${o.mop || 'N/A'}</span></td>
                                 <td style="padding:12px 8px;font-family:monospace;color:#64748b;">${o.utr || 'N/A'}</td>
                                 <td style="padding:12px 8px;text-align:right;"><span style="color:#f59e0b;font-weight:bold;font-size:11px;background:rgba(245,158,11,0.1);padding:4px 8px;border-radius:20px;border:1px solid rgba(245,158,11,0.2);">⏳ PROCESSING</span></td>
                             </tr>
@@ -706,15 +721,14 @@
                 }
 
                 // 2. Fetch completed shipped records archives tracking matching user phone identifiers
-                               const historyResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=history&_t=${cacheBusterTimeToken}`);
+                const historyResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=history&_t=${cacheBusterTimeToken}`);
                 if (historyResponse.ok) {
                     const masterHistoryList = await historyResponse.json();
                     
-                    // 🟢 FIXED: Cleanly matches string formats and handles all property variations (.phone / .contact) perfectly!
+                    // 🟢 FIXED: Fail-safe clean digit-only regex filtering pass for history logs
                     const matchingHistoryTracks = masterHistoryList.filter(o => {
-                        const orderPhoneStr = String(o.phone || o.contact || '').trim();
-                        const sessionPhoneStr = String(activeSessionUser.phone || activeSessionUser.contact || '').trim();
-                        return orderPhoneStr === sessionPhoneStr && orderPhoneStr !== '';
+                        const orderPhone = extractDigits(o.phone || o.contact);
+                        return orderPhone === sessionUserPhone && orderPhone !== '';
                     });
                     
                     historyTargetRows.innerHTML = matchingHistoryTracks.length === 0 ?
