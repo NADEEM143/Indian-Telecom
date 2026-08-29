@@ -197,22 +197,25 @@
                 });
             } catch (e) { return null; }
         }
-               async function pullMasterDatabaseArrays() {
+                      async function pullMasterDatabaseArrays() {
             try {
+                // 🟢 FIXED: Unique millisecond stamp completely bypasses browser/Vercel cache limits
+                const cacheBusterToken = Date.now();
+
                 // 1. Fetch live product catalog structures
-                const productResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=products`);
+                const productResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=products&_t=${cacheBusterToken}`);
                 if (productResponse.ok) { liveInventoryState = await productResponse.json(); }
 
                 // 2. Fetch active checkout order records queue
-                const orderResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=orders`);
+                const orderResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=orders&_t=${cacheBusterToken}`);
                 if (orderResponse.ok) { liveOrdersState = await orderResponse.json(); }
 
-                // 3. 🟢 SYNCED: Fetch completed shipped logs from permanent history database cluster
-                const historyResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=history`);
+                // 3. Fetch completed shipped logs safely from history database cluster
+                const historyResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=history&_t=${cacheBusterToken}`);
                 if (historyResponse.ok) { completedHistoryState = await historyResponse.json(); }
 
                 // 4. FETCH REGISTERED ACCOUNTS SAFELY FROM CLOUD DATA STORE
-                const usersResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=users`);
+                const usersResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=users&_t=${cacheBusterToken}`);
                 const userTableBody = document.getElementById("users-list-target");
                 
                 if (usersResponse.ok && userTableBody) {
@@ -238,7 +241,7 @@
                 // Render dynamic inventory arrays onto their target tables
                 await renderAdminInventory();
                 renderAdminOrders();
-                renderAdminHistoryLog(); // 🟢 SYNCED: Load permanent tracker rows onto the UI
+                renderAdminHistoryLog(); // Load permanent tracker rows onto the UI
             } catch (err) {
                 console.error("Cloud Master State Sync Error:", err.message);
             }
