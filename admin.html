@@ -138,28 +138,39 @@
     </div>
     <!-- SAFELY ENCAPSULATED CONTROLLER JAVASCRIPT BLOCK -->
                 <!-- REGISTERED CUSTOMERS MATRIX OVERVIEW LOGS -->
-          <section class="admin-card" style="margin-top: 30px;">
+                     <!-- REGISTERED CUSTOMERS MATRIX OVERVIEW LOGS -->
+            <section class="admin-card" style="margin-top: 30px;">
                 <div class="card-title">👥 Registered Store Customer Profiles</div>
                 <div class="data-table-wrapper">
                     <table class="admin-table">
-                        <thead>
-                            <tr>
-                                <th>User Account ID</th>
-                                <th>Client Name</th>
-                                <th>Verified Mobile String</th>
-                                <th>Security Pass Key Reference</th>
-                                <!-- 🛠️ NEW WORKSPACE COLUMN ACTION ANCHOR -->
-                                <th style="text-align: right; padding-right: 24px;">Workspace Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="users-list-target"></tbody>
+                        <!-- ... inside data lines ... -->
                     </table>
                 </div>
-            </section>
+            </section> <!-- This is the closing tag of your main profiles card container -->
 
-            <!-- 📦 SECURE PANEL AREA 5: HISTORICAL COMPLETED SHIPPED ARCHIVES -->
-            <section class="admin-card" style="margin-top: 30px; border-top: 4px solid #10b981;">
-                <div class="card-title">📦 Completed & Shipped Order History</div>
+    <!-- 🟢 PASTE THE NEW SUSPENDED ACCOUNTS ARCHIVE CARD DIRECTLY HERE! -->
+    <!-- 🚫 SECURE ACCOUNT PANEL: BLOCKED & SUSPENDED USERS REGISTRY -->
+    <section class="admin-card" style="margin-top: 30px; border-top: 4px solid #ef4444;">
+        <div class="card-title">🚫 Suspended Customer Accounts Archive</div>
+        <div class="data-table-wrapper">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>User Account ID</th>
+                        <th>Client Name</th>
+                        <th>Verified Mobile String</th>
+                        <th>Security Pass Key Reference</th>
+                        <th style="text-align: right; padding-right: 24px;">Workspace Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="suspended-users-list-target"></tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- 📦 SECURE PANEL AREA 5: HISTORICAL COMPLETED SHIPPED ARCHIVES -->
+    <section class="admin-card" style="margin-top: 30px; border-top: 4px solid #10b981;">
+        <div class="card-title">📦 Completed & Shipped Order History</div>
                 <div class="data-table-wrapper">
                     <table class="admin-table">
                         <thead>
@@ -226,7 +237,7 @@
                 if (historyResponse.ok) { completedHistoryState = await historyResponse.json(); }
 
                 // 4. FETCH REGISTERED ACCOUNTS SAFELY FROM CLOUD DATA STORE
-                const usersResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=users&_t=${cacheBusterToken}`);
+                                const usersResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=users&_t=${cacheBusterToken}`);
                 const userTableBody = document.getElementById("users-list-target");
                 
                 if (usersResponse.ok && userTableBody) {
@@ -235,22 +246,52 @@
                     // Clear previous blank items or hidden placeholders safely
                     userTableBody.innerHTML = ""; 
                     
-                                        if (!databaseUsersList || databaseUsersList.length === 0) {
+                    if (!databaseUsersList || databaseUsersList.length === 0) {
                         userTableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#94a3b8; padding:30px; font-weight:700;">No data records found inside cloud store.</td></tr>`;
                     } else {
-                        // 🟢 FIXED: Renders live interactive editing and suspension triggers for each customer account row
-                        userTableBody.innerHTML = databaseUsersList.map((u, idx) => `
-                            <tr>
-                                <td style="font-weight:700; color:#3b82f6; padding:12px 8px;">#${u.id || 'U'}</td>
-                                <td style="color:#ffffff; font-weight:bold; padding:12px 8px;">${u.name || 'N/A'}</td>
-                                <td style="color:#cbd5e1; padding:12px 8px;">${u.phone || u.contact || 'N/A'}</td>
-                                <td style="font-family:monospace; color:#a1a1aa; padding:12px 8px;">${u.password || 'N/A'}</td>
-                                <td style="text-align: right; padding:12px 8px; white-space: nowrap;">
-                                    <button class="action-icon-btn" style="color: #f59e0b; background: rgba(245,158,11,0.1); margin-right: 5px; font-weight: bold;" onclick="triggerInlineUserEdit(${idx})">📝 Edit</button>
-                                    <button class="action-icon-btn" style="color: #ef4444; background: rgba(239,68,68,0.1); font-weight: bold;" onclick="suspendCustomerAccount(${idx})">🚫 Suspend</button>
-                                </td>
-                            </tr>
-                        `).join('');
+                        // 🟢 EXTRACT ACTIVE LOGS: Only display active customer profile rows on the main grid
+                        const activeClients = databaseUsersList.filter(u => u.status !== 'SUSPENDED');
+                        const suspendedClients = databaseUsersList.filter(u => u.status === 'SUSPENDED');
+
+                        userTableBody.innerHTML = activeClients.length === 0 ? 
+                            `<tr><td colspan="5" style="text-align:center; color:#94a3b8; padding:30px;">No active customer profiles found.</td></tr>` :
+                            activeClients.map((u) => {
+                                // Find the true master index string inside the original parent database arrays
+                                const masterIdx = databaseUsersList.findIndex(masterUser => masterUser.id === u.id);
+                                return `
+                                    <tr>
+                                        <td style="font-weight:700; color:#3b82f6; padding:12px 8px;">#${u.id || 'U'}</td>
+                                        <td style="color:#ffffff; font-weight:bold; padding:12px 8px;">${u.name || 'N/A'}</td>
+                                        <td style="color:#cbd5e1; padding:12px 8px;">${u.phone || u.contact || 'N/A'}</td>
+                                        <td style="font-family:monospace; color:#a1a1aa; padding:12px 8px;">${u.password || 'N/A'}</td>
+                                        <td style="text-align: right; padding:12px 8px; white-space: nowrap;">
+                                            <button class="action-icon-btn" style="color: #f59e0b; background: rgba(245,158,11,0.1); margin-right: 5px; font-weight: bold;" onclick="triggerInlineUserEdit(${masterIdx})">📝 Edit</button>
+                                            <button class="action-icon-btn" style="color: #ef4444; background: rgba(239,68,68,0.1); font-weight: bold;" onclick="suspendCustomerAccount(${masterIdx})">🚫 Suspend</button>
+                                        </td>
+                                    </tr>
+                                `;
+                            }).join('');
+
+                        // 🟢 RENDER SUSPENDED LEDGER: Maps blocked profiles safely directly onto the lower crimson section rows
+                        const suspendedTableBody = document.getElementById("suspended-users-list-target");
+                        if (suspendedTableBody) {
+                            suspendedTableBody.innerHTML = suspendedClients.length === 0 ?
+                                `<tr><td colspan="5" style="text-align:center; color:#64748b; padding:20px;">No permanently suspended account histories logged.</td></tr>` :
+                                suspendedClients.map((u) => {
+                                    const masterIdx = databaseUsersList.findIndex(masterUser => masterUser.id === u.id);
+                                    return `
+                                        <tr style="background: rgba(239,68,68,0.02);">
+                                            <td style="font-weight:700; color:#64748b; padding:12px 8px;">#${u.id || 'U'}</td>
+                                            <td style="color:#94a3b8; text-decoration: line-through; padding:12px 8px;">${u.name || 'N/A'}</td>
+                                            <td style="color:#64748b; padding:12px 8px;">${u.phone || u.contact || 'N/A'}</td>
+                                            <td style="font-family:monospace; color:#4b5563; padding:12px 8px;">${u.password || 'N/A'}</td>
+                                            <td style="text-align: right; padding:12px 8px; white-space: nowrap;">
+                                                <button class="action-icon-btn" style="color: #10b981; background: rgba(16,185,129,0.1); font-weight: bold;" onclick="reactivateCustomerAccount(${masterIdx})">🔄 Reactivate</button>
+                                            </td>
+                                        </tr>
+                                    `;
+                                }).join('');
+                        }
                     }
                 }
 
@@ -264,16 +305,16 @@
         }
 
         // =========================================================================
-        // 👥 CUSTOMER COMPLIANCE AND PROFILE EDIT ENGINE MODULES
+        // 👥 CUSTOMER COMPLIANCE AND PROFILE MUTATION LOGIC MODULES
         // =========================================================================
-        async function triggerInlineUserEdit(index) {
+        async function triggerInlineUserEdit(masterIndex) {
             try {
                 // Download a temporary fresh array stack directly from the server to prevent editing stale rows
                 const response = await fetch(`${API_BASE_ENDPOINT}/admin?type=users&_t=${Date.now()}`);
                 if (!response.ok) return alert("Failed to fetch current user records stack.");
                 let currentUsersList = await response.json();
                 
-                const client = currentUsersList[index];
+                const client = currentUsersList[masterIndex];
                 if (!client) return alert("Account record data trace missing.");
 
                 // Prompt management entries using clear, secure modal popups
@@ -311,31 +352,49 @@
             }
         }
 
-        async function suspendCustomerAccount(index) {
-            if (!confirm("CRITICAL WARNING: Are you sure you want to permanently delete and suspend this customer account profile from the Indian Telecom network database? They will be signed out instantly and completely blocked from viewing checkout tracks.")) return;
+        async function suspendCustomerAccount(masterIndex) {
+            if (!confirm("Are you sure you want to suspend this user? They will be signed out instantly and completely blocked from viewing store checkout tracks.")) return;
             
             try {
                 const response = await fetch(`${API_BASE_ENDPOINT}/admin?type=users&_t=${Date.now()}`);
                 if (!response.ok) return alert("Failed to secure active profile logs stack.");
                 let currentUsersList = await response.json();
                 
-                const deadProfile = currentUsersList[index];
-                
-                // Splice row index data point cleanly from collection list
-                currentUsersList.splice(index, 1);
+                // 🟢 SAFE BLOCK ACTION: Change status tag parameters instead of running an array splice erase
+                currentUsersList[masterIndex].status = 'SUSPENDED';
 
-                // Commit the truncated account array back to the cloud storage cell parameters map
                 await fetch(`${API_BASE_ENDPOINT}/admin?type=users`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(currentUsersList)
                 });
 
-                alert(`ACCOUNT DELETED: Profile reference track linked to "#${deadProfile.id}" removed successfully.`);
-                pullMasterDatabaseArrays(); // Refresh dashboard data instantly
-            } catch (err) {
-                alert("Account termination processing server exception: " + err.message);
-            }
+                alert("CUSTOMER SUSPENDED: Account moved cleanly down to the historical archive block registries.");
+                pullMasterDatabaseArrays();
+            } catch (err) { alert("Account termination server exception: " + err.message); }
+        }
+
+        // 🔄 NEW: PROFILE REACTIVATION MUTATOR PATHWAY
+        async function reactivateCustomerAccount(masterIndex) {
+            if (!confirm("Re-link account registration? Confirming will restore their active storefront parameters and grant them clean access to place incoming orders.")) return;
+            
+            try {
+                const response = await fetch(`${API_BASE_ENDPOINT}/admin?type=users&_t=${Date.now()}`);
+                if (!response.ok) return alert("Failed to pull network records queue stack.");
+                let currentUsersList = await response.json();
+                
+                // 🟢 UNBLOCK LOGIC: Strip the suspended tag parameter to make them active globally
+                currentUsersList[masterIndex].status = 'ACTIVE';
+
+                await fetch(`${API_BASE_ENDPOINT}/admin?type=users`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(currentUsersList)
+                });
+
+                alert("SUCCESSFUL ACCOUNT REVIVAL: Client account restored cleanly back to active store rosters!");
+                pullMasterDatabaseArrays();
+            } catch (err) { alert("Profile restoration server validation error: " + err.message); }
         }
 
         async function pushInventoryStateToCloud() {
@@ -385,7 +444,6 @@
                 targetTableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#94a3b8; padding:30px;">No items inside database inventory.</td></tr>`;
                 return;
             }
-
                       let compiledRows = "";
             for (let i = 0; i < liveInventoryState.length; i++) {
                 const item = liveInventoryState[i];
