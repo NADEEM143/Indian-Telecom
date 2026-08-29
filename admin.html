@@ -173,7 +173,13 @@
 
             <!-- 📦 SECURE PANEL AREA 5: HISTORICAL COMPLETED SHIPPED ARCHIVES -->
             <section class="admin-card" style="margin-top: 30px; border-top: 4px solid #10b981;">
-                <div class="card-title">📦 Completed & Shipped Order History</div>
+                
+                <!-- 🔴 DELETE YOUR OLD SINGLE LINE <div class="card-title"> AND PASTE THIS DIRECTLY HERE: -->
+                <div class="card-title" style="display: flex; justify-content: space-between; align-items: center;">
+                    <span>📦 Completed & Shipped Order History</span>
+                    <button onclick="developerResetHistoryBucket()" style="background: rgba(239,68,68,0.1); color: #ef4444; border: 1px solid rgba(239,68,68,0.2); font-size: 11px; font-weight: bold; padding: 6px 12px; border-radius: 6px; cursor: pointer;">🗑️ Reset History Database</button>
+                </div>
+
                 <div class="data-table-wrapper">
                     <table class="admin-table">
                         <thead>
@@ -579,11 +585,29 @@
                     body: JSON.stringify(savePayload)
                 });
 
-                alert("SUCCESS: Your brand-new storefront marquee message announcement text has been published live globally across database registries!");
+                               alert("SUCCESS: Your brand-new storefront marquee message announcement text has been published live globally across database registries!");
                 pullMasterDatabaseArrays();
             } catch (err) {
                 alert("Server announcement sync mapping exception: " + err.message);
             }
+        }
+
+        // 🟢 PASTE THE FORCE FLUSH RESET FUNCTION MODULE DIRECTLY HERE:
+        // =========================================================================
+        // 🛠️ DEVELOPER UTILITY: FORCE FLUSH CORRUPTED DATABASE RECORDS
+        // =========================================================================
+        async function developerResetHistoryBucket() {
+            if (!confirm("WARNING: This will completely wipe out old history logs from your Vercel cloud server to resolve data rendering conflicts. Proceed?")) return;
+            try {
+                await fetch(`${API_BASE_ENDPOINT}/admin?type=history`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify([]) // Sends a clean empty array payload to overwrite corrupted entries
+                });
+                alert("SUCCESS: History repository bucket flushed cleanly! Your system is ready for fresh data cycles.");
+                completedHistoryState = [];
+                renderAdminHistoryLog();
+            } catch (err) { alert("Flush Exception: " + err.message); }
         }
 
         // LOCAL DEVICE STORAGE CONTROLLER - OPEN MEDIA DATABASE ENGINE
