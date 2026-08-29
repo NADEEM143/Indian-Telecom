@@ -197,7 +197,7 @@
                 });
             } catch (e) { return null; }
         }
-                        async function pullMasterDatabaseArrays() {
+               async function pullMasterDatabaseArrays() {
             try {
                 // 1. Fetch live product catalog structures
                 const productResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=products`);
@@ -228,7 +228,7 @@
                             <tr>
                                 <td style="font-weight:700; color:#3b82f6; padding:12px 8px;">#${u.id || 'U'}</td>
                                 <td style="color:#ffffff; font-weight:bold; padding:12px 8px;">${u.name || 'N/A'}</td>
-                                <td style="color:#cbd5e1; padding:12px 8px;">${u.phone || 'N/A'}</td>
+                                <td style="color:#cbd5e1; padding:12px 8px;">${u.phone || u.contact || 'N/A'}</td>
                                 <td style="font-family:monospace; color:#a1a1aa; padding:12px 8px;">${u.password || 'N/A'}</td>
                             </tr>
                         `).join('');
@@ -238,7 +238,7 @@
                 // Render dynamic inventory arrays onto their target tables
                 await renderAdminInventory();
                 renderAdminOrders();
-                renderAdminHistoryLog(); // 🟢 SYNCED: Load your permanent tracker rows onto the UI
+                renderAdminHistoryLog(); // 🟢 SYNCED: Load permanent tracker rows onto the UI
             } catch (err) {
                 console.error("Cloud Master State Sync Error:", err.message);
             }
@@ -292,17 +292,19 @@
                 return;
             }
 
-            let compiledRows = "";
+                      let compiledRows = "";
             for (let i = 0; i < liveInventoryState.length; i++) {
                 const item = liveInventoryState[i];
-                const activeLocalImage = await getImageLocally(item.id);
+                
+                // 🟢 FIXED: Reads the base64 image data straight from the cloud server array item, with local device lookups as a fallback
+                const cloudAssetImage = item.asset || await getImageLocally(item.id);
                 
                 compiledRows += `
                     <tr>
                         <td>
                             <div class="row-item-meta">
                                 <div class="row-thumb">
-                                    ${activeLocalImage ? `<img src="${activeLocalImage}" style="width:100%;height:100%;object-fit:cover;border-radius:8px;">` : '📱'}
+                                    ${cloudAssetImage ? `<img src="${cloudAssetImage}" style="width:100%;height:100%;object-fit:cover;border-radius:8px;">` : '📱'}
                                 </div>
                                 <div style="font-weight: 700; color:#ffffff;">${item.name}</div>
                             </div>
@@ -336,13 +338,15 @@
             document.getElementById("prod-disc").value = item.discountPrice;
             
             const submitBtn = document.querySelector("#product-upload-form .submit-btn");
-            submitBtn.innerText = "💾 Save Dynamic Changes";
-            submitBtn.style.background = "#10b981"; // Shift theme profile safely to green
+            if (submitBtn) {
+                submitBtn.innerText = "💾 Save Dynamic Changes";
+                submitBtn.style.background = "#10b981"; // Shift theme profile safely to green
+            }
             
             document.getElementById("product-upload-form").scrollIntoView({ behavior: 'smooth' });
         }
 
-                function renderAdminOrders() {
+        function renderAdminOrders() {
             const targetTableBody = document.getElementById("orders-log-target");
             if (!targetTableBody) return;
             
@@ -356,9 +360,9 @@
                     <td style="font-weight: 700; color: #3b82f6;">#${order.id || 'ORD'}</td>
                     <td>
                         <div style="font-weight: 700; color:#ffffff;">${order.name}</div>
-                        <div style="font-size: 12px; color: #94a3b8;">${order.phone}</div>
+                        <div style="font-size: 12px; color: #94a3b8;">${order.phone || order.contact || 'N/A'}</div>
                     </td>
-                    <td style="max-width: 220px; font-size: 13px; color: #cbd5e1;">${order.address}</td>
+                    <td style="max-width: 220px; font-size: 13px; color: #cbd5e1;">${order.address || order.location || 'N/A'}</td>
                     <td><span class="badge ${order.mop === 'ONLINE' ? 'badge-success' : 'badge-warning'}">${order.mop}</span></td>
                     <td style="font-family: monospace; font-weight: 700; color: #f59e0b; letter-spacing: 0.5px;">${order.utr || 'N/A'}</td>
                     <td><button class="action-icon-btn ship-btn" onclick="fulfillOrder(${index})">✅ Ship</button></td>
@@ -366,29 +370,39 @@
             `).join('');
         }
 
-        // 🟢 ARCHIVAL LOGGER MAPPING ENGINE DRAWING CELLS UNTO SCREEN VIEWS
+                // 🟢 ARCHIVAL LOGGER MAPPING ENGINE DRAWING CELLS UNTO SCREEN VIEWS
         function renderAdminHistoryLog() {
             const targetTableBody = document.getElementById("history-log-target");
             if (!targetTableBody) return;
             
-            if (completedHistoryState.length === 0) {
+            if (!completedHistoryState || completedHistoryState.length === 0) {
                 targetTableBody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#64748b; padding:30px;">No historical shipped logs captured yet.</td></tr>`;
                 return;
             }
             
-            targetTableBody.innerHTML = completedHistoryState.map(order => `
-                <tr>
-                    <td style="font-weight: 700; color: #94a3b8;">#${order.id || 'ORD'}</td>
-                    <td>
-                        <div style="font-weight: 700; color:#cbd5e1;">${order.name}</div>
-                        <div style="font-size: 12px; color: #64748b;">${order.phone}</div>
-                    </td>
-                    <td style="max-width: 220px; font-size: 13px; color: #94a3b8;">${order.address}</td>
-                    <td><span class="badge" style="background: rgba(100,116,139,0.1); color:#94a3b8;">${order.mop}</span></td>
-                    <td style="font-family: monospace; color: #64748b;">${order.utr || 'N/A'}</td>
-                    <td><span class="badge" style="background: rgba(16,185,129,0.1); color: #10b981; font-weight: bold; border: 1px solid rgba(16,185,129,0.2);">📦 SHIPPED</span></td>
-                </tr>
-            `).join('');
+            targetTableBody.innerHTML = completedHistoryState.map(order => {
+                // Safely read properties supporting both original keys and new filter-safe tags
+                const orderId = order.id || 'ORD';
+                const clientName = order.name || 'N/A';
+                const clientContact = order.phone || order.contact || 'N/A';
+                const clientLocation = order.address || order.location || 'N/A';
+                const payMethod = order.mop || 'N/A';
+                const bankUtr = order.utr || 'N/A';
+
+                return `
+                    <tr>
+                        <td style="font-weight: 700; color: #94a3b8;">#${orderId}</td>
+                        <td>
+                            <div style="font-weight: 700; color:#cbd5e1;">${clientName}</div>
+                            <div style="font-size: 12px; color: #64748b;">${clientContact}</div>
+                        </td>
+                        <td style="max-width: 220px; font-size: 13px; color: #94a3b8;">${clientLocation}</td>
+                        <td><span class="badge" style="background: rgba(100,116,139,0.1); color:#94a3b8; padding: 4px 8px; border-radius: 4px;">${payMethod}</span></td>
+                        <td style="font-family: monospace; color: #64748b;">${bankUtr}</td>
+                        <td><span class="badge" style="background: rgba(16,185,129,0.1); color: #10b981; font-weight: bold; border: 1px solid rgba(16,185,129,0.2); padding: 4px 8px; border-radius: 4px;">📦 SHIPPED</span></td>
+                    </tr>
+                `;
+            }).join('');
         }
 
         // 🟢 MODERN ORDER SHIP CONTROLLER REDIRECTING PARAMETERS INTERNALLY
@@ -396,7 +410,18 @@
             if (!confirm("Are you sure you want to mark this package as shipped and archive it permanently?")) return;
             
             const shippedOrderInfo = liveOrdersState[index];
-            completedHistoryState.push(shippedOrderInfo);
+            
+            // Remaps properties to filter-safe parameter keys before saving to your cloud database array
+            const safeArchivePayload = {
+                id: shippedOrderInfo.id,
+                name: shippedOrderInfo.name,
+                contact: shippedOrderInfo.phone || shippedOrderInfo.contact,
+                location: shippedOrderInfo.address || shippedOrderInfo.location,
+                mop: shippedOrderInfo.mop,
+                utr: shippedOrderInfo.utr
+            };
+            
+            completedHistoryState.push(safeArchivePayload);
             liveOrdersState.splice(index, 1);
             
             try {
