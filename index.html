@@ -572,12 +572,19 @@
                 let databaseUsersList = [];
                 if (response.ok) { databaseUsersList = await response.json(); }
 
-                if (isLoginMode) {
+                               if (isLoginMode) {
                     const matchingProfile = databaseUsersList.find(u => u.phone === phone && u.password === pass);
                     if (!matchingProfile) {
                         alert("Invalid Credentials! Check mobile number or password strings.");
                         return;
                     }
+                    
+                    // 🛑 REJECTION GATEKEEPER BLOCK: Instantly stops suspended clients trying to enter your store
+                    if (matchingProfile.status === 'SUSPENDED') {
+                        alert("ACCESS DENIED: This account has been suspended by Indian Telecom Administration. Please contact Nadim Ahmad via WhatsApp for registration inquiries.");
+                        return;
+                    }
+                    
                     activeSessionUser = matchingProfile;
                     alert(`Welcome Back, ${activeSessionUser.name}! Opening storefront accessories grid...`);
                 } else {
