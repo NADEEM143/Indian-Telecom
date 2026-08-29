@@ -706,20 +706,24 @@
                 }
 
                 // 2. Fetch completed shipped records archives tracking matching user phone identifiers
-                const historyResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=history&_t=${cacheBusterTimeToken}`);
+                               const historyResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=history&_t=${cacheBusterTimeToken}`);
                 if (historyResponse.ok) {
                     const masterHistoryList = await historyResponse.json();
-                    const matchingHistoryTracks = masterHistoryList.filter(o => 
-                        String(o.phone || o.contact).trim() === String(activeSessionUser.phone).trim()
-                    );
+                    
+                    // 🟢 FIXED: Cleanly matches string formats and handles all property variations (.phone / .contact) perfectly!
+                    const matchingHistoryTracks = masterHistoryList.filter(o => {
+                        const orderPhoneStr = String(o.phone || o.contact || '').trim();
+                        const sessionPhoneStr = String(activeSessionUser.phone || activeSessionUser.contact || '').trim();
+                        return orderPhoneStr === sessionPhoneStr && orderPhoneStr !== '';
+                    });
                     
                     historyTargetRows.innerHTML = matchingHistoryTracks.length === 0 ?
                         `<tr><td colspan="5" style="text-align:center;color:#64748b;padding:20px;">No past shipped orders historical entries saved.</td></tr>` :
                         matchingHistoryTracks.map(o => `
                             <tr style="border-bottom: 1px solid #1e293b; color: #cbd5e1;">
-                                <td style="padding:12px 8px;font-weight:700;color:#94a3b8;">#${o.id}</td>
-                                <td style="padding:12px 8px;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${o.address || o.location}</td>
-                                <td style="padding:12px 8px;"><span style="background:rgba(100,116,139,0.1);color:#94a3b8;padding:2px 6px;border-radius:4px;font-size:11px;">${o.mop}</span></td>
+                                <td style="padding:12px 8px;font-weight:700;color:#94a3b8;">#${o.id || 'ORD'}</td>
+                                <td style="padding:12px 8px;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${o.address || o.location || 'N/A'}</td>
+                                <td style="padding:12px 8px;"><span style="background:rgba(100,116,139,0.1);color:#94a3b8;padding:2px 6px;border-radius:4px;font-size:11px;">${o.mop || 'N/A'}</span></td>
                                 <td style="padding:12px 8px;font-family:monospace;color:#64748b;">${o.utr || 'N/A'}</td>
                                 <td style="padding:12px 8px;text-align:right;"><span style="color:#10b981;font-weight:bold;font-size:11px;background:rgba(16,185,129,0.1);padding:4px 8px;border-radius:20px;border:1px solid rgba(16,185,129,0.2);">📦 SHIPPED</span></td>
                             </tr>
