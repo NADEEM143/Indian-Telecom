@@ -57,12 +57,17 @@ export default async function handler(req, res) {
         // ==========================================
         // 📦 PERMANENT SHIPPED ORDER HISTORY ENDPOINTS
         // ==========================================
+                // ==========================================
+        // 📦 PERMANENT SHIPPED ORDER HISTORY ENDPOINTS
+        // ==========================================
         if (dataType === 'history') {
             if (req.method === 'GET') {
+                // 🟢 FIXED: Reads from the exact same storage key name used in your post updates
                 const history = await kv.get('it_order_history') || [];
                 return res.status(200).json(history);
             }
             if (req.method === 'POST') {
+                // 🟢 FIXED: Saves directly into the unified cloud transaction history table
                 await kv.set('it_order_history', req.body);
                 return res.status(200).json({ success: true });
             }
