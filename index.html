@@ -176,15 +176,18 @@
                     </div>
                 </div>
 
-                <button type="submit" class="checkout-trigger" style="margin-top: 15px; background: #0f172a;">Confirm & Place Order</button>
+               <button type="submit" class="checkout-trigger" style="margin-top: 15px; background: #0f172a;">Confirm & Place Order</button>
             </form>
         </div>
     </div>
-    <!-- DYNAMIC AUTHENTICATION POPUP LAYOUT -->
-    <div class="modal" id="auth-modal" style="display: flex;">
+
+    <!-- DYNAMIC AUTHENTICATION POPUP LAYOUT (HIDDEN BY DEFAULT WITH CLOSE OPTION) -->
+    <div class="modal" id="auth-modal" style="display: none;">
         <div class="modal-content">
-            <div class="drawer-header" style="padding: 0 0 16px 0; margin-bottom: 20px;">
+            <div class="drawer-header" style="padding: 0 0 16px 0; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
                 <h3 id="auth-title">Customer Registration</h3>
+                <!-- ❌ CLOSE REGISTRATION ACTION BUTTON -->
+                <button type="button" class="close-btn" style="background: none; border: none; font-size: 20px; color: #94a3b8; cursor: pointer;" onclick="closeAuthModal()">❌</button>
             </div>
             <form id="auth-form" onsubmit="handleAuthentication(event)">
                 <div class="form-group" id="auth-name-group">
@@ -367,14 +370,37 @@
             }
         }
 
+               // 🔒 SECURE CHECKOUT GATEKEEPER: BLOCKS UNREGISTERED TRAFFIC
         function openCheckout() {
-            if(cart.length === 0) return alert("Add items to your cart first!");
+            if (cart.length === 0) return alert("Add items to your cart first!");
+            
+            // 🛑 Intercept unverified guests trying to purchase items
+            if (!activeSessionUser) {
+                alert("Authentication Required: Please register an account or log in to complete your purchase details!");
+                
+                // Close the cart slider drawer view layout cleanly first
+                const drawer = document.getElementById("cart-drawer");
+                const overlay = document.getElementById("drawer-overlay");
+                if (drawer) drawer.style.transform = "translateX(100%)";
+                if (overlay) overlay.style.display = "none";
+
+                // Fire up your account registration overlay popup window box instantly
+                document.getElementById("auth-modal").style.display = "flex";
+                return;
+            }
+            
+            // 🟢 Logged In: Automatically pre-fill the shipping details form using their registered account tokens
+            document.getElementById("cust-name").value = activeSessionUser.name || "";
+            document.getElementById("cust-phone").value = activeSessionUser.phone || "";
+            
             document.getElementById("checkout-modal").style.display = "flex";
         }
         
-        function closeCheckout() { document.getElementById("checkout-modal").style.display = "none"; }
+        function closeCheckout() { 
+            document.getElementById("checkout-modal").style.display = "none"; 
+        }
 
-                function togglePaymentMode(mode) {
+        function togglePaymentMode(mode) {
             const qrSection = document.getElementById("qr-section");
             const utrInput = document.getElementById("pay-utr");
             
@@ -462,7 +488,7 @@
         // =========================================================================
         // 👥 CUSTOMER REGISTER & LOGIN CONTROLLER LOGIC ENGINE
         // =========================================================================
-        let isLoginMode = false;
+               let isLoginMode = false;
         let activeSessionUser = JSON.parse(localStorage.getItem('IT_ACTIVE_USER')) || null;
 
         function toggleAuthMode() {
@@ -474,7 +500,11 @@
             document.getElementById("auth-form").reset();
         }
 
-                async function handleAuthentication(e) {
+        function closeAuthModal() {
+            document.getElementById("auth-modal").style.display = "none";
+        }
+
+        async function handleAuthentication(e) {
             e.preventDefault();
             const phone = document.getElementById("user-phone").value.trim();
             const pass = document.getElementById("user-pass").value;
@@ -527,8 +557,8 @@
                 localStorage.removeItem('IT_ACTIVE_USER'); // Wipe the customer token cache
                 activeSessionUser = null;
                 
-                // Clear the workspace and force the screen overlay blocks back up
-                document.getElementById("auth-modal").style.display = "flex";
+                // Clear the workspace and reset view variables smoothly
+                document.getElementById("auth-modal").style.display = "none";
                 document.getElementById("logout-btn").style.display = "none";
                 document.getElementById("auth-form").reset();
             }
@@ -541,7 +571,7 @@
                 document.getElementById("auth-modal").style.display = "none";
                 if (logoutButtonElement) logoutButtonElement.style.display = "block"; // Show Logout button
             } else {
-                document.getElementById("auth-modal").style.display = "flex";
+                // FIXED: Popups remain completely hidden on boot so guests can read your site layout freely
                 if (logoutButtonElement) logoutButtonElement.style.display = "none"; // Hide Logout button
             }
         }
