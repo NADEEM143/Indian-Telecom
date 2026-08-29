@@ -84,6 +84,9 @@
             <p>Prop. Nadim Ahmad</p>
         </div>
         <div style="display: flex; align-items: center; gap: 15px;">
+            <!-- 👤 USER PROFILE TRACKING PORTAL BUTTON LINK -->
+            <button onclick="enterDashboardView()" style="background: none; border: none; color: #3b82f6; font-weight: 700; font-size: 14px; cursor: pointer; display: none;" id="user-portal-btn">My Account 👤</button>
+            
             <!-- 🚪 NEW LOGOUT ACTION LAYOUT -->
             <button onclick="handleLogout()" style="background: none; border: none; color: #dc2626; font-weight: 700; font-size: 14px; cursor: pointer; display: none;" id="logout-btn">Logout 🚪</button>
             
@@ -99,9 +102,63 @@
             <p>Explore an elite range of mobile accessories handpicked by Indian Telecom for premium drop protection and super fast charging performance.</p>
         </div>
         <div style="font-size: 72px; opacity: 0.3;">🛡️</div>
+    </section> <!-- This is the closing tag of your hero banner area -->
+
+    <!-- 🟢 PASTE THE DYNAMIC CLIENT ACCOUNT DASHBOARD BLOCK DIRECTLY HERE! -->
+    <!-- 👥 DYNAMIC CLIENT ACCOUNT DASHBOARD PANEL LAYOUT -->
+    <section class="container" id="customer-profile-dashboard" style="display: none; margin-top: 30px; margin-bottom: 40px; padding: 20px; background: #0f172a; border-radius: 16px; border: 1px solid #1e293b;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; border-bottom: 1px solid #1e293b; padding-bottom: 16px;">
+            <div>
+                <h2 style="font-size: 22px; font-weight: 800; color: #ffffff;">Welcome Back, <span id="dash-user-title" style="color: #3b82f6;">Customer</span>! 👋</h2>
+                <p style="font-size: 13px; color: #94a3b8; margin-top: 4px;">Track your package delivery paths and view past accounts below.</p>
+            </div>
+            <button onclick="exitDashboardView()" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #ffffff; padding: 8px 16px; border-radius: 8px; font-weight: 700; font-size: 13px; cursor: pointer; transition: 0.2s;">🛒 Back to Store</button>
+        </div>
+
+        <!-- TRACKER GRID CARD LAYOUTS -->
+        <div style="display: flex; flex-direction: column; gap: 24px;">
+            <!-- ACTIVE WAITING QUEUES LOG -->
+            <div style="background: rgba(255,255,255,0.02); padding: 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                <h4 style="font-size: 15px; font-weight: 700; color: #f59e0b; display: flex; align-items: center; gap: 8px; margin-bottom: 14px;">⏳ Active Shipments & Processing Orders</h4>
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 13px;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid #1e293b; color: #94a3b8;">
+                                <th style="padding: 10px 8px;">Order ID</th>
+                                <th style="padding: 10px 8px;">Shipping Destination</th>
+                                <th style="padding: 10px 8px;">Method</th>
+                                <th style="padding: 10px 8px;">UTR Reference</th>
+                                <th style="padding: 10px 8px; text-align: right;">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="client-active-orders-rows"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- COMPLETED LOGS LEDGER ARCHIVE -->
+            <div style="background: rgba(255,255,255,0.02); padding: 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                <h4 style="font-size: 15px; font-weight: 700; color: #10b981; display: flex; align-items: center; gap: 8px; margin-bottom: 14px;">📦 Past Completed Order History</h4>
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 13px;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid #1e293b; color: #94a3b8;">
+                                <th style="padding: 10px 8px;">Order ID</th>
+                                <th style="padding: 10px 8px;">Delivery Location</th>
+                                <th style="padding: 10px 8px;">Method</th>
+                                <th style="padding: 10px 8px;">Bank UTR</th>
+                                <th style="padding: 10px 8px; text-align: right;">Status Code</th>
+                            </tr>
+                        </thead>
+                        <tbody id="client-past-history-rows"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </section>
 
-    <div class="categories-container">
+    <!-- The categories filter navigation menu bar sits directly underneath -->
+    <div class="categories-nav container">
         <button class="cat-btn active" onclick="filterCategory('All', this)">All Items</button>
         <button class="cat-btn" onclick="filterCategory('Cases', this)">Premium Cases</button>
         <button class="cat-btn" onclick="filterCategory('Chargers', this)">Fast Chargers</button>
@@ -500,7 +557,7 @@
             document.getElementById("auth-form").reset();
         }
 
-        function closeAuthModal() {
+               function closeAuthModal() {
             document.getElementById("auth-modal").style.display = "none";
         }
 
@@ -558,25 +615,110 @@
                 activeSessionUser = null;
                 
                 // Clear the workspace and reset view variables smoothly
-                document.getElementById("auth-modal").style.display = "none";
-                document.getElementById("logout-btn").style.display = "none";
+                evaluateUserAccessSession();
                 document.getElementById("auth-form").reset();
+            }
+        }
+
+        // =========================================================================
+        // 👥 CUSTOMER DASHBOARD ACCOUNT TRACKING LOGIC ENGINE MODULES
+        // =========================================================================
+        function enterDashboardView() {
+            if (!activeSessionUser) return alert("Please login first to view tracking logs.");
+            
+            // Hide product accessories grid elements dynamically to keep view clean
+            document.querySelector(".hero-banner").style.display = "none";
+            const catNav = document.querySelector(".categories-nav");
+            if (catNav) catNav.style.display = "none";
+            document.getElementById("product-grid").style.display = "none";
+            
+            // Render user information text values onto greet headers
+            document.getElementById("dash-user-title").innerText = activeSessionUser.name || "Customer";
+            
+            // Fire up data downloading pipelines
+            fetchAndRenderCustomerOrderTracks();
+            document.getElementById("customer-profile-dashboard").style.display = "block";
+        }
+
+        function exitDashboardView() {
+            // Restore visibility of storefront grid blocks seamlessly
+            document.querySelector(".hero-banner").style.display = "flex";
+            const catNav = document.querySelector(".categories-nav");
+            if (catNav) catNav.style.display = "flex";
+            document.getElementById("product-grid").style.display = "grid";
+            document.getElementById("customer-profile-dashboard").style.display = "none";
+        }
+        async function fetchAndRenderCustomerOrderTracks() {
+            const activeTargetRows = document.getElementById("client-active-orders-rows");
+            const historyTargetRows = document.getElementById("client-past-history-rows");
+            const cacheBusterTimeToken = Date.now();
+            
+            if(!activeTargetRows || !historyTargetRows) return;
+            
+            activeTargetRows.innerHTML = `<tr><td colspan="5" style="text-align:center;color:#94a3b8;padding:15px;">Downloading live tracking markers...</td></tr>`;
+            historyTargetRows.innerHTML = `<tr><td colspan="5" style="text-align:center;color:#94a3b8;padding:15px;">Downloading past history entries...</td></tr>`;
+            
+            try {
+                // 1. Fetch active waiting pipeline lines matching user's phone token string
+                const ordersResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=orders&_t=${cacheBusterTimeToken}`);
+                if (ordersResponse.ok) {
+                    const masterOrdersList = await ordersResponse.json();
+                    const matchingActiveTracks = masterOrdersList.filter(o => String(o.phone).trim() === String(activeSessionUser.phone).trim());
+                    
+                    activeTargetRows.innerHTML = matchingActiveTracks.length === 0 ?
+                        `<tr><td colspan="5" style="text-align:center;color:#64748b;padding:20px;">No processing packages captured in queue right now.</td></tr>` :
+                        matchingActiveTracks.map(o => `
+                            <tr style="border-bottom: 1px solid #1e293b; color: #cbd5e1;">
+                                <td style="padding:12px 8px;font-weight:700;color:#3b82f6;">#${o.id}</td>
+                                <td style="padding:12px 8px;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${o.address}</td>
+                                <td style="padding:12px 8px;"><span style="background:rgba(245,158,11,0.1);color:#f59e0b;padding:2px 6px;border-radius:4px;font-size:11px;">${o.mop}</span></td>
+                                <td style="padding:12px 8px;font-family:monospace;color:#64748b;">${o.utr || 'N/A'}</td>
+                                <td style="padding:12px 8px;text-align:right;"><span style="color:#f59e0b;font-weight:bold;font-size:11px;background:rgba(245,158,11,0.1);padding:4px 8px;border-radius:20px;border:1px solid rgba(245,158,11,0.2);">⏳ PROCESSING</span></td>
+                            </tr>
+                        `).join('');
+                }
+
+                // 2. Fetch completed shipped records archives tracking matching user phone identifiers
+                const historyResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=history&_t=${cacheBusterTimeToken}`);
+                if (historyResponse.ok) {
+                    const masterHistoryList = await historyResponse.json();
+                    const matchingHistoryTracks = masterHistoryList.filter(o => 
+                        String(o.phone || o.contact).trim() === String(activeSessionUser.phone).trim()
+                    );
+                    
+                    historyTargetRows.innerHTML = matchingHistoryTracks.length === 0 ?
+                        `<tr><td colspan="5" style="text-align:center;color:#64748b;padding:20px;">No past shipped orders historical entries saved.</td></tr>` :
+                        matchingHistoryTracks.map(o => `
+                            <tr style="border-bottom: 1px solid #1e293b; color: #cbd5e1;">
+                                <td style="padding:12px 8px;font-weight:700;color:#94a3b8;">#${o.id}</td>
+                                <td style="padding:12px 8px;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${o.address || o.location}</td>
+                                <td style="padding:12px 8px;"><span style="background:rgba(100,116,139,0.1);color:#94a3b8;padding:2px 6px;border-radius:4px;font-size:11px;">${o.mop}</span></td>
+                                <td style="padding:12px 8px;font-family:monospace;color:#64748b;">${o.utr || 'N/A'}</td>
+                                <td style="padding:12px 8px;text-align:right;"><span style="color:#10b981;font-weight:bold;font-size:11px;background:rgba(16,185,129,0.1);padding:4px 8px;border-radius:20px;border:1px solid rgba(16,185,129,0.2);">📦 SHIPPED</span></td>
+                            </tr>
+                        `).join('');
+                }
+            } catch (err) {
+                console.error("Client side order verification tracking mapping crash:", err);
             }
         }
 
         function evaluateUserAccessSession() {
             const logoutButtonElement = document.getElementById("logout-btn");
+            const accountPortalButtonElement = document.getElementById("user-portal-btn");
             
             if (activeSessionUser) {
                 document.getElementById("auth-modal").style.display = "none";
-                if (logoutButtonElement) logoutButtonElement.style.display = "block"; // Show Logout button
+                if (logoutButtonElement) logoutButtonElement.style.display = "block";
+                if (accountPortalButtonElement) accountPortalButtonElement.style.display = "block"; // Show Account dashboard button
             } else {
-                // FIXED: Popups remain completely hidden on boot so guests can read your site layout freely
-                if (logoutButtonElement) logoutButtonElement.style.display = "none"; // Hide Logout button
+                exitDashboardView();
+                if (logoutButtonElement) logoutButtonElement.style.display = "none";
+                if (accountPortalButtonElement) accountPortalButtonElement.style.display = "none"; // Hide Account dashboard button
             }
         }
 
-        // INITIALIZE APPLICATION BOOT ACTIONS
+        // INITIALIZE APPLICATION BOOT ACTIONS WITH ACTIVE STATE CHECKS
         window.onload = () => {
             evaluateUserAccessSession();
             fetchLiveInventory();
@@ -584,3 +726,4 @@
     </script>
 </body>
 </html>
+
