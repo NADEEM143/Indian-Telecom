@@ -1,235 +1,63 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>INDIAN TELECOM - Master Admin Command Center</title>
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: system-ui, -apple-system, sans-serif; background-color: #0f172a; color: #f8fafc; padding: 30px 5%; }
-        header { display: flex; justify-content: space-between; align-items: center; border-b: 1px solid #334155; padding-bottom: 20px; margin-bottom: 30px; }
-        .brand-meta h1 { font-size: 26px; color: #ffffff; letter-spacing: -0.5px; }
-        .brand-meta h1 span { color: #3b82f6; }
-        .brand-meta p { font-size: 12px; color: #94a3b8; font-weight: 600; margin-top: 4px; text-transform: uppercase; letter-spacing: 1px; }
-        .secure-badge { background: #1e293b; border: 1px solid #334155; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; color: #10b981; }
-        .dashboard-grid { display: grid; grid-template-columns: 1fr; gap: 30px; }
-        @media(min-width: 992px) { .dashboard-grid { grid-template-columns: 380px 1fr; } }
-        .admin-card { background: #1e293b; border: 1px solid #334155; border-radius: 24px; padding: 24px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3); }
-        .card-title { font-size: 18px; font-weight: 800; margin-bottom: 20px; color: #ffffff; display: flex; align-items: center; gap: 8px; border-b: 1px solid #334155; padding-bottom: 12px; }
-        .form-group { margin-bottom: 16px; }
-        .form-group label { display: block; font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px; }
-        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px 16px; background: #0f172a; border: 1px solid #334155; border-radius: 12px; font-size: 14px; color: #ffffff; outline: none; transition: border-color 0.2s; }
-        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: #3b82f6; }
-        .file-upload-zone { border: 2px dashed #475569; background: #0f172a; border-radius: 14px; padding: 20px; text-align: center; cursor: pointer; position: relative; transition: all 0.2s; }
-        .file-upload-zone:hover { border-color: #3b82f6; background: #1e293b; }
-        .file-upload-zone input[type="file"] { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
-        .preview-box { width: 100px; height: 100px; background: #1e293b; margin: 12px auto 0 auto; border-radius: 12px; border: 1px solid #334155; display: none; object-fit: cover; }
-        .submit-btn { width: 100%; background: #3b82f6; color: white; border: none; padding: 14px; border-radius: 12px; font-weight: 700; font-size: 14px; cursor: pointer; transition: background 0.2s; margin-top: 10px; }
-        .submit-btn:hover { background: #2563eb; }
-        .data-table-wrapper { overflow-x: auto; }
-        .admin-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; }
-        .admin-table th { padding: 14px; background: #0f172a; color: #94a3b8; font-weight: 700; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; border-bottom: 1px solid #334155; }
-        .admin-table td { padding: 14px; border-bottom: 1px solid #334155; vertical-align: middle; }
-        .admin-table tr:hover { background: #2d3748; }
-        .badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; display: inline-block; }
-        .badge-success { background: rgba(16,185,129,0.15); color: #10b981; border: 1px solid rgba(16,185,129,0.3); }
-        .badge-warning { background: rgba(245,158,11,0.15); color: #f59e0b; border: 1px solid rgba(245,158,11,0.3); }
-        .toggle-switch { position: relative; display: inline-block; width: 44px; height: 24px; }
-        .toggle-switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; inset: 0; background-color: #475569; transition: .3s; border-radius: 24px; }
-        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 4px; bottom: 4px; background-color: white; transition: .3s; border-radius: 50%; }
-        input:checked + .slider { background-color: #3b82f6; }
-        input:checked + .slider:before { transform: translateX(20px); }
-        .action-icon-btn { border: none; background: none; font-size: 14px; cursor: pointer; padding: 6px 12px; border-radius: 8px; color: #ef4444; font-weight: bold; background: rgba(239,68,68,0.1); }
-        .action-icon-btn:hover { background: rgba(239,68,68,0.2); }
-        .ship-btn { color: #10b981; background: rgba(16,185,129,0.1); }
-        .ship-btn:hover { background: rgba(16,185,129,0.2); }
-        .row-item-meta { display: flex; align-items: center; gap: 12px; }
-        .row-thumb { width: 40px; height: 40px; border-radius: 8px; background: #0f172a; object-fit: cover; display: flex; align-items: center; justify-content: center; border: 1px solid #334155; }
-    </style>
-</head>
-<body>
-
-    <header>
-        <div class="brand-meta">
-            <h1>INDIAN <span>TELECOM</span></h1>
-            <p>Proprietor Console Platform • Welcome Nadim Ahmad</p>
-        </div>
-        <div class="secure-badge">🛡️ Secure Session Connected</div>
-    </header>
-
-    <!-- 📢 NEW DYNAMIC MARQUEE OFFER BANNER MESSAGE CONTROLLER CARD -->
-    <div style="max-width: 1400px; margin: 20px auto 0 auto; padding: 0 20px;">
-        <section class="admin-card" style="border-top: 4px solid #f59e0b; margin-bottom: -10px;">
-            <div class="card-title">🔥 Live Storefront Marquee Offer Announcement Banner</div>
-            <div style="padding: 15px 0 5px 0;">
-                <div class="form-group" style="margin-bottom: 12px;">
-                    <label style="display: block; font-size: 13px; color: #94a3b8; font-weight: 600; margin-bottom: 6px;">Dynamic Marquee Header Text Message String</label>
-                    <input type="text" id="live-banner-message-field" placeholder="Type hot mega announcement text deals here..." required style="width: 100%; padding: 12px; background: #1e293b; border: 1px solid #334155; border-radius: 8px; color: #ffffff; font-weight: 600; box-sizing: border-box;">
-                </div>
-                <button onclick="pushNewMarqueeOfferMessage()" class="ship-btn" style="border: none; font-size: 14px; cursor: pointer; padding: 10px 20px; border-radius: 8px; font-weight: bold; background: rgba(245,158,11,0.1); color: #f59e0b; transition: 0.2s;" onmouseover="this.style.background='rgba(245,158,11,0.2)'" onmouseout sabotage="this.style.background='rgba(245,158,11,0.1)'">📢 Push Live Offer</button>
-            </div>
-        </section>
-    </div>
-
-    <div class="dashboard-grid">
-        <aside class="admin-card">
-            <div class="card-title">📦 Add New Premium Accessory</div>
-            <form id="product-upload-form">
-                <div class="form-group">
-                    <label>Product Title / Name</label>
-                    <input type="text" id="prod-name" placeholder="e.g. Leather MagSafe Slim Case" required>
-                </div>
-                <div class="form-group">
-                    <label>Accessory Category Mapping</label>
-                    <select id="prod-cat">
-                        <option value="Cases">Cases & Covers</option>
-                        <option value="Chargers">Power & Cables</option>
-                        <option value="Audio">Wireless Audio</option>
-                    </select>
-                </div>
-                <div class="form-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                    <div>
-                        <label>Original Price (₹)</label>
-                        <input type="number" id="prod-price" placeholder="1999" required>
-                    </div>
-                    <div>
-                        <label>Offer Price (₹)</label>
-                        <input type="number" id="prod-disc" placeholder="1199" required>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label>Product Luxury Media Asset</label>
-                    <div class="file-upload-zone">
-                        <span style="font-size: 24px; display: block; margin-bottom: 4px;">📸</span>
-                        <p style="font-size: 12px; font-weight: 600; color: #94a3b8;">Browse Image from Phone/Laptop</p>
-                        <input type="file" id="prod-file" accept="image/*" onchange="generateImagePreview(this)">
-                        <img id="upload-preview" class="preview-box" alt="Preview">
-                    </div>
-                </div>
-                <button type="submit" class="submit-btn">Publish to Live Storefront</button>
-            </form>
-        </aside>
-
-        <div style="display: flex; flex-direction: column; gap: 30px;">
-            <section class="admin-card">
-                <div class="card-title">📥 Incoming Real-Time Orders & UTR Validation</div>
-                <div class="data-table-wrapper">
-                    <table class="admin-table">
-                        <thead>
-                            <tr>
-                                <th>Order ID</th>
-                                <th>Customer Configuration</th>
-                                <th>Destination Address</th>
-                                <th>MOP Method</th>
-                                <th>Verified Bank UTR</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="orders-log-target"></tbody>
-                    </table>
-                </div>
-            </section>
-
-            <section class="admin-card">
-                <div class="card-title">⚙️ Master Product Inventory List (Unlist / Edit Controls)</div>
-                <div class="data-table-wrapper">
-                    <table class="admin-table">
-                        <thead>
-                            <tr>
-                                <th>Product Configuration Details</th>
-                                <th>Category</th>
-                                <th>Listed Pricing Matrix</th>
-                                <th>Visibility Switch</th>
-                                <th>Operations</th>
-                            </tr>
-                        </thead>
-                        <tbody id="inventory-list-target"></tbody>
-                    </table>
-                </div>
-            </section>
-        </div>
-    </div>
-    <!-- SAFELY ENCAPSULATED CONTROLLER JAVASCRIPT BLOCK -->
-                <!-- REGISTERED CUSTOMERS MATRIX OVERVIEW LOGS -->
-          <section class="admin-card" style="margin-top: 30px;">
-                <div class="card-title">👥 Registered Store Customer Profiles</div>
-                <div class="data-table-wrapper">
-                    <table class="admin-table">
-                        <thead>
-                            <tr>
-                                <th>User Account ID</th>
-                                <th>Client Name</th>
-                                <th>Verified Mobile String</th>
-                                <th>Security Pass Key Reference</th>
-                                <!-- 🛠️ NEW WORKSPACE COLUMN ACTION ANCHOR -->
-                                <th style="text-align: right; padding-right: 24px;">Workspace Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="users-list-target"></tbody>
-                    </table>
-                </div>
-            </section>
-
-            <!-- 📦 SECURE PANEL AREA 5: HISTORICAL COMPLETED SHIPPED ARCHIVES -->
-            <section class="admin-card" style="margin-top: 30px; border-top: 4px solid #10b981;">
-                
-                <!-- 🔴 DELETE YOUR OLD SINGLE LINE <div class="card-title"> AND PASTE THIS DIRECTLY HERE: -->
-                <div class="card-title" style="display: flex; justify-content: space-between; align-items: center;">
-                    <span>📦 Completed & Shipped Order History</span>
-                    <button onclick="developerResetHistoryBucket()" style="background: rgba(239,68,68,0.1); color: #ef4444; border: 1px solid rgba(239,68,68,0.2); font-size: 11px; font-weight: bold; padding: 6px 12px; border-radius: 6px; cursor: pointer;">🗑️ Reset History Database</button>
-                </div>
-
-                <div class="data-table-wrapper">
-                    <table class="admin-table">
-                        <thead>
-                            <tr>
-                                <th>Order ID</th>
-                                <th>Customer Details</th>
-                                <th>Destination Address</th>
-                                <th>MOP Method</th>
-                                <th>Verified Bank UTR</th>
-                                <th>Status Badge</th>
-                            </tr>
-                        </thead>
-                        <tbody id="history-log-target"></tbody>
-                    </table>
-                </div>
-            </section>
-
-    <!-- SAFELY ENCAPSULATED CONTROLLER JAVASCRIPT BLOCK -->
     <script>
-                const API_BASE_ENDPOINT = '/api';
+        const API_BASE_ENDPOINT = '/api';
+        
+        // =========================================================================
+        // 💾 UNIFIED SYSTEM STATE POINTERS (NO DUPLICATIONS)
+        // =========================================================================
         let liveInventoryState = [];
         let liveOrdersState = [];
-        let completedHistoryState = []; // <-- 🟢 FIXED: Safe array container initialization for order logs history
+        let completedHistoryState = [];
         let temporaryImageBase64 = "";
         let liveMarqueeOfferMessageStr = "";
 
-        // EXTRACT STORAGE MEDIA BINARY CORES FROM LOCAL HARDWARE SANDBOXES
+        // LOCAL DEVICE STORAGE CONTROLLER - OPEN MEDIA DATABASE ENGINE
+        function openIndexedDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open("IndianTelecomMediaDB", 1);
+                request.onupgradeneeded = (e) => {
+                    const db = e.target.result;
+                    if (!db.objectStoreNames.contains("product_images")) {
+                        db.createObjectStore("product_images", { keyPath: "id" });
+                    }
+                };
+                request.onsuccess = (e) => resolve(e.target.result);
+                request.onerror = (e) => reject(e.target.error);
+            });
+        }
+
+        async function saveImageLocally(id, base64Data) {
+            try {
+                const db = await openIndexedDB();
+                const transaction = db.transaction("product_images", "readwrite");
+                const store = transaction.objectStore("product_images");
+                store.put({ id: id, data: base64Data });
+            } catch (err) { console.error("IndexedDB Save Fault:", err); }
+        }
+
         async function getImageLocally(id) {
             try {
                 const db = await openIndexedDB();
-                if (!db) return null;
-                const tx = db.transaction("product_images", "readonly");
-                const store = tx.objectStore("product_images");
-                return new Promise((res) => {
-                    const req = store.get(id);
-                    req.onsuccess = () => res(req.result ? req.result.data : null);
-                    req.onerror = () => res(null);
+                return new Promise((resolve) => {
+                    const transaction = db.transaction("product_images", "readonly");
+                    const store = transaction.objectStore("product_images");
+                    const request = store.get(id);
+                    request.onsuccess = (e) => resolve(e.target.result ? e.target.result.data : null);
+                    request.onerror = () => resolve(null);
                 });
-            } catch (e) { return null; }
+            } catch (err) { return null; }
         }
-                      async function pullMasterDatabaseArrays() {
+        // =========================================================================
+        // 📥 CLOUD SYNC INITIALIZATION PIPELINE
+        // =========================================================================
+        async function pullMasterDatabaseArrays() {
             try {
-                // 🟢 FIXED: Unique millisecond stamp completely bypasses browser/Vercel cache limits
                 const cacheBusterToken = Date.now();
 
-                // 📢 NEW: Fetch the active storefront marquee offer message text string on dashboard load
+                // 📢 LIVE BANNER DOWNLOAD LAYER
                 const bannerMsgResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=banner_msg&_t=${cacheBusterToken}`);
                 if (bannerMsgResponse.ok) {
                     const parsedBannerPayload = await bannerMsgResponse.json();
-                    liveMarqueeOfferMessageStr = parsedBannerPayload.message || "🔥 MEGA OFFER: FLAT 30% OFF ON PREMIUM CHARGERS & COVERS! LIMITED STOCK!";
+                    liveMarqueeOfferMessageStr = parsedBannerPayload.message || "MEGA OFFER: FLAT 30% OFF ON PREMIUM CHARGERS & COVERS!";
                     const msgInputFieldElement = document.getElementById("live-banner-message-field");
                     if (msgInputFieldElement) msgInputFieldElement.value = liveMarqueeOfferMessageStr;
                 }
@@ -241,272 +69,11 @@
                 // 2. Fetch active checkout order records queue
                 const orderResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=orders&_t=${cacheBusterToken}`);
                 if (orderResponse.ok) { liveOrdersState = await orderResponse.json(); }
-
-                // 3. Fetch completed shipped logs safely from history database cluster
-                const historyResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=history&_t=${cacheBusterToken}`);
-                if (historyResponse.ok) { completedHistoryState = await historyResponse.json(); }
-
-                // 4. FETCH REGISTERED ACCOUNTS SAFELY FROM CLOUD DATA STORE
-                const usersResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=users&_t=${cacheBusterToken}`);
-                const userTableBody = document.getElementById("users-list-target");
-                
-                if (usersResponse.ok && userTableBody) {
-                    const databaseUsersList = await usersResponse.json();
-                    
-                    // Clear previous blank items or hidden placeholders safely
-                    userTableBody.innerHTML = ""; 
-                    
-                                        if (!databaseUsersList || databaseUsersList.length === 0) {
-                        userTableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#94a3b8; padding:30px; font-weight:700;">No data records found inside cloud store.</td></tr>`;
-                    } else {
-                        // 🟢 FIXED: Renders live interactive editing and suspension triggers for each customer account row
-                        userTableBody.innerHTML = databaseUsersList.map((u, idx) => `
-                            <tr>
-                                <td style="font-weight:700; color:#3b82f6; padding:12px 8px;">#${u.id || 'U'}</td>
-                                <td style="color:#ffffff; font-weight:bold; padding:12px 8px;">${u.name || 'N/A'}</td>
-                                <td style="color:#cbd5e1; padding:12px 8px;">${u.phone || u.contact || 'N/A'}</td>
-                                <td style="font-family:monospace; color:#a1a1aa; padding:12px 8px;">${u.password || 'N/A'}</td>
-                                <td style="text-align: right; padding:12px 8px; white-space: nowrap;">
-                                    <button class="action-icon-btn" style="color: #f59e0b; background: rgba(245,158,11,0.1); margin-right: 5px; font-weight: bold;" onclick="triggerInlineUserEdit(${idx})">📝 Edit</button>
-                                    <button class="action-icon-btn" style="color: #ef4444; background: rgba(239,68,68,0.1); font-weight: bold;" onclick="suspendCustomerAccount(${idx})">🚫 Suspend</button>
-                                </td>
-                            </tr>
-                        `).join('');
-                    }
-                }
-
-                // Render dynamic inventory arrays onto their target tables
-                await renderAdminInventory();
-                renderAdminOrders();
-                renderAdminHistoryLog(); // Load permanent tracker rows onto the UI
-            } catch (err) {
-                console.error("Cloud Master State Sync Error:", err.message);
-            }
-        }
-
-        // =========================================================================
-        // 👥 CUSTOMER COMPLIANCE AND PROFILE EDIT ENGINE MODULES
-        // =========================================================================
-        async function triggerInlineUserEdit(index) {
-            try {
-                // Download a temporary fresh array stack directly from the server to prevent editing stale rows
-                const response = await fetch(`${API_BASE_ENDPOINT}/admin?type=users&_t=${Date.now()}`);
-                if (!response.ok) return alert("Failed to fetch current user records stack.");
-                let currentUsersList = await response.json();
-                
-                const client = currentUsersList[index];
-                if (!client) return alert("Account record data trace missing.");
-
-                // Prompt management entries using clear, secure modal popups
-                const targetName = prompt("Modify Customer Full Name:", client.name);
-                if (targetName === null) return; // Action terminated by administrator
-                
-                const targetPhone = prompt("Modify Verified 10-Digit Mobile Number:", client.phone || client.contact);
-                if (targetPhone === null) return;
-                
-                const targetPass = prompt("Modify Security Password Key Reference:", client.password);
-                if (targetPass === null) return;
-
-                if (!targetName.trim() || !targetPhone.trim() || !targetPass.trim()) {
-                    alert("Operation Denied: Input validation fields cannot be empty parameters.");
-                    return;
-                }
-
-                // Inject modified values right back into target index parameters map
-                client.name = targetName.trim();
-                client.phone = targetPhone.trim();
-                client.contact = targetPhone.trim();
-                client.password = targetPass.trim();
-
-                // Save updated record matrix directly back up to your Vercel KV cloud cell
-                await fetch(`${API_BASE_ENDPOINT}/admin?type=users`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(currentUsersList)
-                });
-
-                alert(`SUCCESS: Profile metrics for "${client.name}" saved globally across database registers!`);
-                pullMasterDatabaseArrays(); // Force layout tables reload instantly
-            } catch (err) {
-                alert("Cloud updating verification pipeline crash error: " + err.message);
-            }
-        }
-
-        async function suspendCustomerAccount(index) {
-            if (!confirm("CRITICAL WARNING: Are you sure you want to permanently delete and suspend this customer account profile from the Indian Telecom network database? They will be signed out instantly and completely blocked from viewing checkout tracks.")) return;
-            
-            try {
-                const response = await fetch(`${API_BASE_ENDPOINT}/admin?type=users&_t=${Date.now()}`);
-                if (!response.ok) return alert("Failed to secure active profile logs stack.");
-                let currentUsersList = await response.json();
-                
-                const deadProfile = currentUsersList[index];
-                
-                // Splice row index data point cleanly from collection list
-                currentUsersList.splice(index, 1);
-
-                // Commit the truncated account array back to the cloud storage cell parameters map
-                await fetch(`${API_BASE_ENDPOINT}/admin?type=users`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(currentUsersList)
-                });
-
-                alert(`ACCOUNT DELETED: Profile reference track linked to "#${deadProfile.id}" removed successfully.`);
-                pullMasterDatabaseArrays(); // Refresh dashboard data instantly
-            } catch (err) {
-                alert("Account termination processing server exception: " + err.message);
-            }
-        }
-
-        async function pushInventoryStateToCloud() {
-            try {
-                // 🟢 FIXED: Keeps the 'asset' parameter intact so images save globally to the cloud
-                const fullInventoryWithImages = liveInventoryState.map(item => ({
-                    id: item.id, 
-                    name: item.name, 
-                    category: item.category, 
-                    price: item.price, 
-                    discountPrice: item.discountPrice, 
-                    isLive: item.isLive,
-                    asset: item.asset // <-- Attaches the photo data globally
-                }));
-                
-                await fetch(`${API_BASE_ENDPOINT}/admin?type=products`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(fullInventoryWithImages)
-                });
-            } catch (err) { console.error("Cloud data writing exception:", err); }
-        }
-
-        // 🌟 ADD THIS EXACT PIECE TO FIXED SYSTEM GALLERY UPLOADS
-        function generateImagePreview(inputElement) {
-            const preview = document.getElementById("upload-preview");
-            if (inputElement.files && inputElement.files[0]) {
-                const fileReaderEngine = new FileReader();
-                fileReaderEngine.onload = function (e) {
-                    temporaryImageBase64 = e.target.result;
-                    if (preview) {
-                        preview.src = temporaryImageBase64;
-                        preview.style.display = "block";
-                    }
-                };
-                fileReaderEngine.readAsDataURL(inputElement.files[0]);
-            }
-        }
-        // GLOBAL TEMPORARY MEMORY TRACKER KEY FOR DYNAMIC EDITING STATE POINTERS
-        let activeEditingProductIndex = null;
-
-        async function renderAdminInventory() {
-            const targetTableBody = document.getElementById("inventory-list-target");
-            if (!targetTableBody) return;
-            
-            if (liveInventoryState.length === 0) {
-                targetTableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#94a3b8; padding:30px;">No items inside database inventory.</td></tr>`;
-                return;
-            }
-
-                      let compiledRows = "";
-            for (let i = 0; i < liveInventoryState.length; i++) {
-                const item = liveInventoryState[i];
-                
-                // 🟢 FIXED: Reads the base64 image data straight from the cloud server array item, with local device lookups as a fallback
-                const cloudAssetImage = item.asset || await getImageLocally(item.id);
-                
-                compiledRows += `
-                    <tr>
-                        <td>
-                            <div class="row-item-meta">
-                                <div class="row-thumb">
-                                    ${cloudAssetImage ? `<img src="${cloudAssetImage}" style="width:100%;height:100%;object-fit:cover;border-radius:8px;">` : '📱'}
-                                </div>
-                                <div style="font-weight: 700; color:#ffffff;">${item.name}</div>
-                            </div>
-                        </td>
-                        <td style="color:#cbd5e1;">${item.category}</td>
-                        <td style="color:#ffffff;"><strong>₹${item.discountPrice}</strong> <span style="font-size:12px; color:#64748b; text-decoration:line-through; margin-left:5px;">₹${item.price}</span></td>
-                        <td>
-                            <label class="toggle-switch">
-                                <input type="checkbox" ${item.isLive ? 'checked' : ''} onchange="toggleProductVisibility(${i})">
-                                <span class="slider"></span>
-                            </label>
-                        </td>
-                        <td>
-                            <button class="action-icon-btn" style="color: #3b82f6; background: rgba(59,130,246,0.1); margin-right: 5px; font-weight: bold;" onclick="loadProductIntoEditorForm(${i})">📝 Edit</button>
-                            <button class="action-icon-btn" onclick="deleteInventoryItem(${i})">🗑️ Remove</button>
-                        </td>
-                    </tr>
-                `;
-            }
-            targetTableBody.innerHTML = compiledRows;
-        }
-
-        // INLINE CATALOG EXTRACT ENGINE MAPPING DATA INTO ACTIVE PANEL INPUT FIELDS
-        function loadProductIntoEditorForm(index) {
-            activeEditingProductIndex = index;
-            const item = liveInventoryState[index];
-            
-            document.getElementById("prod-name").value = item.name;
-            document.getElementById("prod-cat").value = item.category;
-            document.getElementById("prod-price").value = item.price;
-            document.getElementById("prod-disc").value = item.discountPrice;
-            
-            const submitBtn = document.querySelector("#product-upload-form .submit-btn");
-            if (submitBtn) {
-                submitBtn.innerText = "💾 Save Dynamic Changes";
-                submitBtn.style.background = "#10b981"; // Shift theme profile safely to green
-            }
-            
-            document.getElementById("product-upload-form").scrollIntoView({ behavior: 'smooth' });
-        }
-
-        function renderAdminOrders() {
-            const targetTableBody = document.getElementById("orders-log-target");
-            if (!targetTableBody) return;
-            
-            if (liveOrdersState.length === 0) {
-                targetTableBody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#94a3b8; padding:30px;">No active orders in queue!</td></tr>`;
-                return;
-            }
-            
-            targetTableBody.innerHTML = liveOrdersState.map((order, index) => `
-                <tr>
-                    <td style="font-weight: 700; color: #3b82f6;">#${order.id || 'ORD'}</td>
-                    <td>
-                        <div style="font-weight: 700; color:#ffffff;">${order.name}</div>
-                        <div style="font-size: 12px; color: #94a3b8;">${order.phone || order.contact || 'N/A'}</div>
-                    </td>
-                    <td style="max-width: 220px; font-size: 13px; color: #cbd5e1;">${order.address || order.location || 'N/A'}</td>
-                    <td><span class="badge ${order.mop === 'ONLINE' ? 'badge-success' : 'badge-warning'}">${order.mop}</span></td>
-                    <td style="font-family: monospace; font-weight: 700; color: #f59e0b; letter-spacing: 0.5px;">${order.utr || 'N/A'}</td>
-                    <td><button class="action-icon-btn ship-btn" onclick="fulfillOrder(${index})">✅ Ship</button></td>
-                </tr>
-            `).join('');
-        }
-
-                // 🟢 ARCHIVAL LOGGER MAPPING ENGINE DRAWING CELLS UNTO SCREEN VIEWS
-                async function pullMasterDatabaseArrays() {
-            try {
-                // 🟢 CACHE BUSTER: Destroys browser and network cache blocks completely for real-time streaming
-                const cacheBusterToken = Date.now();
-
-                // 1. Fetch live product catalog structures
-                const productResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=products&_t=${cacheBusterToken}`);
-                if (productResponse.ok) { liveInventoryState = await productResponse.json(); }
-
-                // 2. Fetch active checkout order records queue
-                const orderResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=orders&_t=${cacheBusterToken}`);
-                if (orderResponse.ok) { liveOrdersState = await orderResponse.json(); }
-
-                // 3. 🟢 FIXED: Downloads history logs array and explicitly links it to the active memory tracker
+                // 3. Fetch completed shipped logs array safely into global tracker
                 const historyResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=history&_t=${cacheBusterToken}`);
                 if (historyResponse.ok) { 
                     const historicalServerPayload = await historyResponse.json();
-                    // Forces conversion to a valid array structure under all conditions
                     completedHistoryState = Array.isArray(historicalServerPayload) ? historicalServerPayload : [];
-                } else {
-                    completedHistoryState = [];
                 }
 
                 // 4. Fetch registered client credentials accounts safely
@@ -563,18 +130,79 @@
                     }
                 }
 
-                // Render dynamic pipelines onto their target layout table views
                 await renderAdminInventory();
                 renderAdminOrders();
                 renderAdminHistoryLog();
-            } catch (err) {
-                console.error("Cloud Master State Sync Error:", err.message);
+            } catch (err) { console.error("Master Sync Error:", err); }
+        }
+        // =========================================================================
+        // 💻 RENDER PIPELINES FOR DATA TABLES
+        // =========================================================================
+        async function renderAdminInventory() {
+            const targetTableBody = document.getElementById("inventory-list-target");
+            if (!targetTableBody) return;
+            
+            if (liveInventoryState.length === 0) {
+                targetTableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#94a3b8; padding:30px;">No items inside database inventory.</td></tr>`;
+                return;
             }
+
+            let compiledRows = "";
+            for (let i = 0; i < liveInventoryState.length; i++) {
+                const item = liveInventoryState[i];
+                const cloudAssetImage = item.asset || await getImageLocally(item.id);
+                
+                compiledRows += `
+                    <tr>
+                        <td>
+                            <div class="row-item-meta">
+                                <div class="row-thumb">
+                                    ${cloudAssetImage ? `<img src="${cloudAssetImage}" style="width:100%;height:100%;object-fit:cover;border-radius:8px;">` : '📱'}
+                                </div>
+                                <div style="font-weight: 700; color:#ffffff;">${item.name}</div>
+                            </div>
+                        </td>
+                        <td style="color:#cbd5e1;">${item.category}</td>
+                        <td style="color:#ffffff;"><strong>₹${item.discountPrice}</strong> <span style="font-size:12px; color:#64748b; text-decoration:line-through; margin-left:5px;">₹${item.price}</span></td>
+                        <td>
+                            <label class="toggle-switch">
+                                <input type="checkbox" ${item.isLive ? 'checked' : ''} onchange="toggleProductVisibility(${i})">
+                                <span class="slider"></span>
+                            </label>
+                        </td>
+                        <td>
+                            <button class="action-icon-btn" style="color: #3b82f6; background: rgba(59,130,246,0.1); margin-right: 5px; font-weight: bold;" onclick="loadProductIntoEditorForm(${i})">📝 Edit</button>
+                            <button class="action-icon-btn" onclick="deleteInventoryItem(${i})">🗑️ Remove</button>
+                        </td>
+                    </tr>
+                `;
+            }
+            targetTableBody.innerHTML = compiledRows;
+        }
+        function renderAdminOrders() {
+            const targetTableBody = document.getElementById("orders-log-target");
+            if (!targetTableBody) return;
+            
+            if (liveOrdersState.length === 0) {
+                targetTableBody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#94a3b8; padding:30px;">No active orders in queue!</td></tr>`;
+                return;
+            }
+            
+            targetTableBody.innerHTML = liveOrdersState.map((order, index) => `
+                <tr>
+                    <td style="font-weight: 700; color: #3b82f6;">#${order.id || 'ORD'}</td>
+                    <td>
+                        <div style="font-weight: 700; color:#ffffff;">${order.name}</div>
+                        <div style="font-size: 12px; color: #94a3b8;">${order.phone || order.contact || 'N/A'}</div>
+                    </td>
+                    <td style="max-width: 220px; font-size: 13px; color: #cbd5e1;">${order.address || order.location || 'N/A'}</td>
+                    <td><span class="badge ${order.mop === 'ONLINE' ? 'badge-success' : 'badge-warning'}">${order.mop}</span></td>
+                    <td style="font-family: monospace; font-weight: 700; color: #f59e0b; letter-spacing: 0.5px;">${order.utr || 'N/A'}</td>
+                    <td><button class="action-icon-btn ship-btn" onclick="fulfillOrder(${index})">✅ Ship</button></td>
+                </tr>
+            `).join('');
         }
 
-        // =========================================================================
-        // 📦 FIXED: ARCHIVAL LOGGER MAPPING ENGINE MATCHING EXACT HTML DOM IDS
-        // =========================================================================
         function renderAdminHistoryLog() {
             const targetTableBody = document.getElementById("history-log-target");
             if (!targetTableBody) return;
@@ -584,36 +212,28 @@
                 return;
             }
             
-            targetTableBody.innerHTML = completedHistoryState.map(order => {
-                const orderId = order.id || 'ORD';
-                const clientName = order.name || 'N/A';
-                const clientContact = order.phone || order.contact || 'N/A';
-                const clientLocation = order.address || order.location || 'N/A';
-                const payMethod = order.mop || 'N/A';
-                const bankUtr = order.utr || 'N/A';
-
-                return `
-                    <tr style="border-bottom: 1px solid #334155;">
-                        <td style="font-weight: 700; color: #94a3b8; padding: 12px 8px;">#${orderId}</td>
-                        <td style="padding: 12px 8px;">
-                            <div style="font-weight: 700; color:#cbd5e1;">${clientName}</div>
-                            <div style="font-size: 12px; color: #64748b;">${clientContact}</div>
-                        </td>
-                        <td style="max-width: 220px; font-size: 13px; color: #cbd5e1; padding: 12px 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${clientLocation}</td>
-                        <td style="padding: 12px 8px;"><span class="badge" style="background: rgba(100,116,139,0.1); color:#cbd5e1; padding: 4px 8px; border-radius: 4px; font-size: 12px;">${payMethod}</span></td>
-                        <td style="font-family: monospace; color: #f59e0b; padding: 12px 8px; font-weight: bold;">${bankUtr}</td>
-                        <td style="padding: 12px 8px;"><span class="badge" style="background: rgba(16,185,129,0.1); color: #10b981; font-weight: bold; border: 1px solid rgba(16,185,129,0.2); padding: 4px 8px; border-radius: 4px; font-size: 12px;">📦 SHIPPED</span></td>
-                    </tr>
-                `;
-            }).join('');
+            targetTableBody.innerHTML = completedHistoryState.map(order => `
+                <tr style="border-bottom: 1px solid #334155;">
+                    <td style="font-weight: 700; color: #94a3b8; padding: 12px 8px;">#${order.id || 'ORD'}</td>
+                    <td style="padding: 12px 8px;">
+                        <div style="font-weight: 700; color:#cbd5e1;">${order.name || 'N/A'}</div>
+                        <div style="font-size: 12px; color: #64748b;">${order.contact || order.phone || 'N/A'}</div>
+                    </td>
+                    <td style="max-width: 220px; font-size: 13px; color: #cbd5e1; padding: 12px 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${order.location || order.address || 'N/A'}</td>
+                    <td style="padding: 12px 8px;"><span class="badge" style="background: rgba(100,116,139,0.1); color:#cbd5e1; padding: 4px 8px; border-radius: 4px; font-size: 12px;">${order.mop || 'N/A'}</span></td>
+                    <td style="font-family: monospace; color: #f59e0b; padding: 12px 8px; font-weight: bold;">${order.utr || 'N/A'}</td>
+                    <td style="padding: 12px 8px;"><span class="badge" style="background: rgba(16,185,129,0.1); color: #10b981; font-weight: bold; border: 1px solid rgba(16,185,129,0.2); padding: 4px 8px; border-radius: 4px; font-size: 12px;">📦 SHIPPED</span></td>
+                </tr>
+            `).join('');
         }
-        // 🟢 MODERN ORDER SHIP CONTROLLER REDIRECTING PARAMETERS INTERNALLY
-                   // 🟢 MODERN ORDER SHIP CONTROLLER REDIRECTING PARAMETERS INTERNALLY
+        // =========================================================================
+        // 🔄 MUTATION CONTROLLERS AND ACTION ENGINES
+        // =========================================================================
         async function fulfillOrder(index) {
-            if (!confirm("Are you sure you want to mark this package as shipped and archive it permanently?")) return;
+            if (!confirm("Are you sure you want to mark this package as shipped?")) return;
             
             const shippedOrderInfo = liveOrdersState[index];
-            if (!shippedOrderInfo) return alert("Order data reference missing!");
+            if (!shippedOrderInfo) return alert("Order reference lost!");
             
             const trueCustomerPhone = shippedOrderInfo.phone || shippedOrderInfo.contact || "";
             const trueCustomerAddress = shippedOrderInfo.address || shippedOrderInfo.location || "N/A";
@@ -631,178 +251,117 @@
             liveOrdersState.splice(index, 1);
             
             try {
-                // 1. Update active waiting dashboard orders records list
                 await fetch(`${API_BASE_ENDPOINT}/admin?type=orders`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(liveOrdersState)
                 });
                 
-                // 2. Save your remapped, filter-safe order history directly inside your database records bucket
                 await fetch(`${API_BASE_ENDPOINT}/admin?type=history`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(completedHistoryState)
                 });
                 
-                alert(`SUCCESS: Order #${shippedOrderInfo.id} safely archived into permanent history database registries!`);
+                alert(`SUCCESS: Order #${shippedOrderInfo.id} archived into historical registries!`);
                 renderAdminOrders();
                 renderAdminHistoryLog();
-            } catch (e) { 
-                console.error("Historical cluster syncing execution crash error:", e); 
-            }
+            } catch (e) { console.error("Shipping Fault:", e); }
         }
 
-        // =========================================================================
-        // 📢 NEW: MASTER MARQUEE OFFER CONTROLLER METHOD PIPELINES
-        // =========================================================================
         async function pushNewMarqueeOfferMessage() {
             const inputFieldVal = document.getElementById("live-banner-message-field").value.trim();
-            if (!inputFieldVal) return alert("Operation Denied: Input validation announcement strings cannot be empty.");
+            if (!inputFieldVal) return alert("Announcement validation strings cannot be empty.");
             
-            if (!confirm(`Are you sure you want to push this new live message announcement to your store? \n\n"${inputFieldVal}"`)) return;
-
             try {
                 const savePayload = { message: inputFieldVal };
-                
-                // 🟢 FIXED: Clean path targeting prevents route sandboxing crashes
                 await fetch(`${API_BASE_ENDPOINT}/admin?type=banner_msg`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(savePayload)
                 });
-
-                alert("SUCCESS: Your brand-new storefront marquee message announcement text has been published live globally across database registries!");
+                alert("SUCCESS: Your storefront announcement headline has been updated live!");
                 pullMasterDatabaseArrays();
-            } catch (err) {
-                alert("Server announcement sync mapping exception: " + err.message);
-            }
+            } catch (err) { alert("Banner Sync Error: " + err.message); }
+        }
+        async function triggerInlineUserEdit(masterIndex) {
+            try {
+                const response = await fetch(`${API_BASE_ENDPOINT}/admin?type=users&_t=${Date.now()}`);
+                let currentUsersList = await response.json();
+                const client = currentUsersList[masterIndex];
+                
+                const targetName = prompt("Modify Customer Full Name:", client.name);
+                if (targetName === null) return;
+                const targetPhone = prompt("Modify Verified 10-Digit Mobile Number:", client.phone || client.contact);
+                if (targetPhone === null) return;
+                const targetPass = prompt("Modify Security Password Key Reference:", client.password);
+                if (targetPass === null) return;
+
+                client.name = targetName.trim();
+                client.phone = targetPhone.trim();
+                client.contact = targetPhone.trim();
+                client.password = targetPass.trim();
+
+                await fetch(`${API_BASE_ENDPOINT}/admin?type=users`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(currentUsersList)
+                });
+                alert("SUCCESS: Profile metrics updated!");
+                pullMasterDatabaseArrays();
+            } catch (err) { alert("User Edit Error: " + err.message); }
         }
 
-        // 🟢 PASTE THE FORCE FLUSH RESET FUNCTION MODULE DIRECTLY HERE:
-        // =========================================================================
-        // 🛠️ DEVELOPER UTILITY: FORCE FLUSH CORRUPTED DATABASE RECORDS
-        // =========================================================================
+        async function suspendCustomerAccount(masterIndex) {
+            if (!confirm("Are you sure you want to suspend this user?")) return;
+            try {
+                const response = await fetch(`${API_BASE_ENDPOINT}/admin?type=users&_t=${Date.now()}`);
+                let currentUsersList = await response.json();
+                currentUsersList[masterIndex].status = 'SUSPENDED';
+
+                await fetch(`${API_BASE_ENDPOINT}/admin?type=users`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(currentUsersList)
+                });
+                alert("Customer Suspended successfully.");
+                pullMasterDatabaseArrays();
+            } catch (err) { alert("Suspension Error: " + err.message); }
+        }
+
+        async function reactivateCustomerAccount(masterIndex) {
+            if (!confirm("Restore active storefront access parameters for this user?")) return;
+            try {
+                const response = await fetch(`${API_BASE_ENDPOINT}/admin?type=users&_t=${Date.now()}`);
+                let currentUsersList = await response.json();
+                currentUsersList[masterIndex].status = 'ACTIVE';
+
+                await fetch(`${API_BASE_ENDPOINT}/admin?type=users`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(currentUsersList)
+                });
+                alert("Customer account revived cleanly.");
+                pullMasterDatabaseArrays();
+            } catch (err) { alert("Reactivation Error: " + err.message); }
+        }
+
         async function developerResetHistoryBucket() {
-            if (!confirm("WARNING: This will completely wipe out old history logs from your Vercel cloud server to resolve data rendering conflicts. Proceed?")) return;
+            if (!confirm("Completely wipe history records from the cloud repository to fix data streams?")) return;
             try {
                 await fetch(`${API_BASE_ENDPOINT}/admin?type=history`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify([]) // Sends a clean empty array payload to overwrite corrupted entries
+                    body: JSON.stringify([])
                 });
-                alert("SUCCESS: History repository bucket flushed cleanly! Your system is ready for fresh data cycles.");
+                alert("Repository cleared fresh!");
                 completedHistoryState = [];
                 renderAdminHistoryLog();
-            } catch (err) { alert("Flush Exception: " + err.message); }
+            } catch (err) { alert("Reset Error: " + err.message); }
         }
-
-        // LOCAL DEVICE STORAGE CONTROLLER - OPEN MEDIA DATABASE ENGINE
-        function openIndexedDB() {
-            return new Promise((resolve, reject) => {
-                const request = indexedDB.open("IndianTelecomMediaDB", 1);
-                request.onupgradeneeded = (e) => {
-                    const db = e.target.result;
-                    if (!db.objectStoreNames.contains("product_images")) {
-                        db.createObjectStore("product_images", { keyPath: "id" });
-                    }
-                };
-                request.onsuccess = (e) => resolve(e.target.result);
-                request.onerror = (e) => reject(e.target.error);
-            });
-        }
-
-        async function saveImageLocally(id, base64Data) {
-            try {
-                const db = await openIndexedDB();
-                const tx = db.transaction("product_images", "readwrite");
-                tx.objectStore("product_images").put({ id: id, data: base64Data });
-                return new Promise((res) => tx.oncomplete = () => res(true));
-            } catch (err) { console.error("Local Image Cache Write Error", err); }
-        }
-
-        async function processNewProduct(event) {
-            event.preventDefault();
-            const name = document.getElementById("prod-name").value;
-            const cat = document.getElementById("prod-cat").value;
-            const price = parseInt(document.getElementById("prod-price").value);
-            const discount = parseInt(document.getElementById("prod-disc").value);
-
-            // DETECT INTERCEPT OPERATIONAL UPDATE PIPELINES VS FRESH INSERTS
-            if (activeEditingProductIndex !== null) {
-                const targetedItem = liveInventoryState[activeEditingProductIndex];
-                
-                targetedItem.name = name;
-                targetedItem.category = cat;
-                targetedItem.price = price;
-                targetedItem.discountPrice = discount;
-                
-                if (temporaryImageBase64) {
-                    await saveImageLocally(targetedItem.id, temporaryImageBase64);
-                }
-
-                await pushInventoryStateToCloud();
-                activeEditingProductIndex = null;
-                
-                const submitBtn = document.querySelector("#product-upload-form .submit-btn");
-                submitBtn.innerText = "Publish to Live Storefront";
-                submitBtn.style.background = "#3b82f6";
-                
-                alert(`SUCCESS: "${name}" configurations updated live seamlessly!`);
-            } else {
-                const generatedId = "p_" + Date.now();
-
-                if (temporaryImageBase64) {
-                    await saveImageLocally(generatedId, temporaryImageBase64);
-                }
-
-                            const newProductItem = {
-                id: generatedId,
-                name: name,
-                category: cat,
-                price: price,
-                discountPrice: discount,
-                isLive: true,
-                asset: temporaryImageBase64 || null // <-- MAKE SURE THIS LINE IS PRESENT
-            };
-
-                liveInventoryState.push(newProductItem);
-                await pushInventoryStateToCloud();
-                alert(`Success: "${name}" uploaded with high-res media storage locked successfully!`);
-            }
-
-            await renderAdminInventory();
-            document.getElementById("product-upload-form").reset();
-            document.getElementById("upload-preview").style.display = "none";
-            temporaryImageBase64 = "";
-        }
-        async function toggleProductVisibility(index) {
-            liveInventoryState[index].isLive = !liveInventoryState[index].isLive;
-            await pushInventoryStateToCloud();
-        }
-
-        async function deleteInventoryItem(index) {
-            if (confirm("Remove this accessory from active storefront?")) {
-                liveInventoryState.splice(index, 1);
-                await pushInventoryStateToCloud();
-                await renderAdminInventory();
-            }
-        }
-
-        async function fulfillOrder(index) {
-            alert("Fulfilling order logs.");
-            liveOrdersState.splice(index, 1);
-            try {
-                await fetch(`${API_BASE_ENDPOINT}/admin?type=orders`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(liveOrdersState)
-                });
-            } catch (e) { console.error(e); }
-            renderAdminOrders();
-        }
-
-        // DYNAMIC PREVIEW CONTROLLER MODULE HOOK
+        // =========================================================================
+        // 📦 PRODUCT INVENTORY DATA HANDLING & INTERACTION ENGINE
+        // =========================================================================
         function generateImagePreview(inputElement) {
             const preview = document.getElementById("upload-preview");
             if (inputElement.files && inputElement.files[0]) {
@@ -818,10 +377,158 @@
             }
         }
 
-        window.onload = function() {
+        async function handleProductSubmission(event) {
+            event.preventDefault();
+            
+            const name = document.getElementById("prod-name").value.trim();
+            const category = document.getElementById("prod-cat").value;
+            const price = parseFloat(document.getElementById("prod-price").value);
+            const discountPrice = parseFloat(document.getElementById("prod-discount-price").value);
+
+            if (!name || isNaN(price) || isNaN(discountPrice)) {
+                alert("Please fill in all mandatory product data values accurately.");
+                return;
+            }
+            try {
+                if (activeEditingProductIndex !== null) {
+                    // Update existing accessory index values inline
+                    const targetProduct = liveInventoryState[activeEditingProductIndex];
+                    targetProduct.name = name;
+                    targetProduct.category = category;
+                    targetProduct.price = price;
+                    targetProduct.discountPrice = discountPrice;
+                    
+                    if (temporaryImageBase64) {
+                        targetProduct.asset = temporaryImageBase64;
+                        await saveImageLocally(targetProduct.id, temporaryImageBase64);
+                    }
+                    
+                    alert(`SUCCESS: Item "${name}" modifications updated locally!`);
+                    activeEditingProductIndex = null;
+                    const submitBtnText = document.getElementById("submit-btn-text");
+                    if (submitBtnText) submitBtnText.innerText = "Deploy Fresh Premium Accessory";
+                } else {
+                    // Generate fresh array object footprint structures
+                    const uniqueAssetId = "PROD_" + Date.now();
+                    const freshItemPayload = {
+                        id: uniqueAssetId,
+                        name: name,
+                        category: category,
+                        price: price,
+                        discountPrice: discountPrice,
+                        isLive: true,
+                        asset: temporaryImageBase64 || ""
+                    };
+                    
+                    if (temporaryImageBase64) {
+                        await saveImageLocally(uniqueAssetId, temporaryImageBase64);
+                    }
+                    
+                    liveInventoryState.push(freshItemPayload);
+                    alert(`SUCCESS: Accessory "${name}" deployed into active repository grid queues!`);
+                }
+
+                // Push unified catalog modifications safely up to the cloud storage nodes
+                await pushInventoryStateToCloud();
+                document.getElementById("product-upload-form").reset();
+                
+                const previewImg = document.getElementById("upload-preview");
+                if (previewImg) previewImg.style.display = "none";
+                temporaryImageBase64 = "";
+
+                pullMasterDatabaseArrays();
+            } catch (err) {
+                console.error("Accessory Deployment Crash:", err);
+            }
+        }
+        function loadProductIntoEditorForm(index) {
+            const item = liveInventoryState[index];
+            if (!item) return;
+
+            activeEditingProductIndex = index;
+            
+            // Map array indices smoothly into form input values
+            document.getElementById("prod-name").value = item.name || "";
+            document.getElementById("prod-cat").value = item.category || "Cases";
+            document.getElementById("prod-price").value = item.price || "";
+            document.getElementById("prod-discount-price").value = item.discountPrice || "";
+
+            const previewImg = document.getElementById("upload-preview");
+            const activeImage = item.asset;
+            
+            if (activeImage && previewImg) {
+                previewImg.src = activeImage;
+                previewImg.style.display = "block";
+                temporaryImageBase64 = activeImage;
+            } else if (previewImg) {
+                previewImg.style.display = "none";
+                temporaryImageBase64 = "";
+            }
+
+            const submitBtnText = document.getElementById("submit-btn-text");
+            if (submitBtnText) submitBtnText.innerText = "💾 Save Accessory Changes";
+            
+            // Scroll form smoothly into active viewport view
+            document.getElementById("product-upload-form").scrollIntoView({ behavior: 'smooth' });
+        }
+
+        async function toggleProductVisibility(index) {
+            const item = liveInventoryState[index];
+            if (!item) return;
+
+            // Flip active boolean flag values
+            item.isLive = !item.isLive;
+            
+            try {
+                await pushInventoryStateToCloud();
+                pullMasterDatabaseArrays();
+            } catch (err) {
+                console.error("Visibility Toggle Sync Fault:", err);
+            }
+        }
+        async function deleteInventoryItem(index) {
+            const item = liveInventoryState[index];
+            if (!item) return;
+
+            if (!confirm(`Are you absolutely sure you want to permanently delete "${item.name}" from your store catalog? This action cannot be undone.`)) return;
+
+            // Remove the item from your runtime state storage array cleanly
+            liveInventoryState.splice(index, 1);
+
+            try {
+                await pushInventoryStateToCloud();
+                alert("Accessory deleted successfully from cloud store rows!");
+                pullMasterDatabaseArrays();
+            } catch (err) {
+                console.error("Catalog deletion processing fault:", err);
+            }
+        }
+
+        async function pushInventoryStateToCloud() {
+            try {
+                const fullInventoryWithImages = liveInventoryState.map(item => ({
+                    id: item.id, 
+                    name: item.name, 
+                    category: item.category, 
+                    price: item.price, 
+                    discountPrice: item.discountPrice, 
+                    isLive: item.isLive,
+                    asset: item.asset
+                }));
+                
+                await fetch(`${API_BASE_ENDPOINT}/admin?type=products', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(fullInventoryWithImages)
+                });
+            } catch (err) { console.error("Cloud data writing exception:", err); }
+        }
+        // =========================================================================
+        // 🏁 ADMINISTRATIVE WORKSPACE INITIALIZATION BOOTSTRAPPER
+        // =========================================================================
+        window.onload = () => {
+            // Trigger automatic cloud downloads right on page layout mount
             pullMasterDatabaseArrays();
-            const formElement = document.getElementById("product-upload-form");
-            if (formElement) formElement.addEventListener("submit", processNewProduct);
         };
     </script>
 </body>
