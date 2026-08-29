@@ -58,6 +58,20 @@
         <div class="secure-badge">🛡️ Secure Session Connected</div>
     </header>
 
+    <!-- 📢 NEW DYNAMIC MARQUEE OFFER BANNER MESSAGE CONTROLLER CARD -->
+    <div style="max-width: 1400px; margin: 20px auto 0 auto; padding: 0 20px;">
+        <section class="admin-card" style="border-top: 4px solid #f59e0b; margin-bottom: -10px;">
+            <div class="card-title">🔥 Live Storefront Marquee Offer Announcement Banner</div>
+            <div style="padding: 15px 0 5px 0;">
+                <div class="form-group" style="margin-bottom: 12px;">
+                    <label style="display: block; font-size: 13px; color: #94a3b8; font-weight: 600; margin-bottom: 6px;">Dynamic Marquee Header Text Message String</label>
+                    <input type="text" id="live-banner-message-field" placeholder="Type hot mega announcement text deals here..." required style="width: 100%; padding: 12px; background: #1e293b; border: 1px solid #334155; border-radius: 8px; color: #ffffff; font-weight: 600; box-sizing: border-box;">
+                </div>
+                <button onclick="pushNewMarqueeOfferMessage()" class="ship-btn" style="border: none; font-size: 14px; cursor: pointer; padding: 10px 20px; border-radius: 8px; font-weight: bold; background: rgba(245,158,11,0.1); color: #f59e0b; transition: 0.2s;" onmouseover="this.style.background='rgba(245,158,11,0.2)'" onmouseout sabotage="this.style.background='rgba(245,158,11,0.1)'">📢 Push Live Offer</button>
+            </div>
+        </section>
+    </div>
+
     <div class="dashboard-grid">
         <aside class="admin-card">
             <div class="card-title">📦 Add New Premium Accessory</div>
@@ -184,6 +198,7 @@
         let liveOrdersState = [];
         let completedHistoryState = []; // <-- 🟢 FIXED: Safe array container initialization for order logs history
         let temporaryImageBase64 = "";
+        let liveMarqueeOfferMessageStr = "";
 
         // EXTRACT STORAGE MEDIA BINARY CORES FROM LOCAL HARDWARE SANDBOXES
         async function getImageLocally(id) {
@@ -203,6 +218,15 @@
             try {
                 // 🟢 FIXED: Unique millisecond stamp completely bypasses browser/Vercel cache limits
                 const cacheBusterToken = Date.now();
+
+                // 📢 NEW: Fetch the active storefront marquee offer message text string on dashboard load
+                const bannerMsgResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=banner_msg&_t=${cacheBusterToken}`);
+                if (bannerMsgResponse.ok) {
+                    const parsedBannerPayload = await bannerMsgResponse.json();
+                    liveMarqueeOfferMessageStr = parsedBannerPayload.message || "🔥 MEGA OFFER: FLAT 30% OFF ON PREMIUM CHARGERS & COVERS! LIMITED STOCK!";
+                    const msgInputFieldElement = document.getElementById("live-banner-message-field");
+                    if (msgInputFieldElement) msgInputFieldElement.value = liveMarqueeOfferMessageStr;
+                }
 
                 // 1. Fetch live product catalog structures
                 const productResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=products&_t=${cacheBusterToken}`);
@@ -489,9 +513,8 @@
                 `;
             }).join('');
         }
-
         // 🟢 MODERN ORDER SHIP CONTROLLER REDIRECTING PARAMETERS INTERNALLY
-                async function fulfillOrder(index) {
+        async function fulfillOrder(index) {
             if (!confirm("Are you sure you want to mark this package as shipped and archive it permanently?")) return;
             
             // Extract the selected active order info matching your user click index trigger point
@@ -536,6 +559,33 @@
                 console.error("Historical cluster syncing execution crash error:", e); 
             }
         }
+
+        // =========================================================================
+        // 📢 NEW: MASTER MARQUEE OFFER CONTROLLER METHOD PIPELINES
+        // =========================================================================
+        async function pushNewMarqueeOfferMessage() {
+            const inputFieldVal = document.getElementById("live-banner-message-field").value.trim();
+            if (!inputFieldVal) return alert("Operation Denied: Input validation announcement strings cannot be empty.");
+            
+            if (!confirm(`Are you sure you want to push this new live message announcement to your store? \n\n"${inputFieldVal}"`)) return;
+
+            try {
+                // Save updated text property string payload straight up to Vercel KV cloud cell parameters map
+                const savePayload = { message: inputFieldVal };
+                
+                await fetch(`${API_BASE_ENDPOINT}/api/admin?type=banner_msg`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(savePayload)
+                });
+
+                alert("SUCCESS: Your brand-new storefront marquee message announcement text has been published live globally across database registries!");
+                pullMasterDatabaseArrays();
+            } catch (err) {
+                alert("Server announcement sync mapping exception: " + err.message);
+            }
+        }
+
         // LOCAL DEVICE STORAGE CONTROLLER - OPEN MEDIA DATABASE ENGINE
         function openIndexedDB() {
             return new Promise((resolve, reject) => {
