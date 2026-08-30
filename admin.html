@@ -721,16 +721,18 @@
                 const savePayload = { message: inputFieldVal };
                 
                 // 🟢 FIXED: Clean path targeting prevents route sandboxing crashes
-                await fetch(`${API_BASE_ENDPOINT}/admin?type=banner_msg`, {
+                            await fetch(`${API_BASE_ENDPOINT}/admin?type=banner_msg`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(savePayload)
                 });
 
-                alert("SUCCESS: Your brand-new storefront marquee message announcement text has been published live globally across database registries!");
+                // 🟢 FIXED: Smooth on-screen slide toast replaces the blocking browser alert box!
+                showNotification("SUCCESS: Your brand-new storefront marquee offer banner announcement has been published live globally!", "📢");
                 pullMasterDatabaseArrays();
             } catch (err) {
-                alert("Server announcement sync mapping exception: " + err.message);
+                // 🟢 FIXED: Error tracking also prints smoothly via on-screen toast alerts!
+                showNotification("Server announcement sync exception: " + err.message, "⚠️");
             }
         }
 
