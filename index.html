@@ -469,8 +469,7 @@
     if (drawer) drawer.style.transform = "translateX(100%)";
     if (overlay) overlay.style.display = "none";
 
-    // Check if user is logged in to determine which modal to display
-         function openCheckout() {
+    function openCheckout() {
     if (cart.length === 0) return alert("Add items to your cart first!");
     
     // Close the cart slider drawer view layout cleanly first
@@ -499,91 +498,91 @@ function closeCheckout() {
     document.getElementById("checkout-modal").style.display = "none"; 
 }
 
-        function togglePaymentMode(mode) {
-            const qrSection = document.getElementById("qr-section");
-            const utrInput = document.getElementById("pay-utr");
+function togglePaymentMode(mode) {
+    const qrSection = document.getElementById("qr-section");
+    const utrInput = document.getElementById("pay-utr");
+    
+    if (mode === 'ONLINE') {
+        qrSection.style.display = "block";
+        utrInput.setAttribute("required", "required");
+
+        // 1. Calculate live basket total sum
+        const rawTotal = cart.reduce((acc, current) => acc + (current.discountPrice * current.qty), 0);
+        
+        // 2. Strict NPCI Formatter: Forces integer values into a 2-decimal financial string
+        const npciFormattedAmount = Number(rawTotal).toFixed(2);
+        
+        // Update your front-end text layout counter view
+        document.getElementById("qr-amount-display").innerText = `₹${npciFormattedAmount}`;
+
+        const canvasBox = document.getElementById("qrcode-canvas");
+        if (canvasBox) {
+            canvasBox.innerHTML = ""; // Clear out previous cache boxes to avoid rendering bugs
             
-            if (mode === 'ONLINE') {
-                qrSection.style.display = "block";
-                utrInput.setAttribute("required", "required");
+            // 3. Strict NPCI URL Encoded String Mapping Block
+            const strictNpciUpiString = `upi://pay?pa=exple@ybl&pn=INDIAN%20TELECOM&am=${npciFormattedAmount}&cu=INR&tn=Shopping%20Payment`;
+            
+            qrCodeInstance = new EasyQRCode(canvasBox, {
+                text: strictNpciUpiString,
+                width: 130,
+                height: 130,
+                colorDark: "#0f172a",
+                colorLight: "#ffffff",
+                correctLevel: 2 // NPCI optimization parameter for fluid camera scans
+            });
+        }
+    } else {
+        qrSection.style.display = "none";
+        utrInput.removeAttribute("required");
+    }
+}
 
-                // 1. Calculate live basket total sum
-                const rawTotal = cart.reduce((acc, current) => acc + (current.discountPrice * current.qty), 0);
-                
-                // 2. Strict NPCI Formatter: Forces integer values into a 2-decimal financial string (e.g. 1199 -> 1199.00)
-                const npciFormattedAmount = Number(rawTotal).toFixed(2);
-                
-                // Update your front-end text layout counter view
-                document.getElementById("qr-amount-display").innerText = `₹${npciFormattedAmount}`;
+async function submitOrder(e) {
+    e.preventDefault();
+    const mode = document.querySelector('input[name="mop"]:checked').value;
+    const utrNum = document.getElementById("pay-utr").value.trim();
+    
+    if(mode === 'ONLINE' && utrNum.length < 6) {
+        alert("Please enter a valid banking UTR reference number.");
+        return;
+    }
 
-                const canvasBox = document.getElementById("qrcode-canvas");
-                if (canvasBox) {
-                    canvasBox.innerHTML = ""; // Clear out previous cache boxes to avoid rendering bugs
-                    
-                    // 3. Strict NPCI URL Encoded String Mapping Block
-                    const strictNpciUpiString = `upi://pay?pa=exple@ybl&pn=INDIAN%20TELECOM&am=${npciFormattedAmount}&cu=INR&tn=Shopping%20Payment`;
-                    
-                    qrCodeInstance = new QRCode(canvasBox, {
-                        text: strictNpciUpiString,
-                        width: 130,
-                        height: 130,
-                        colorDark: "#0f172a",
-                        colorLight: "#ffffff",
-                        correctLevel: QRCode.CorrectLevel.M // NPCI optimization parameter for fluid camera scans
-                    });
-                }
-            } else {
-                qrSection.style.display = "none";
-                utrInput.removeAttribute("required");
-            }
+    const freshCheckoutOrder = {
+        id: "ORD-" + Math.floor(1000 + Math.random() * 9000),
+        name: document.getElementById("cust-name").value,
+        phone: document.getElementById("cust-phone").value,
+        address: document.getElementById("cust-address").value,
+        mop: mode,
+        utr: mode === 'ONLINE' ? utrNum : 'N/A'
+    };
+
+    try {
+        const existingOrdersResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=orders`);
+        let existingOrdersList = [];
+        if (existingOrdersResponse.ok) {
+            existingOrdersList = await existingOrdersResponse.json();
         }
 
-               async function submitOrder(e) {
-            e.preventDefault();
-            const mode = document.querySelector('input[name="mop"]:checked').value;
-            const utrNum = document.getElementById("pay-utr").value.trim();
-            
-            if(mode === 'ONLINE' && utrNum.length < 6) {
-                alert("Please enter a valid banking UTR reference number.");
-                return;
-            }
+        existingOrdersList.push(freshCheckoutOrder);
 
-            const freshCheckoutOrder = {
-                id: "ORD-" + Math.floor(1000 + Math.random() * 9000),
-                name: document.getElementById("cust-name").value,
-                phone: document.getElementById("cust-phone").value,
-                address: document.getElementById("cust-address").value,
-                mop: mode,
-                utr: mode === 'ONLINE' ? utrNum : 'N/A'
-            };
+        await fetch(`${API_BASE_ENDPOINT}/admin?type=orders`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(existingOrdersList)
+        });
 
-            try {
-                const existingOrdersResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=orders`);
-                let existingOrdersList = [];
-                if (existingOrdersResponse.ok) {
-                    existingOrdersList = await existingOrdersResponse.json();
-                }
-
-                existingOrdersList.push(freshCheckoutOrder);
-
-                await fetch(`${API_BASE_ENDPOINT}/admin?type=orders`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(existingOrdersList)
-                });
-
-                alert("Order Registered Successfully! Md Kamre Alam will review your verification parameters.");
-                cart = [];
-                syncCartToBrowserLocalStorage();
-                updateCartUI();
-                closeCheckout();
-                toggleCart(false);
-                document.getElementById("order-form").reset();
-                togglePaymentMode('COD');
-            } catch (networkError) {
-                alert("Checkout connection failed. Try resubmitting parameters.");
-            }
-        }
+        alert("Order Registered Successfully! Md Kamre Alam will review your verification parameters.");
+        cart = [];
+        syncCartToBrowserLocalStorage();
+        updateCartUI();
+        closeCheckout();
+        toggleCart(false);
+        document.getElementById("order-form").reset();
+        togglePaymentMode('COD');
+    } catch (networkError) {
+        alert("Checkout connection failed. Try resubmitting parameters.");
+    }
+}
 
         // =========================================================================
         // 👥 CUSTOMER REGISTER & LOGIN CONTROLLER LOGIC ENGINE
