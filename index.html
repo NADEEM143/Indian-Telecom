@@ -463,20 +463,16 @@
         function openCheckout() {
             if (cart.length === 0) return alert("Add items to your cart first!");
             
-            // 🛑 Intercept unverified guests trying to purchase items
-            if (!activeSessionUser) {
-                alert("Authentication Required: Please register an account or log in to complete your purchase details!");
-                
-                // Close the cart slider drawer view layout cleanly first
-                const drawer = document.getElementById("cart-drawer");
-                const overlay = document.getElementById("drawer-overlay");
-                if (drawer) drawer.style.transform = "translateX(100%)";
-                if (overlay) overlay.style.display = "none";
+            // Close the cart slider drawer view layout cleanly first
+            const drawer = document.getElementById("cart-drawer");
+            const overlay = document.getElementById("drawer-overlay");
+            if (drawer) drawer.style.transform = "translateX(100%)";
+            if (overlay) overlay.style.display = "none";
 
-                // Fire up your account registration overlay popup window box instantly
-                document.getElementById("auth-modal").style.display = "flex";
-                return;
-            }
+            // Fire up your account registration overlay popup window box instantly
+            document.getElementById("auth-modal").style.display = "flex";
+            return;
+        }
             
             // 🟢 Logged In: Automatically pre-fill the shipping details form using their registered account tokens
             document.getElementById("cust-name").value = activeSessionUser.name || "";
