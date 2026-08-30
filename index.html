@@ -576,7 +576,7 @@ function closeCheckout() {
                let isLoginMode = false;
         let activeSessionUser = JSON.parse(localStorage.getItem('IT_ACTIVE_USER')) || null;
 
-     function toggleAuthMode() {
+       function toggleAuthMode() {
             isLoginMode = !isLoginMode;
             document.getElementById("auth-title").innerText = isLoginMode ? "Customer Login" : "Customer Registration";
             document.getElementById("auth-submit-btn").innerText = isLoginMode ? "Login to Store" : "Register Account";
@@ -592,12 +592,11 @@ function closeCheckout() {
             // Dynamically switch the footer layout text link based on the mode state
             const toggleLink = document.getElementById("toggle-auth-mode") || document.querySelector('[onclick="toggleAuthMode()"]');
             if (toggleLink) {
-                toggleLink.innerText = isLoginMode ? "New to the store? Switch to Registration Mode" : "Already registered? Switch to Login Mode";
+                toggleLink.innerHTML = isLoginMode ? "New to the store? Switch to Registration Mode" : "Already registered? Switch to Login Mode";
             }
 
             document.getElementById("auth-form").reset();
         }
-
 
 
                function closeAuthModal() {
@@ -624,15 +623,15 @@ function closeCheckout() {
                     
                     // 🛑 REJECTION GATEKEEPER BLOCK: Instantly stops suspended clients trying to enter your store
                     if (matchingProfile.status === 'SUSPENDED') {
-                        showOnScreenNotification("ACCESS DENIED: This account has been suspended by Indian Telecom Administration. Please contact Md Fakhre Alam via WhatsApp for registration inquiries.", true);
+                        alert("ACCESS DENIED: This account has been suspended by Indian Telecom Administration. Please contact Md Fakhre Alam via WhatsApp for registration inquiries.");
                         return;
                     }
                     
                     activeSessionUser = matchingProfile;
-                    showOnScreenNotification(`Welcome Back, ${activeSessionUser.name}! Opening storefront accessories grid...`);
+                    alert(`Welcome Back, ${activeSessionUser.name}! Opening storefront accessories grid...`);
                 } else {
                     if (databaseUsersList.some(u => u.phone === phone)) {
-                        showOnScreenNotification("This mobile number is already registered! Please switch to Login mode.", true);
+                        alert("This mobile number is already registered! Please switch to Login mode.");
                         return;
                     }
                     
@@ -646,7 +645,7 @@ function closeCheckout() {
                     });
 
                     activeSessionUser = newProfilePayload;
-                    showOnScreenNotification("Account Registered Successfully inside Indian Telecom repository matrix!");
+                    alert("Account Registered Successfully inside Indian Telecom repository matrix!");
                 }
 
                 localStorage.setItem('IT_ACTIVE_USER', JSON.stringify(activeSessionUser));
@@ -654,71 +653,30 @@ function closeCheckout() {
                 // Update button visibility instantly upon successful authorization entry
                 evaluateUserAccessSession();
             } catch (err) {
-                showOnScreenNotification("Server verification operations error. Try reconnecting parameter blocks.", true);
+                alert("Server verification operations error. Try reconnecting parameter blocks.");
             }
-        }
-
-        // =========================================================================
-        // 🚀 TOAST NOTIFICATION HELPER ENGINE
-        // =========================================================================
-        function showOnScreenNotification(message, isError = false) {
-            let container = document.getElementById("toast-notification-container");
-            if (!container) {
-                container = document.createElement("div");
-                container.id = "toast-notification-container";
-                container.style.cssText = "position: fixed; bottom: 24px; right: 24px; z-index: 10000; display: flex; flex-direction: column; gap: 10px; font-family: sans-serif;";
-                document.body.appendChild(container);
-            }
-
-            const toast = document.createElement("div");
-            toast.style.cssText = `
-                background: ${isError ? '#ef4444' : '#1e1e24'};
-                color: #ffffff;
-                padding: 16px 24px;
-                border-radius: 8px;
-                box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-                font-size: 14px;
-                font-weight: 500;
-                opacity: 0;
-                transform: translateY(20px);
-                transition: all 0.3s ease;
-                border-left: 4px solid ${isError ? '#b91c1c' : '#3b82f6'};
-            `;
-            toast.innerText = message;
-            container.appendChild(toast);
-
-            setTimeout(() => {
-                toast.style.opacity = "1";
-                toast.style.transform = "translateY(0)";
-            }, 10);
-
-            setTimeout(() => {
-                toast.style.opacity = "0";
-                toast.style.transform = "translateY(-20px)";
-                setTimeout(() => toast.remove(), 300);
-            }, 4000);
         }
 
         // 🚪 NEW LOGOUT LOGIC MECHANISM ENGINE
-        function handleLogout() {
-            // Show the custom on-screen modal instead of the browser system popup
-            const logoutModal = document.getElementById("logout-confirmation-modal");
-            if (logoutModal) {
-                logoutModal.style.display = "flex";
-            }
-        }
+       function handleLogout() {
+    // Show the custom on-screen modal instead of the browser system popup
+    const logoutModal = document.getElementById("logout-confirmation-modal");
+    if (logoutModal) {
+        logoutModal.style.display = "flex";
+    }
+}
 
-        function confirmLogoutAction() {
-            // Original logout sequence logic preserved exactly as written
-            localStorage.removeItem('IT_ACTIVE_USER'); // Wipe the customer token cache
-            activeSessionUser = null;
-            
-            // Clear the workspace and reset view variables smoothly
-            evaluateUserAccessSession();
-            document.getElementById("auth-form").reset();
-            
-            closeLogoutModal();
-        }
+function confirmLogoutAction() {
+    // Original logout sequence logic preserved exactly as written
+    localStorage.removeItem('IT_ACTIVE_USER'); // Wipe the customer token cache
+    activeSessionUser = null;
+    
+    // Clear the workspace and reset view variables smoothly
+    evaluateUserAccessSession();
+    document.getElementById("auth-form").reset();
+    
+    closeLogoutModal();
+}
 
 function closeLogoutModal() {
     const logoutModal = document.getElementById("logout-confirmation-modal");
