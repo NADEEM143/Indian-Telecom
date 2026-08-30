@@ -242,21 +242,21 @@
     <div class="modal" id="auth-modal" style="display: none;">
         <div class="modal-content">
             <div class="drawer-header" style="padding: 0 0 16px 0; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
-                <h3 id="auth-title">Customer Registration</h3>
+                <h3 id="auth-title">Customer Login</h3>
                 <!-- ❌ CLOSE REGISTRATION ACTION BUTTON -->
                 <button type="button" class="close-btn" style="background: none; border: none; font-size: 20px; color: #94a3b8; cursor: pointer;" onclick="closeAuthModal()">❌</button>
             </div>
             <form id="auth-form" onsubmit="handleAuthentication(event)">
-                <div class="form-group" id="auth-name-group">
+                <div class="form-group" id="auth-name-group" style="display: none;">
                     <label>Full Name</label>
-                    <input type="text" id="user-name" required>
+                    <input type="text" id="user-name">
                 </div>
                 <div class="form-group">
                     <label>Mobile Number</label>
                     <input type="tel" id="user-phone" pattern="[0-9]{10}" placeholder="10-digit number" required>
                 </div>
                 <div class="form-group">
-                    <label>Create Secret Password</label>
+                    <label>Password</label>
                     <input type="password" id="user-pass" required>
                 </div>
                 
