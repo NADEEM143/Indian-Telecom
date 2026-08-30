@@ -564,6 +564,7 @@ function closeCheckout() {
 
                 alert("Order Registered Successfully! Md Kamre Alam will review your verification parameters.");
                 cart = [];
+                syncCartToBrowserLocalStorage();
                 updateCartUI();
                 closeCheckout();
                 toggleCart(false);
