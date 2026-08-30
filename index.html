@@ -763,34 +763,6 @@
             }
         }
 
-        // =========================================================================
-        // 🛍️ FAIL-SAFE CART RESET OVERLAY CORES FOR SUCCESSFUL CHECKOUTS
-        // =========================================================================
-        document.addEventListener("click", function(event) {
-            const clickedElement = event.target;
-            if (clickedElement && (clickedElement.innerText.includes("Confirm") || clickedElement.innerText.includes("Place Order") || clickedElement.id === "place-order-btn")) {
-                
-                // Wait exactly 2 seconds for your server pipeline to successfully register the order
-                setTimeout(() => {
-                    try {
-                        // Forces whatever cart variable name your code uses to empty out completely
-                        if (typeof cart !== 'undefined') { cart = []; }
-                        if (typeof cartListStateMemory !== 'undefined') { cartListStateMemory = []; }
-                        
-                        // Completely clear out the browser's persistent cache data traces
-                        localStorage.removeItem('IT_STORE_CART_CACHE');
-                        
-                        // Force the cart UI badge to immediately re-evaluate and drop straight down to "0"!
-                        if (typeof updateCartUI === 'function') { updateCartUI(); }
-                        if (typeof renderCart === 'function') { renderCart(); }
-                        
-                    } catch (cartResetErr) {
-                        console.error("Cart badge cleanup sequence exception skipped:", cartResetErr);
-                    }
-                }, 2000); 
-            }
-        });
-
         // INITIALIZE APPLICATION BOOT ACTIONS WITH ACTIVE STATE CHECKS
         window.onload = () => {
             evaluateUserAccessSession();
