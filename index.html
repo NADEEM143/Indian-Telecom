@@ -470,13 +470,13 @@
     if (overlay) overlay.style.display = "none";
 
     // Check if user is logged in to determine which modal to display
-       if (!activeSessionUser) {
-        // Force reset state variables back to registration settings on fresh modal triggers
-        isLoginMode = true; 
+          if (!activeSessionUser) {
+        // Force reset state variables back to login settings on fresh modal triggers
+        isLoginMode = false; // 🟢 CHANGED FROM true TO false
         toggleAuthMode(); 
         
         document.getElementById("auth-modal").style.display = "flex";
-    } else {
+    }
         // 🟢 Logged In: Automatically pre-fill the shipping details form using their registered account tokens
         document.getElementById("cust-name").value = activeSessionUser.name || "";
         document.getElementById("cust-phone").value = activeSessionUser.phone || "";
