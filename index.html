@@ -484,7 +484,7 @@
                 const cacheBusterTimeToken = Date.now();
                 
                 // 🟢 FIXED: Dynamically downloads your live announcement string right on page boot
-                try {
+                                try {
                     const bannerMsgResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=banner_msg&_t=${cacheBusterTimeToken}`);
                     if (bannerMsgResponse.ok) {
                         const parsedBannerPayload = await bannerMsgResponse.json();
