@@ -272,10 +272,12 @@
                     <input type="password" id="user-pass" required>
                 </div>
                 
-                <button type="submit" class="checkout-trigger" id="auth-submit-btn" style="margin-top: 15px; background: #0f172a;">Register Account</button>
+                <!-- ⚙️ FIXED: Corrected default button string to match Login state view -->
+                <button type="submit" class="checkout-trigger" id="auth-submit-btn" style="margin-top: 15px; background: #0f172a;">Login to Store</button>
                 
-                <p style="font-size: 13px; text-align: center; margin-top: 14px; color: #64748b; cursor: pointer; font-weight: 600;" onclick="toggleAuthMode()">
-                    Already registered? Switch to Login Mode
+                <!-- ⚙️ FIXED: Added required ID attribute and adjusted structural default message text -->
+                <p id="toggle-auth-mode" style="font-size: 13px; text-align: center; margin-top: 14px; color: #64748b; cursor: pointer; font-weight: 600;" onclick="toggleAuthMode()">
+                    New to the store? Switch to Registration Mode
                 </p>
             </form>
         </div>
@@ -283,18 +285,21 @@
     <a target="_blank" href="https://wa.me/919330301096" class="whatsapp-float">💬</a>
     <!-- SAFELY ENCAPSULATED CONTROLLER JAVASCRIPT BLOCK -->
     <script>
-                const API_BASE_ENDPOINT = '/api';
+        const API_BASE_ENDPOINT = '/api';
         let productsList = [];
         
         // 🟢 FIXED: Automatically downloads existing basket contents from browser storage keys on load
         let cart = JSON.parse(localStorage.getItem('IT_STOREFRONT_CART')) || [];
+
+        // ⚙️ FIXED: Initialize value safely to keep initial variable status in perfect lockstep with layout
+        isLoginMode = true;
 
         // Helper framework routine updating internal machine storage on layout mutation cycles
         function syncCartToBrowserLocalStorage() {
             localStorage.setItem('IT_STOREFRONT_CART', JSON.stringify(cart));
         }
 
-               async function fetchLiveInventory() {
+        async function fetchLiveInventory() {
             try {
                 const cacheBusterTimeToken = Date.now();
                 
@@ -313,7 +318,10 @@
                 } catch (bannerErr) {
                     console.error("Banner download exception skipped:", bannerErr);
                 }
-
+            } catch (inventoryErr) {
+                console.error("Inventory fetch outer exception skipped:", inventoryErr);
+            }
+        }
                 // Injects a dynamic timestamp token to destroy browser cache limits for a true live catalog sync
                 const response = await fetch(`${API_BASE_ENDPOINT}/admin?type=products&_t=${cacheBusterTimeToken}`);
                 if (response.ok) {
