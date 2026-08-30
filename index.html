@@ -254,7 +254,7 @@
     <div class="modal" id="auth-modal" style="display: none;">
         <div class="modal-content">
             <div class="drawer-header" style="padding: 0 0 16px 0; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
-                <h3 id="auth-title">Customer Login</h3>
+                <h3 id="auth-title">Customer Registration</h3>
                 <!-- ❌ CLOSE REGISTRATION ACTION BUTTON -->
                 <button type="button" class="close-btn" style="background: none; border: none; font-size: 20px; color: #94a3b8; cursor: pointer;" onclick="closeAuthModal()">❌</button>
             </div>
@@ -470,7 +470,11 @@
     if (overlay) overlay.style.display = "none";
 
     // Check if user is logged in to determine which modal to display
-    if (!activeSessionUser) {
+       if (!activeSessionUser) {
+        // Force reset state variables back to registration settings on fresh modal triggers
+        isLoginMode = true; 
+        toggleAuthMode(); 
+        
         document.getElementById("auth-modal").style.display = "flex";
     } else {
         // 🟢 Logged In: Automatically pre-fill the shipping details form using their registered account tokens
