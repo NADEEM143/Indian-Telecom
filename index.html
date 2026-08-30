@@ -251,7 +251,7 @@
     </div>
 
     <!-- DYNAMIC AUTHENTICATION POPUP LAYOUT (HIDDEN BY DEFAULT WITH CLOSE OPTION) -->
-    <div class="modal" id="auth-modal" style="display: none;">
+   <div class="modal" id="auth-modal" style="display: none;">
         <div class="modal-content">
             <div class="drawer-header" style="padding: 0 0 16px 0; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
                 <h3 id="auth-title">Customer Login</h3>
@@ -272,10 +272,10 @@
                     <input type="password" id="user-pass" required>
                 </div>
                 
-                <!-- ⚙️ FIXED: Corrected default button string to match Login state view -->
+                <!-- ⚙️ FIXED: Button text now defaults properly to Login Mode to match the header -->
                 <button type="submit" class="checkout-trigger" id="auth-submit-btn" style="margin-top: 15px; background: #0f172a;">Login to Store</button>
                 
-                <!-- ⚙️ FIXED: Added required ID attribute and adjusted structural default message text -->
+                <!-- ⚙️ FIXED: Footer text and ID now prompt unregistered users correctly on first load -->
                 <p id="toggle-auth-mode" style="font-size: 13px; text-align: center; margin-top: 14px; color: #64748b; cursor: pointer; font-weight: 600;" onclick="toggleAuthMode()">
                     New to the store? Switch to Registration Mode
                 </p>
@@ -284,15 +284,15 @@
     </div>
     <a target="_blank" href="https://wa.me/919330301096" class="whatsapp-float">💬</a>
     <!-- SAFELY ENCAPSULATED CONTROLLER JAVASCRIPT BLOCK -->
-    <script>
+   <script>
         const API_BASE_ENDPOINT = '/api';
         let productsList = [];
         
         // 🟢 FIXED: Automatically downloads existing basket contents from browser storage keys on load
         let cart = JSON.parse(localStorage.getItem('IT_STOREFRONT_CART')) || [];
 
-        // ⚙️ FIXED: Initialize value safely to keep initial variable status in perfect lockstep with layout
-        isLoginMode = true;
+        // ⚙️ FIXED: Initialize to true so it synchronizes instantly with the Customer Login HTML layout mode
+        let isLoginMode = true;
 
         // Helper framework routine updating internal machine storage on layout mutation cycles
         function syncCartToBrowserLocalStorage() {
@@ -318,10 +318,7 @@
                 } catch (bannerErr) {
                     console.error("Banner download exception skipped:", bannerErr);
                 }
-            } catch (inventoryErr) {
-                console.error("Inventory fetch outer exception skipped:", inventoryErr);
-            }
-        }
+
                 // Injects a dynamic timestamp token to destroy browser cache limits for a true live catalog sync
                 const response = await fetch(`${API_BASE_ENDPOINT}/admin?type=products&_t=${cacheBusterTimeToken}`);
                 if (response.ok) {
@@ -584,7 +581,7 @@ function closeCheckout() {
                let isLoginMode = false;
         let activeSessionUser = JSON.parse(localStorage.getItem('IT_ACTIVE_USER')) || null;
 
-       function toggleAuthMode() {
+     function toggleAuthMode() {
             isLoginMode = !isLoginMode;
             document.getElementById("auth-title").innerText = isLoginMode ? "Customer Login" : "Customer Registration";
             document.getElementById("auth-submit-btn").innerText = isLoginMode ? "Login to Store" : "Register Account";
@@ -600,11 +597,12 @@ function closeCheckout() {
             // Dynamically switch the footer layout text link based on the mode state
             const toggleLink = document.getElementById("toggle-auth-mode") || document.querySelector('[onclick="toggleAuthMode()"]');
             if (toggleLink) {
-                toggleLink.innerHTML = isLoginMode ? "New to the store? Switch to Registration Mode" : "Already registered? Switch to Login Mode";
+                toggleLink.innerText = isLoginMode ? "New to the store? Switch to Registration Mode" : "Already registered? Switch to Login Mode";
             }
 
             document.getElementById("auth-form").reset();
         }
+
 
 
                function closeAuthModal() {
@@ -631,15 +629,15 @@ function closeCheckout() {
                     
                     // 🛑 REJECTION GATEKEEPER BLOCK: Instantly stops suspended clients trying to enter your store
                     if (matchingProfile.status === 'SUSPENDED') {
-                        alert("ACCESS DENIED: This account has been suspended by Indian Telecom Administration. Please contact Md Fakhre Alam via WhatsApp for registration inquiries.");
+                        showOnScreenNotification("ACCESS DENIED: This account has been suspended by Indian Telecom Administration. Please contact Md Fakhre Alam via WhatsApp for registration inquiries.", true);
                         return;
                     }
                     
                     activeSessionUser = matchingProfile;
-                    alert(`Welcome Back, ${activeSessionUser.name}! Opening storefront accessories grid...`);
+                    showOnScreenNotification(`Welcome Back, ${activeSessionUser.name}! Opening storefront accessories grid...`);
                 } else {
                     if (databaseUsersList.some(u => u.phone === phone)) {
-                        alert("This mobile number is already registered! Please switch to Login mode.");
+                        showOnScreenNotification("This mobile number is already registered! Please switch to Login mode.", true);
                         return;
                     }
                     
@@ -653,7 +651,7 @@ function closeCheckout() {
                     });
 
                     activeSessionUser = newProfilePayload;
-                    alert("Account Registered Successfully inside Indian Telecom repository matrix!");
+                    showOnScreenNotification("Account Registered Successfully inside Indian Telecom repository matrix!");
                 }
 
                 localStorage.setItem('IT_ACTIVE_USER', JSON.stringify(activeSessionUser));
@@ -661,30 +659,71 @@ function closeCheckout() {
                 // Update button visibility instantly upon successful authorization entry
                 evaluateUserAccessSession();
             } catch (err) {
-                alert("Server verification operations error. Try reconnecting parameter blocks.");
+                showOnScreenNotification("Server verification operations error. Try reconnecting parameter blocks.", true);
             }
         }
 
-        // 🚪 NEW LOGOUT LOGIC MECHANISM ENGINE
-       function handleLogout() {
-    // Show the custom on-screen modal instead of the browser system popup
-    const logoutModal = document.getElementById("logout-confirmation-modal");
-    if (logoutModal) {
-        logoutModal.style.display = "flex";
-    }
-}
+        // =========================================================================
+        // 🚀 TOAST NOTIFICATION HELPER ENGINE
+        // =========================================================================
+        function showOnScreenNotification(message, isError = false) {
+            let container = document.getElementById("toast-notification-container");
+            if (!container) {
+                container = document.createElement("div");
+                container.id = "toast-notification-container";
+                container.style.cssText = "position: fixed; bottom: 24px; right: 24px; z-index: 10000; display: flex; flex-direction: column; gap: 10px; font-family: sans-serif;";
+                document.body.appendChild(container);
+            }
 
-function confirmLogoutAction() {
-    // Original logout sequence logic preserved exactly as written
-    localStorage.removeItem('IT_ACTIVE_USER'); // Wipe the customer token cache
-    activeSessionUser = null;
-    
-    // Clear the workspace and reset view variables smoothly
-    evaluateUserAccessSession();
-    document.getElementById("auth-form").reset();
-    
-    closeLogoutModal();
-}
+            const toast = document.createElement("div");
+            toast.style.cssText = `
+                background: ${isError ? '#ef4444' : '#1e1e24'};
+                color: #ffffff;
+                padding: 16px 24px;
+                border-radius: 8px;
+                box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+                font-size: 14px;
+                font-weight: 500;
+                opacity: 0;
+                transform: translateY(20px);
+                transition: all 0.3s ease;
+                border-left: 4px solid ${isError ? '#b91c1c' : '#3b82f6'};
+            `;
+            toast.innerText = message;
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.opacity = "1";
+                toast.style.transform = "translateY(0)";
+            }, 10);
+
+            setTimeout(() => {
+                toast.style.opacity = "0";
+                toast.style.transform = "translateY(-20px)";
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        // 🚪 NEW LOGOUT LOGIC MECHANISM ENGINE
+        function handleLogout() {
+            // Show the custom on-screen modal instead of the browser system popup
+            const logoutModal = document.getElementById("logout-confirmation-modal");
+            if (logoutModal) {
+                logoutModal.style.display = "flex";
+            }
+        }
+
+        function confirmLogoutAction() {
+            // Original logout sequence logic preserved exactly as written
+            localStorage.removeItem('IT_ACTIVE_USER'); // Wipe the customer token cache
+            activeSessionUser = null;
+            
+            // Clear the workspace and reset view variables smoothly
+            evaluateUserAccessSession();
+            document.getElementById("auth-form").reset();
+            
+            closeLogoutModal();
+        }
 
 function closeLogoutModal() {
     const logoutModal = document.getElementById("logout-confirmation-modal");
