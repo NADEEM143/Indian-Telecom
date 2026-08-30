@@ -345,23 +345,121 @@
                 </p>
             </form>
         </div>
+    <div id="customer-auth-modal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15,23,42,0.85); backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 10000; padding: 16px; box-sizing: border-box;">
+        <div class="auth-modal-view-panel" style="background: #1e293b; border: 1px solid #334155; width: 100%; max-width: 420px; border-radius: 16px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); overflow: hidden; display: flex; flex-direction: column;">
+            
+            <!-- Modal Header Toolbar -->
+            <div style="padding: 16px; border-bottom: 1px solid #334155; display: flex; justify-content: space-between; align-items: center; background: #0f172a;">
+                <div style="font-weight: 800; font-size: 16px; color: #ffffff; display: flex; align-items: center; gap: 8px;">
+                    <span id="auth-modal-title-icon">🔑</span> <span id="auth-modal-title-text">Account Login</span>
+                </div>
+                <button onclick="closeCustomerAuthModal()" style="background: rgba(239,68,68,0.1); border: none; color: #ef4444; width: 32px; height: 32px; border-radius: 50%; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center;">✕</button>
+            </div>
+
+            <!-- Dynamic Content Forms Scroll Layer -->
+            <div class="modal-content-scroll-layer" style="padding: 20px; box-sizing: border-box;">
+                
+                <!-- 1. LOGIN CORE VIEW GRID -->
+                <div id="auth-sub-panel-login">
+                    <div style="margin-bottom: 16px;">
+                        <label style="display:block; font-size: 12px; font-weight: 700; color: #94a3b8; margin-bottom: 6px; text-transform: uppercase;">10-Digit Mobile Number</label>
+                        <input type="tel" id="auth-login-phone" placeholder="Enter your registered mobile..." style="width: 100%; padding: 12px; background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: #ffffff; font-weight: 600; box-sizing: border-box;">
+                    </div>
+                    <div style="margin-bottom: 16px;">
+                        <label style="display:block; font-size: 12px; font-weight: 700; color: #94a3b8; margin-bottom: 6px; text-transform: uppercase;">Secure Account Password</label>
+                        <input type="password" id="auth-login-pass" placeholder="••••••••" style="width: 100%; padding: 12px; background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: #ffffff; box-sizing: border-box;">
+                    </div>
+                    <div style="text-align: right; margin-bottom: 16px;">
+                        <button onclick="switchAuthSubPanel('forgot')" style="background: none; border: none; color: #3b82f6; font-size: 13px; font-weight: bold; cursor: pointer; padding: 0;">Forgot Password? ⚙️</button>
+                    </div>
+                    <button onclick="executeCustomerLoginAction()" style="width: 100%; background: #3b82f6; color: #ffffff; border: none; padding: 14px; font-weight: 800; border-radius: 8px; font-size: 14px; cursor: pointer;">🚀 Sign In Securely</button>
+                    <div style="text-align: center; margin-top: 20px; font-size: 13px; color: #64748b;">
+                        New customer? <button onclick="switchAuthSubPanel('register')" style="background: none; border: none; color: #10b981; font-weight: bold; cursor: pointer; padding: 0;">Create Account</button>
+                    </div>
+                </div>
+
+                <!-- 2. REGISTRATION CORE VIEW GRID -->
+                <div id="auth-sub-panel-register" style="display: none;">
+                    <div style="margin-bottom: 12px;">
+                        <label style="display:block; font-size: 12px; font-weight: 700; color: #94a3b8; margin-bottom: 6px; text-transform: uppercase;">Full Name</label>
+                        <input type="text" id="auth-reg-name" placeholder="Nadim Ahmad" style="width: 100%; padding: 12px; background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: #ffffff; box-sizing: border-box;">
+                    </div>
+                    <div style="margin-bottom: 12px;">
+                        <label style="display:block; font-size: 12px; font-weight: 700; color: #94a3b8; margin-bottom: 6px; text-transform: uppercase;">10-Digit Mobile Number</label>
+                        <input type="tel" id="auth-reg-phone" placeholder="9876543210" style="width: 100%; padding: 12px; background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: #ffffff; box-sizing: border-box;">
+                    </div>
+                    <div style="margin-bottom: 16px;">
+                        <label style="display:block; font-size: 12px; font-weight: 700; color: #94a3b8; margin-bottom: 6px; text-transform: uppercase;">Create Account Password</label>
+                        <input type="password" id="auth-reg-pass" placeholder="Minimum 4 characters..." style="width: 100%; padding: 12px; background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: #ffffff; box-sizing: border-box;">
+                    </div>
+                    <button onclick="executeCustomerRegistrationAction()" style="width: 100%; background: #10b981; color: #ffffff; border: none; padding: 14px; font-weight: 800; border-radius: 8px; font-size: 14px; cursor: pointer;">✨ Create Fresh Profile</button>
+                    <div style="text-align: center; margin-top: 20px; font-size: 13px; color: #64748b;">
+                        Already have an account? <button onclick="switchAuthSubPanel('login')" style="background: none; border: none; color: #3b82f6; font-weight: bold; cursor: pointer; padding: 0;">Login here</button>
+                    </div>
+                </div>
+
+                <!-- 3. FORGOT PASSWORD CORE VIEW GRID -->
+                <div id="auth-sub-panel-forgot" style="display: none;">
+                    <p style="font-size: 13px; color: #94a3b8; line-height: 1.5; margin: 0 0 16px 0;">Enter your registered 10-digit mobile number below. Our security engine will match your file fields and retrieve your account password right on this screen.</p>
+                    <div style="margin-bottom: 16px;">
+                        <label style="display:block; font-size: 12px; font-weight: 700; color: #94a3b8; margin-bottom: 6px; text-transform: uppercase;">Your Registered Mobile Number</label>
+                        <input type="tel" id="auth-forgot-phone" placeholder="Enter mobile to recover keys..." style="width: 100%; padding: 12px; background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: #ffffff; font-weight: 600; box-sizing: border-box;">
+                    </div>
+                    <button onclick="executePasswordRecoveryAction()" style="width: 100%; background: #f59e0b; color: #0f172a; border: none; padding: 14px; font-weight: 800; border-radius: 8px; font-size: 14px; cursor: pointer;">🔍 Look Up My Password</button>
+                    
+                    <!-- Decoded Security Key Print Slot Container -->
+                    <div id="auth-recovery-display-box" style="margin-top: 16px; padding: 12px; border-radius: 8px; background: rgba(245,158,11,0.05); border: 1px dashed rgba(245,158,11,0.2); display: none; text-align: center;">
+                        <div style="font-size: 12px; color: #f59e0b; font-weight: 700; text-transform: uppercase; margin-bottom: 4px;">Security Key Recovered Successfully!</div>
+                        <div id="auth-recovered-password-target" style="font-size: 20px; font-family: monospace; font-weight: 800; color: #ffffff; letter-spacing: 1px;">-</div>
+                    </div>
+
+                    <div style="text-align: center; margin-top: 20px; font-size: 13px; color: #64748b;">
+                        Remembered it? <button onclick="switchAuthSubPanel('login')" style="background: none; border: none; color: #3b82f6; font-weight: bold; cursor: pointer; padding: 0;">Back to Login</button>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
     </div>
-    <a target="_blank" href="https://wa.me/919718439786" class="whatsapp-float">💬</a>
+
     <!-- SAFELY ENCAPSULATED CONTROLLER JAVASCRIPT BLOCK -->
-        <script>
+    <script>
+            <script>
         const API_BASE_ENDPOINT = '/api';
         let productsList = [];
         
-        // 🟢 FIXED: Automatically downloads existing basket contents from browser storage keys on load
+        // Automatically downloads existing basket contents from browser storage keys on load
         let cart = JSON.parse(localStorage.getItem('IT_STOREFRONT_CART')) || [];
 
-        // Helper framework routine updating internal machine storage on layout mutation cycles
+        // 🟢 PASTE THE NEW UPDATED ABANDONED CARTS BROADCASTER ROUTINE DIRECTLY HERE:
+        // =========================================================================
+        // 🟢 EXTEND CART SYNC ROUTINES TO AUTOMATICALLY BROADCAST ABANDONED CARTS
+        // =========================================================================
         function syncCartToBrowserLocalStorage() {
             localStorage.setItem('IT_STOREFRONT_CART', JSON.stringify(cart));
+            
+            // If a client is logged in, automatically mirror their active basket state to the cloud database rows!
+            if (activeSessionUser && activeSessionUser.phone) {
+                const uniqueClientPhone = String(activeSessionUser.phone || activeSessionUser.contact || '').trim();
+                const cartDataPayload = {
+                    customerName: activeSessionUser.name || "Guest Customer",
+                    phone: uniqueClientPhone,
+                    updatedAt: new Date().toLocaleTimeString(),
+                    items: cart
+                };
+                
+                // Fire and forget transmission directly down onto your server channels
+                fetch(`${API_BASE_ENDPOINT}/admin?type=abandoned_carts&phone=${uniqueClientPhone}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(cartDataPayload)
+                }).catch(e => console.error("Live cart broadcast sync fault:", e));
+            }
         }
 
         // =========================================================================
-        // 🚀 CUSTOM NOTIFICATION ENGINE (REPLACES BROWSER ALERT POPUPS)
+        // CUSTOM NOTIFICATION ENGINE (REPLACES BROWSER ALERT POPUPS)
         // =========================================================================
         function showNotification(message, icon = "🚀") {
             const toast = document.getElementById("ui-toast-notification");
@@ -852,6 +950,147 @@
                 }
             } catch (err) {
                 console.error("Client side order verification tracking mapping crash:", err);
+            }
+        }
+
+        // =========================================================================
+        // 🔑 INDEPENDENT ACCESS CONTROLLERS & SECURE PASSWORD RECOVERY RECON
+        // =========================================================================
+        function openCustomerAuthModal() {
+            const modal = document.getElementById("customer-auth-modal");
+            if (modal) {
+                modal.style.display = "flex";
+                switchAuthSubPanel('login'); 
+            }
+        }
+
+        function closeCustomerAuthModal() {
+            const modal = document.getElementById("customer-auth-modal");
+            if (modal) modal.style.display = "none";
+        }
+
+        function switchAuthSubPanel(mode) {
+            const loginPanel = document.getElementById("auth-sub-panel-login");
+            const regPanel = document.getElementById("auth-sub-panel-register");
+            const forgotPanel = document.getElementById("auth-sub-panel-forgot");
+            const titleText = document.getElementById("auth-modal-title-text");
+            const titleIcon = document.getElementById("auth-modal-title-icon");
+            const recoveryDisplay = document.getElementById("auth-recovery-display-box");
+
+            if(!loginPanel || !regPanel || !forgotPanel) return;
+
+            loginPanel.style.display = "none";
+            regPanel.style.display = "none";
+            forgotPanel.style.display = "none";
+            if (recoveryDisplay) recoveryDisplay.style.display = "none";
+
+            if (mode === 'login') {
+                loginPanel.style.display = "block";
+                if(titleText) titleText.innerText = "Account Login";
+                if(titleIcon) titleIcon.innerText = "🔑";
+            } else if (mode === 'register') {
+                regPanel.style.display = "block";
+                if(titleText) titleText.innerText = "Create Store Account";
+                if(titleIcon) titleIcon.innerText = "✨";
+            } else if (mode === 'forgot') {
+                forgotPanel.style.display = "block";
+                if(titleText) titleText.innerText = "Password Recovery";
+                if(titleIcon) titleIcon.innerText = "⚙️";
+                document.getElementById("auth-forgot-phone").value = "";
+            }
+        }
+
+        async function executeCustomerLoginAction() {
+            const phone = document.getElementById("auth-login-phone").value.trim();
+            const pass = document.getElementById("auth-login-pass").value;
+
+            if (!phone || !pass) return showNotification("Please complete all security validation parameters fields.", "⚠️");
+
+            try {
+                const response = await fetch(`${API_BASE_ENDPOINT}/admin?type=users&_t=${Date.now()}`);
+                if (!response.ok) throw new Error("Database offline mapping exception.");
+                
+                const userRegistry = await response.json();
+                const matchedUser = userRegistry.find(u => String(u.phone || u.contact || '').trim() === String(phone).trim());
+
+                if (!matchedUser || matchedUser.password !== pass) {
+                    return showNotification("Invalid Mobile Number or Security Password combination.", "❌");
+                }
+
+                if (matchedUser.status === 'SUSPENDED') {
+                    return showNotification("ACCESS TERMINATED: Your profile has been suspended by administration.", "🚫");
+                }
+
+                activeSessionUser = matchedUser;
+                localStorage.setItem('IT_ACTIVE_USER', JSON.stringify(activeSessionUser));
+                
+                showNotification(`Welcome back, ${matchedUser.name || 'Customer'}! Access granted.`, "✅");
+                evaluateUserAccessSession();
+                if (typeof fetchAndRenderCustomerOrderTracks === 'function') fetchAndRenderCustomerOrderTracks();
+                closeCustomerAuthModal();
+            } catch (err) {
+                showNotification("Authentication process error: " + err.message, "⚠️");
+            }
+        }
+
+        async function executeCustomerRegistrationAction() {
+            const name = document.getElementById("auth-reg-name").value.trim();
+            const phone = document.getElementById("auth-reg-phone").value.trim();
+            const pass = document.getElementById("auth-reg-pass").value;
+
+            if (!name || !phone || !pass) return showNotification("Please complete all registration parameters fields.", "⚠️");
+            if (phone.length < 10) return showNotification("Please enter a valid 10-digit mobile number.", "📱");
+
+            try {
+                const response = await fetch(`${API_BASE_ENDPOINT}/admin?type=users&_t=${Date.now()}`);
+                let userRegistry = response.ok ? await response.json() : [];
+                
+                const duplicateCheck = userRegistry.find(u => String(u.phone || u.contact || '').trim() === String(phone).trim());
+                if (duplicateCheck) return showNotification("This mobile number is already registered! Please log in instead.", "⚠️");
+
+                const freshAccount = { id: "U_" + Date.now(), name, phone, password: pass, status: "ACTIVE" };
+                userRegistry.push(freshAccount);
+
+                await fetch(`${API_BASE_ENDPOINT}/admin?type=users`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(userRegistry)
+                });
+
+                showNotification("Profile Created! Switching to Login window panel...", "🎉");
+                document.getElementById("auth-login-phone").value = phone;
+                switchAuthSubPanel('login');
+            } catch (err) {
+                showNotification("Registration workflow fault: " + err.message, "⚠️");
+            }
+        }
+
+        async function executePasswordRecoveryAction() {
+            const lookUpPhone = document.getElementById("auth-forgot-phone").value.trim();
+            if (!lookUpPhone) return showNotification("Please enter your registered phone number to look up keys.", "⚠️");
+
+            try {
+                const response = await fetch(`${API_BASE_ENDPOINT}/admin?type=users&_t=${Date.now()}`);
+                if (!response.ok) throw new Error("Data cluster communication exception.");
+                
+                const userRegistry = await response.json();
+                const matchedUser = userRegistry.find(u => String(u.phone || u.contact || '').trim() === String(lookUpPhone).trim());
+
+                const displayBox = document.getElementById("auth-recovery-display-box");
+                const targetText = document.getElementById("auth-recovered-password-target");
+
+                if (!matchedUser) {
+                    if (displayBox) displayBox.style.display = "none";
+                    return showNotification("No customer profile found matching this mobile number records.", "❌");
+                }
+
+                if (displayBox && targetText) {
+                    targetText.innerText = matchedUser.password || "N/A";
+                    displayBox.style.display = "block";
+                    showNotification("Account key matched and extracted successfully!", "🔓");
+                }
+            } catch (err) {
+                showNotification("Recovery script exception: " + err.message, "⚠️");
             }
         }
 
