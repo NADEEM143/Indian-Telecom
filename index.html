@@ -360,6 +360,7 @@
             <div class="modal-content-scroll-layer" style="padding: 20px; box-sizing: border-box;">
                 
                 <!-- 1. LOGIN CORE VIEW GRID -->
+                               <!-- 1. LOGIN CORE VIEW GRID -->
                 <div id="auth-sub-panel-login">
                     <div style="margin-bottom: 16px;">
                         <label style="display:block; font-size: 12px; font-weight: 700; color: #94a3b8; margin-bottom: 6px; text-transform: uppercase;">10-Digit Mobile Number</label>
@@ -369,10 +370,15 @@
                         <label style="display:block; font-size: 12px; font-weight: 700; color: #94a3b8; margin-bottom: 6px; text-transform: uppercase;">Secure Account Password</label>
                         <input type="password" id="auth-login-pass" placeholder="••••••••" style="width: 100%; padding: 12px; background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: #ffffff; box-sizing: border-box;">
                     </div>
+                    
+                    <!-- 🟢 THIS IS YOUR FORGOT PASSWORD TRIGGER BUTTON LINK ELEMENT -->
                     <div style="text-align: right; margin-bottom: 16px;">
                         <button onclick="switchAuthSubPanel('forgot')" style="background: none; border: none; color: #3b82f6; font-size: 13px; font-weight: bold; cursor: pointer; padding: 0;">Forgot Password? ⚙️</button>
                     </div>
-                    <button onclick="executeCustomerLoginAction()" style="width: 100%; background: #3b82f6; color: #ffffff; border: none; padding: 14px; font-weight: 800; border-radius: 8px; font-size: 14px; cursor: pointer;">🚀 Sign In Securely</button>
+                    
+                    <button onclick="executeCustomerLoginAction()" style="width: 100%; background: #0f172a; color: #ffffff; border: none; padding: 14px; font-weight: 800; border-radius: 8px; font-size: 14px; cursor: pointer;">Login to Store</button>
+                    
+                    <!-- 🟢 THIS LINK LETS USERS SWITCH BACK TO REGISTRATION VIEW STATES -->
                     <div style="text-align: center; margin-top: 20px; font-size: 13px; color: #64748b;">
                         New customer? <button onclick="switchAuthSubPanel('register')" style="background: none; border: none; color: #10b981; font-weight: bold; cursor: pointer; padding: 0;">Create Account</button>
                     </div>
@@ -968,7 +974,7 @@
             if (modal) modal.style.display = "none";
         }
 
-        function switchAuthSubPanel(mode) {
+                function switchAuthSubPanel(mode) {
             const loginPanel = document.getElementById("auth-sub-panel-login");
             const regPanel = document.getElementById("auth-sub-panel-register");
             const forgotPanel = document.getElementById("auth-sub-panel-forgot");
@@ -985,8 +991,15 @@
 
             if (mode === 'login') {
                 loginPanel.style.display = "block";
-                if(titleText) titleText.innerText = "Account Login";
+                if(titleText) titleText.innerText = "Customer Login";
                 if(titleIcon) titleIcon.innerText = "🔑";
+                
+                // 🟢 FIXED: Forcefully overrides any lingering registration text labels on screen
+                const passwordLabel = document.querySelector("#auth-sub-panel-login label:nth-of-type(2)");
+                if (passwordLabel) passwordLabel.innerText = "Secure Account Password";
+                
+                const mainActionBtn = document.querySelector("#auth-sub-panel-login button[onclick='executeCustomerLoginAction()']");
+                if (mainActionBtn) mainActionBtn.innerText = "Login to Store";
             } else if (mode === 'register') {
                 regPanel.style.display = "block";
                 if(titleText) titleText.innerText = "Create Store Account";
@@ -995,7 +1008,8 @@
                 forgotPanel.style.display = "block";
                 if(titleText) titleText.innerText = "Password Recovery";
                 if(titleIcon) titleIcon.innerText = "⚙️";
-                document.getElementById("auth-forgot-phone").value = "";
+                const forgotPhoneInput = document.getElementById("auth-forgot-phone");
+                if (forgotPhoneInput) forgotPhoneInput.value = "";
             }
         }
 
