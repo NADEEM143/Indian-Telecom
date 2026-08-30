@@ -206,9 +206,8 @@
             </section>
 
             <!-- 📦 SECURE PANEL AREA 5: HISTORICAL COMPLETED SHIPPED ARCHIVES -->
-            <section class="admin-card" style="margin-top: 30px; border-top: 4px solid #10b981;">
+                        <section class="admin-card" style="margin-top: 30px; border-top: 4px solid #10b981;">
                 
-                <!-- 🔴 DELETE YOUR OLD SINGLE LINE <div class="card-title"> AND PASTE THIS DIRECTLY HERE: -->
                 <div class="card-title" style="display: flex; justify-content: space-between; align-items: center;">
                     <span>📦 Completed & Shipped Order History</span>
                     <button onclick="developerResetHistoryBucket()" style="background: rgba(239,68,68,0.1); color: #ef4444; border: 1px solid rgba(239,68,68,0.2); font-size: 11px; font-weight: bold; padding: 6px 12px; border-radius: 6px; cursor: pointer;">🗑️ Reset History Database</button>
@@ -305,13 +304,13 @@
                 const usersResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=users&_t=${cacheBusterToken}`);
                 const userTableBody = document.getElementById("users-list-target");
                 
-                if (usersResponse.ok && userTableBody) {
+                               if (usersResponse.ok && userTableBody) {
                     const databaseUsersList = await usersResponse.json();
                     
                     // Clear previous blank items or hidden placeholders safely
                     userTableBody.innerHTML = ""; 
                     
-                                        if (!databaseUsersList || databaseUsersList.length === 0) {
+                    if (!databaseUsersList || databaseUsersList.length === 0) {
                         userTableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#94a3b8; padding:30px; font-weight:700;">No data records found inside cloud store.</td></tr>`;
                     } else {
                         // 🟢 FIXED: Renders live interactive editing and suspension triggers for each customer account row
@@ -328,6 +327,15 @@
                             </tr>
                         `).join('');
                     }
+                }
+
+                // =========================================================================
+                // 📢 DOWNLOAD LIVE ACTIVE SHOPPING BASKETS FROM BACKEND
+                // =========================================================================
+                const cartsResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=abandoned_carts&_t=${cacheBusterToken}`);
+                if (cartsResponse.ok) {
+                    const serverCartsPayload = await cartsResponse.json();
+                    renderLiveCustomerCarts(serverCartsPayload);
                 }
 
                 // Render dynamic inventory arrays onto their target tables
@@ -596,7 +604,7 @@
                                 `;
                             }).join('');
 
-                        const suspendedTableBody = document.getElementById("suspended-users-list-target");
+                                                const suspendedTableBody = document.getElementById("suspended-users-list-target");
                         if (suspendedTableBody) {
                             suspendedTableBody.innerHTML = suspendedClients.length === 0 ?
                                 `<tr><td colspan="5" style="text-align:center; color:#64748b; padding:20px;">No permanently suspended account histories logged.</td></tr>` :
@@ -616,6 +624,14 @@
                                 }).join('');
                         }
                     }
+                }
+
+                // 📢 DOWNLOAD LIVE ACTIVE SHOPPING BASKETS FROM BACKEND
+                const runtimeBusterToken = typeof cacheBusterToken !== 'undefined' ? cacheBusterToken : Date.now();
+                const cartsResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=abandoned_carts&_t=${runtimeBusterToken}`);
+                if (cartsResponse.ok) {
+                    const serverCartsPayload = await cartsResponse.json();
+                    renderLiveCustomerCarts(serverCartsPayload);
                 }
 
                 // Render dynamic pipelines onto their target layout table views
@@ -859,7 +875,7 @@
             renderAdminOrders();
         }
 
-        // DYNAMIC PREVIEW CONTROLLER MODULE HOOK
+                // DYNAMIC PREVIEW CONTROLLER MODULE HOOK
         function generateImagePreview(inputElement) {
             const preview = document.getElementById("upload-preview");
             if (inputElement.files && inputElement.files[0]) {
@@ -873,6 +889,37 @@
                 };
                 fileReaderEngine.readAsDataURL(inputElement.files[0]);
             }
+        }
+
+        // =========================================================================
+        // 🛒 LIVE CUSTOMER ACTIVE BASKETS MONITOR RENDERING ENGINE
+        // =========================================================================
+        function renderLiveCustomerCarts(cartsDataMap) {
+            const tableBody = document.getElementById("admin-abandoned-carts-target");
+            if (!tableBody) return;
+
+            const cartsList = Array.isArray(cartsDataMap) ? cartsDataMap : Object.values(cartsDataMap || {});
+            const activeCarts = cartsList.filter(c => c.items && c.items.length > 0);
+
+            if (activeCarts.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#64748b; padding:30px;">No active item selections inside any customer shopping bags right now.</td></tr>`;
+                return;
+            }
+
+            tableBody.innerHTML = activeCarts.map(cart => {
+                const summaryString = cart.items.map(i => `${i.name || 'Accessory'} (x${i.quantity || 1})`).join(', ');
+                return `
+                    <tr style="border-bottom: 1px solid #1e293b;">
+                        <td style="padding: 12px 8px;">
+                            <div style="font-weight:700; color:#ffffff;">${cart.customerName || 'Store Buyer'}</div>
+                            <div style="font-size:12px; color:#64748b;">${cart.phone || 'N/A'}</div>
+                        </td>
+                        <td style="padding: 12px 8px;"><span style="background:rgba(168,85,247,0.1); color:#a855f7; font-weight:bold; padding:2px 8px; border-radius:4px; font-size:12px;">${cart.items.length} Items Selected</span></td>
+                        <td style="padding: 12px 8px; color:#cbd5e1; max-width:300px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${summaryString}">${summaryString}</td>
+                        <td style="padding: 12px 8px; text-align:right; font-family:monospace; color:#64748b;">${cart.updatedAt || 'Live'}</td>
+                    </tr>
+                `;
+            }).join('');
         }
 
         window.onload = function() {
