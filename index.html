@@ -800,22 +800,21 @@ function enterDashboardView() {
             }
         }
 
-        function evaluateUserAccessSession() {
+                function evaluateUserAccessSession() {
             const logoutButtonElement = document.getElementById("logout-btn");
             const accountPortalButtonElement = document.getElementById("user-portal-btn");
             
             if (activeSessionUser) {
-                document.getElementById("auth-modal").style.display = "none";
+                closeAuthModal();
                 if (logoutButtonElement) logoutButtonElement.style.display = "block";
-                if (accountPortalButtonElement) accountPortalButtonElement.style.display = "block"; // Show Account dashboard button
+                if (accountPortalButtonElement) accountPortalButtonElement.style.display = "block";
             } else {
                 exitDashboardView();
                 if (logoutButtonElement) logoutButtonElement.style.display = "none";
-                if (accountPortalButtonElement) accountPortalButtonElement.style.display = "none"; // Hide Account dashboard button
+                if (accountPortalButtonElement) accountPortalButtonElement.style.display = "none";
             }
-        }
+        } // <--- DOUBLE CHECK THIS CLOSING BRACKET IS PRESENT!
 
-        // INITIALIZE APPLICATION BOOT ACTIONS WITH ACTIVE STATE CHECKS
         window.onload = () => {
             evaluateUserAccessSession();
             fetchLiveInventory();
