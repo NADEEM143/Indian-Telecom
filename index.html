@@ -568,14 +568,28 @@
                let isLoginMode = false;
         let activeSessionUser = JSON.parse(localStorage.getItem('IT_ACTIVE_USER')) || null;
 
-        function toggleAuthMode() {
+       function toggleAuthMode() {
             isLoginMode = !isLoginMode;
             document.getElementById("auth-title").innerText = isLoginMode ? "Customer Login" : "Customer Registration";
             document.getElementById("auth-submit-btn").innerText = isLoginMode ? "Login to Store" : "Register Account";
             document.getElementById("auth-name-group").style.display = isLoginMode ? "none" : "block";
             document.getElementById("user-name").required = !isLoginMode;
+            
+            // Dynamically switch the password label text based on the mode state
+            const passwordLabel = document.querySelector('label[for="user-pass"]') || document.getElementById("user-pass").previousElementSibling;
+            if (passwordLabel) {
+                passwordLabel.innerText = isLoginMode ? "Password" : "Create Secret Password";
+            }
+
+            // Dynamically switch the footer layout text link based on the mode state
+            const toggleLink = document.getElementById("toggle-auth-mode") || document.querySelector('[onclick="toggleAuthMode()"]');
+            if (toggleLink) {
+                toggleLink.innerHTML = isLoginMode ? "New to the store? Switch to Registration Mode" : "Already registered? Switch to Login Mode";
+            }
+
             document.getElementById("auth-form").reset();
         }
+
 
                function closeAuthModal() {
             document.getElementById("auth-modal").style.display = "none";
