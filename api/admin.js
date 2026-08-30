@@ -68,13 +68,38 @@ export default async function handler(req, res) {
                 }
                 break;
 
-            case 'banner_msg':
+                        case 'banner_msg':
                 if (req.method === 'GET') {
                     const bannerData = await kv.get('it_live_banner_msg') || { message: "MEGA OFFER: FLAT 30% OFF ON PREMIUM CHARGERS & COVERS! LIMITED STOCK!" };
                     return res.status(200).json(bannerData);
                 }
                 if (req.method === 'POST') {
                     await kv.set('it_live_banner_msg', req.body);
+                    return res.status(200).json({ success: true });
+                }
+                break;
+
+            case 'abandoned_carts':
+                if (req.method === 'GET') {
+                    const cartsMap = await kv.get('it_abandoned_carts_registry') || {};
+                    return res.status(200).json(Object.values(cartsMap));
+                }
+                if (req.method === 'POST') {
+                    const clientPhoneId = url.searchParams.get('phone');
+                    if (!clientPhoneId) return res.status(400).json({ error: "Missing identity token." });
+                    
+                    let cartsMap = await kv.get('it_abandoned_carts_registry') || {};
+                    cartsMap[clientPhoneId] = req.body; // Map user phone to their active item array
+                    
+                    await kv.set('it_abandoned_carts_registry', cartsMap);
+                    return res.status(200).json({ success: true });
+                }
+                if (req.method === 'DELETE') {
+                    const clientPhoneId = url.searchParams.get('phone');
+                    let cartsMap = await kv.get('it_abandoned_carts_registry') || {};
+                    delete cartsMap[clientPhoneId]; // Drop bag profile record upon conversion to order success
+                    
+                    await kv.set('it_abandoned_carts_registry', cartsMap);
                     return res.status(200).json({ success: true });
                 }
                 break;
