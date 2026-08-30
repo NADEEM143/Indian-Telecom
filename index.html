@@ -345,82 +345,82 @@
                 </p>
             </form>
         </div>
+        <!-- 👤 DYNAMIC INDEPENDENT CUSTOMER AUTHENTICATION & SECURITY MODAL DESK -->
     <div id="customer-auth-modal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15,23,42,0.85); backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 10000; padding: 16px; box-sizing: border-box;">
-        <div class="auth-modal-view-panel" style="background: #1e293b; border: 1px solid #334155; width: 100%; max-width: 420px; border-radius: 16px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); overflow: hidden; display: flex; flex-direction: column;">
+        <div class="auth-modal-view-panel" style="background: #1e293b; border: 1px solid #334155; width: 100%; max-width: 420px; border-radius: 16px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); overflow: hidden; display: flex; flex-direction: column; text-align: left;">
             
             <!-- Modal Header Toolbar -->
             <div style="padding: 16px; border-bottom: 1px solid #334155; display: flex; justify-content: space-between; align-items: center; background: #0f172a;">
                 <div style="font-weight: 800; font-size: 16px; color: #ffffff; display: flex; align-items: center; gap: 8px;">
-                    <span id="auth-modal-title-icon">🔑</span> <span id="auth-modal-title-text">Account Login</span>
+                    <span id="auth-modal-title-icon">🔑</span> <span id="auth-modal-title-text">Customer Login</span>
                 </div>
                 <button onclick="closeCustomerAuthModal()" style="background: rgba(239,68,68,0.1); border: none; color: #ef4444; width: 32px; height: 32px; border-radius: 50%; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center;">✕</button>
             </div>
 
             <!-- Dynamic Content Forms Scroll Layer -->
-            <div class="modal-content-scroll-layer" style="padding: 20px; box-sizing: border-box;">
+            <div class="modal-content-scroll-layer" style="padding: 20px; box-sizing: border-box; background: #1e293b;">
                 
                 <!-- 1. LOGIN CORE VIEW GRID -->
-                               <!-- 1. LOGIN CORE VIEW GRID -->
-                <div id="auth-sub-panel-login">
+                <div id="auth-sub-panel-login" style="display: block;">
                     <div style="margin-bottom: 16px;">
-                        <label style="display:block; font-size: 12px; font-weight: 700; color: #94a3b8; margin-bottom: 6px; text-transform: uppercase;">10-Digit Mobile Number</label>
+                        <label style="display:block; font-size: 11px; font-weight: 700; color: #94a3b8; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">10-Digit Mobile Number</label>
                         <input type="tel" id="auth-login-phone" placeholder="Enter your registered mobile..." style="width: 100%; padding: 12px; background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: #ffffff; font-weight: 600; box-sizing: border-box;">
                     </div>
                     <div style="margin-bottom: 16px;">
-                        <label style="display:block; font-size: 12px; font-weight: 700; color: #94a3b8; margin-bottom: 6px; text-transform: uppercase;">Secure Account Password</label>
+                        <label style="display:block; font-size: 11px; font-weight: 700; color: #94a3b8; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Secure Account Password</label>
                         <input type="password" id="auth-login-pass" placeholder="••••••••" style="width: 100%; padding: 12px; background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: #ffffff; box-sizing: border-box;">
                     </div>
-                    
+
                     <!-- 🟢 THIS IS YOUR FORGOT PASSWORD TRIGGER BUTTON LINK ELEMENT -->
-                    <div style="text-align: right; margin-bottom: 16px;">
-                        <button onclick="switchAuthSubPanel('forgot')" style="background: none; border: none; color: #3b82f6; font-size: 13px; font-weight: bold; cursor: pointer; padding: 0;">Forgot Password? ⚙️</button>
+                    <div style="text-align: right; margin-bottom: 20px;">
+                        <button type="button" onclick="switchAuthSubPanel('forgot')" style="background: none; border: none; color: #3b82f6; font-size: 13px; font-weight: 700; cursor: pointer; padding: 0;">Forgot Password? ⚙️</button>
                     </div>
                     
-                    <button onclick="executeCustomerLoginAction()" style="width: 100%; background: #0f172a; color: #ffffff; border: none; padding: 14px; font-weight: 800; border-radius: 8px; font-size: 14px; cursor: pointer;">Login to Store</button>
+                    <button onclick="executeCustomerLoginAction()" style="width: 100%; background: #3b82f6; color: #ffffff; border: none; padding: 14px; font-weight: 800; border-radius: 8px; font-size: 14px; cursor: pointer;">Login to Store</button>
                     
                     <!-- 🟢 THIS LINK LETS USERS SWITCH BACK TO REGISTRATION VIEW STATES -->
-                    <div style="text-align: center; margin-top: 20px; font-size: 13px; color: #64748b;">
-                        New customer? <button onclick="switchAuthSubPanel('register')" style="background: none; border: none; color: #10b981; font-weight: bold; cursor: pointer; padding: 0;">Create Account</button>
+                    <div style="text-align: center; margin-top: 24px; font-size: 13px; color: #64748b;">
+                        New customer? <button type="button" onclick="switchAuthSubPanel('register')" style="background: none; border: none; color: #10b981; font-weight: 800; cursor: pointer; padding: 0; margin-left: 4px;">Create Account</button>
                     </div>
                 </div>
 
                 <!-- 2. REGISTRATION CORE VIEW GRID -->
                 <div id="auth-sub-panel-register" style="display: none;">
                     <div style="margin-bottom: 12px;">
-                        <label style="display:block; font-size: 12px; font-weight: 700; color: #94a3b8; margin-bottom: 6px; text-transform: uppercase;">Full Name</label>
+                        <label style="display:block; font-size: 11px; font-weight: 700; color: #94a3b8; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Full Name</label>
                         <input type="text" id="auth-reg-name" placeholder="Nadim Ahmad" style="width: 100%; padding: 12px; background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: #ffffff; box-sizing: border-box;">
                     </div>
                     <div style="margin-bottom: 12px;">
-                        <label style="display:block; font-size: 12px; font-weight: 700; color: #94a3b8; margin-bottom: 6px; text-transform: uppercase;">10-Digit Mobile Number</label>
+                        <label style="display:block; font-size: 11px; font-weight: 700; color: #94a3b8; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">10-Digit Mobile Number</label>
                         <input type="tel" id="auth-reg-phone" placeholder="9876543210" style="width: 100%; padding: 12px; background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: #ffffff; box-sizing: border-box;">
                     </div>
-                    <div style="margin-bottom: 16px;">
-                        <label style="display:block; font-size: 12px; font-weight: 700; color: #94a3b8; margin-bottom: 6px; text-transform: uppercase;">Create Account Password</label>
+                    <div style="margin-bottom: 20px;">
+                        <label style="display:block; font-size: 11px; font-weight: 700; color: #94a3b8; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Create Account Password</label>
                         <input type="password" id="auth-reg-pass" placeholder="Minimum 4 characters..." style="width: 100%; padding: 12px; background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: #ffffff; box-sizing: border-box;">
                     </div>
                     <button onclick="executeCustomerRegistrationAction()" style="width: 100%; background: #10b981; color: #ffffff; border: none; padding: 14px; font-weight: 800; border-radius: 8px; font-size: 14px; cursor: pointer;">✨ Create Fresh Profile</button>
-                    <div style="text-align: center; margin-top: 20px; font-size: 13px; color: #64748b;">
-                        Already have an account? <button onclick="switchAuthSubPanel('login')" style="background: none; border: none; color: #3b82f6; font-weight: bold; cursor: pointer; padding: 0;">Login here</button>
+                    <div style="text-align: center; margin-top: 24px; font-size: 13px; color: #64748b;">
+                        Already have an account? <button type="button" onclick="switchAuthSubPanel('login')" style="background: none; border: none; color: #3b82f6; font-weight: 800; cursor: pointer; padding: 0; margin-left: 4px;">Login here</button>
                     </div>
                 </div>
 
                 <!-- 3. FORGOT PASSWORD CORE VIEW GRID -->
                 <div id="auth-sub-panel-forgot" style="display: none;">
                     <p style="font-size: 13px; color: #94a3b8; line-height: 1.5; margin: 0 0 16px 0;">Enter your registered 10-digit mobile number below. Our security engine will match your file fields and retrieve your account password right on this screen.</p>
-                    <div style="margin-bottom: 16px;">
-                        <label style="display:block; font-size: 12px; font-weight: 700; color: #94a3b8; margin-bottom: 6px; text-transform: uppercase;">Your Registered Mobile Number</label>
+                    <div style="margin-bottom: 20px;">
+                        <label style="display:block; font-size: 11px; font-weight: 700; color: #94a3b8; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Your Registered Mobile Number</label>
                         <input type="tel" id="auth-forgot-phone" placeholder="Enter mobile to recover keys..." style="width: 100%; padding: 12px; background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: #ffffff; font-weight: 600; box-sizing: border-box;">
                     </div>
                     <button onclick="executePasswordRecoveryAction()" style="width: 100%; background: #f59e0b; color: #0f172a; border: none; padding: 14px; font-weight: 800; border-radius: 8px; font-size: 14px; cursor: pointer;">🔍 Look Up My Password</button>
                     
                     <!-- Decoded Security Key Print Slot Container -->
-                    <div id="auth-recovery-display-box" style="margin-top: 16px; padding: 12px; border-radius: 8px; background: rgba(245,158,11,0.05); border: 1px dashed rgba(245,158,11,0.2); display: none; text-align: center;">
+                    <div id="auth-recovery-display-box" style="margin-top: 20px; padding: 12px; border-radius: 8px; background: rgba(245,158,11,0.05); border: 1px dashed rgba(245,158,11,0.2); display: none; text-align: center;">
                         <div style="font-size: 12px; color: #f59e0b; font-weight: 700; text-transform: uppercase; margin-bottom: 4px;">Security Key Recovered Successfully!</div>
                         <div id="auth-recovered-password-target" style="font-size: 20px; font-family: monospace; font-weight: 800; color: #ffffff; letter-spacing: 1px;">-</div>
                     </div>
 
-                                        <div style="text-align: center; margin-top: 20px; font-size: 13px; color: #64748b;">
-                        Remembered it? <button onclick="switchAuthSubPanel('login')" style="background: none; border: none; color: #3b82f6; font-weight: bold; cursor: pointer; padding: 0;">Back to Login</button>
+                    <div style="text-align: center; margin-top: 24px; font-size: 13px; color: #64748b;">
+                        Remembered it? <button type="button" onclick="switchAuthSubPanel('login')" style="background: none; border: none; color: #3b82f6; font-weight: 800; cursor: pointer; padding: 0; margin-left: 4px;">Back to Login</button>
                     </div>
                 </div>
 
