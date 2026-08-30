@@ -460,30 +460,30 @@
         }
 
                // 🔒 SECURE CHECKOUT GATEKEEPER: BLOCKS UNREGISTERED TRAFFIC
-        function openCheckout() {
-            if (cart.length === 0) return alert("Add items to your cart first!");
-            
-            // Close the cart slider drawer view layout cleanly first
-            const drawer = document.getElementById("cart-drawer");
-            const overlay = document.getElementById("drawer-overlay");
-            if (drawer) drawer.style.transform = "translateX(100%)";
-            if (overlay) overlay.style.display = "none";
+       function openCheckout() {
+    if (cart.length === 0) return alert("Add items to your cart first!");
+    
+    // Close the cart slider drawer view layout cleanly first
+    const drawer = document.getElementById("cart-drawer");
+    const overlay = document.getElementById("drawer-overlay");
+    if (drawer) drawer.style.transform = "translateX(100%)";
+    if (overlay) overlay.style.display = "none";
 
-            // Fire up your account registration overlay popup window box instantly
-            document.getElementById("auth-modal").style.display = "flex";
-            return;
-        }
-            
-            // 🟢 Logged In: Automatically pre-fill the shipping details form using their registered account tokens
-            document.getElementById("cust-name").value = activeSessionUser.name || "";
-            document.getElementById("cust-phone").value = activeSessionUser.phone || "";
-            
-            document.getElementById("checkout-modal").style.display = "flex";
-        }
+    // Check if user is logged in to determine which modal to display
+    if (!activeSessionUser) {
+        document.getElementById("auth-modal").style.display = "flex";
+    } else {
+        // 🟢 Logged In: Automatically pre-fill the shipping details form using their registered account tokens
+        document.getElementById("cust-name").value = activeSessionUser.name || "";
+        document.getElementById("cust-phone").value = activeSessionUser.phone || "";
         
-        function closeCheckout() { 
-            document.getElementById("checkout-modal").style.display = "none"; 
-        }
+        document.getElementById("checkout-modal").style.display = "flex";
+    }
+}
+
+function closeCheckout() { 
+    document.getElementById("checkout-modal").style.display = "none"; 
+}
 
         function togglePaymentMode(mode) {
             const qrSection = document.getElementById("qr-section");
