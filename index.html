@@ -66,92 +66,14 @@
         .radio-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 6px; }
         .radio-label { border: 1px solid #e2e8f0; background: #f8fafc; padding: 14px; border-radius: 12px; display: flex; align-items: center; gap: 10px; cursor: pointer; font-weight: 600; font-size: 14px; color: #0f172a; }
         
-       #qr-section { background: #f8fafc; border: 1px dashed #e2e8f0; border-radius: 16px; padding: 20px; margin-top: 16px; text-align: center; display: none; }
+        #qr-section { background: #f8fafc; border: 1px dashed #e2e8f0; border-radius: 16px; padding: 20px; margin-top: 16px; text-align: center; display: none; }
         .qr-placeholder { background: white; width: 140px; height: 140px; margin: 0 auto 12px auto; display: flex; align-items: center; justify-content: center; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.02); }
         .qr-placeholder img { width: 120px; height: 120px; object-fit: contain; }
         
         .whatsapp-float { position: fixed; bottom: 24px; right: 24px; background: #25D366; color: white; width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; box-shadow: 0 8px 24px rgba(37,211,102,0.3); text-decoration: none; z-index: 99; }
-
-        /* 📱 MOBILE-OPTIMIZED CUSTOM ON-SCREEN TOAST NOTIFICATIONS */
-        .custom-toast-container {
-            position: fixed;
-            bottom: 24px;
-            left: 50%;
-            transform: translateX(-50%) translateY(100px);
-            background: #1e293b;
-            border: 1px solid #3b82f6;
-            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.5), 0 8px 10px -6px rgba(0,0,0,0.5);
-            padding: 16px 24px;
-            border-radius: 12px;
-            color: #ffffff;
-            font-weight: 600;
-            font-size: 14px;
-            z-index: 99999;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            width: calc(100% - 32px);
-            max-width: 400px;
-            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-sizing: border-box;
-        }
-        .custom-toast-container.show {
-            transform: translateX(-50%) translateY(0);
-        }
-                /* ... YOUR EXISTING CSS STYLES ARE ABOVE THIS LINE ... */
-        .toast-icon { font-size: 18px; }
-
-    /* 🟢 PASTE THE NEW MOBILE ENGINE ENGINE CSS RULES DIRECTLY HERE: */
-    /* 📱 100% FLUID MOBILE RESPONSIVE ENGINE RULES */
-    @media screen and (max-width: 768px) {
-        /* 1. Global Viewport Adjustments & Layout Spacing */
-        body { padding: 0; overflow-x: hidden; font-size: 14px; }
-        header { padding: 12px 16px; flex-direction: column; gap: 12px; align-items: stretch; text-align: center; }
-        header .logo { justify-content: center; font-size: 20px; }
-        header .nav-actions-wrapper { display: flex; justify-content: space-between; gap: 8px; width: 100%; }
-        header button { flex: 1; padding: 10px; font-size: 12px; justify-content: center; white-space: nowrap; }
-
-        /* 2. Top Marquee Banner Scaling */
-        #mega-offer-banner { font-size: 11px; padding: 10px 8px; line-height: 1.4; text-align: center; white-space: normal; }
-
-        /* 3. Category Horizontal Scroll Tracks */
-        .category-scroll-container { display: flex; overflow-x: auto; gap: 8px; padding: 4px 16px 12px 16px; margin: 0; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
-        .category-scroll-container::-webkit-scrollbar { display: none; }
-        .category-chip { flex: 0 0 auto; white-space: nowrap; padding: 8px 16px; font-size: 12px; border-radius: 20px; }
-
-        /* 4. Fluid 2-Column Product Grid Configuration */
-        .products-grid-container { grid-template-columns: repeat(2, 1fr) !important; gap: 12px !important; padding: 0 12px 24px 12px !important; }
-        .product-card { padding: 8px; border-radius: 12px; display: flex; flex-direction: column; justify-content: space-between; height: auto; }
-        .product-card .img-wrapper { height: 140px; border-radius: 8px; margin-bottom: 8px; }
-        .product-card .title { font-size: 13px; line-height: 1.3; margin: 4px 0; height: 34px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
-        .product-card .price-row { flex-direction: column; align-items: flex-start; gap: 2px; margin-bottom: 8px; }
-        .product-card .current-price { font-size: 15px; }
-        .product-card .old-price { font-size: 11px; margin-left: 0; }
-        .product-card .buy-btn { width: 100%; padding: 10px; font-size: 12px; border-radius: 8px; text-align: center; }
-
-        /* 5. Full-Screen Slide Out Shopping Drawers & Modals */
-        .cart-drawer-sheet, .checkout-modal-view-panel, .auth-modal-view-panel { width: 100% !important; max-width: 100% !important; height: 100% !important; max-height: 100% !important; border-radius: 0 !important; top: 0 !important; right: 0 !important; bottom: 0 !important; left: 0 !important; margin: 0 !important; box-sizing: border-box; }
-        .modal-content-scroll-layer { height: calc(100% - 70px) !important; overflow-y: auto !important; padding: 16px !important; -webkit-overflow-scrolling: touch; }
-        
-        /* 6. Form Fields & Touch Optimization */
-        input, select, textarea { font-size: 16px !important; padding: 12px !important; border-radius: 8px !important; }
-        .form-grid-2-col { grid-template-columns: 1fr !important; gap: 12px !important; }
-        
-        /* 7. Tracking Tables Mobile Layout Modifiers */
-        .admin-table { display: block; width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
-        .admin-table th, .admin-table td { padding: 10px 6px; font-size: 12px; }
-    }
-
-    </style> <!-- 🔴 THE ABSOLUTE STYLE SHEET CLOSING TAG -->
+    </style>
 </head>
 <body>
-
-    <!-- Beautiful UI notification toast container anchor -->
-    <div id="ui-toast-notification" class="custom-toast-container">
-        <span class="toast-icon" id="ui-toast-icon">🚀</span>
-        <span id="ui-toast-message">Notification Message</span>
-    </div>
-
     <div id="mega-offer-banner">
         🔥 MEGA OFFER: FLAT 30% OFF ON PREMIUM CHARGERS & COVERS! LIMITED STOCK!
     </div>
@@ -345,151 +267,27 @@
                 </p>
             </form>
         </div>
-        <!-- 👤 DYNAMIC INDEPENDENT CUSTOMER AUTHENTICATION & SECURITY MODAL DESK -->
-    <div id="customer-auth-modal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15,23,42,0.85); backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 10000; padding: 16px; box-sizing: border-box;">
-        <div class="auth-modal-view-panel" style="background: #1e293b; border: 1px solid #334155; width: 100%; max-width: 420px; border-radius: 16px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); overflow: hidden; display: flex; flex-direction: column; text-align: left;">
-            
-            <!-- Modal Header Toolbar -->
-            <div style="padding: 16px; border-bottom: 1px solid #334155; display: flex; justify-content: space-between; align-items: center; background: #0f172a;">
-                <div style="font-weight: 800; font-size: 16px; color: #ffffff; display: flex; align-items: center; gap: 8px;">
-                    <span id="auth-modal-title-icon">🔑</span> <span id="auth-modal-title-text">Customer Login</span>
-                </div>
-                <button onclick="closeCustomerAuthModal()" style="background: rgba(239,68,68,0.1); border: none; color: #ef4444; width: 32px; height: 32px; border-radius: 50%; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center;">✕</button>
-            </div>
-
-            <!-- Dynamic Content Forms Scroll Layer -->
-            <div class="modal-content-scroll-layer" style="padding: 20px; box-sizing: border-box; background: #1e293b;">
-                
-                             <!-- 1. LOGIN CORE VIEW GRID -->
-                <div id="auth-sub-panel-login" style="display: block;">
-                    <div style="margin-bottom: 16px;">
-                        <label style="display:block; font-size: 11px; font-weight: 700; color: #94a3b8; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Mobile Number</label>
-                        <input type="tel" id="auth-login-phone" placeholder="Enter your registered mobile..." style="width: 100%; padding: 12px; background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: #ffffff; font-weight: 600; box-sizing: border-box;">
-                    </div>
-                    <div style="margin-bottom: 16px;">
-                        <label style="display:block; font-size: 11px; font-weight: 700; color: #94a3b8; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Secure Password</label>
-                        <input type="password" id="auth-login-pass" placeholder="••••••••" style="width: 100%; padding: 12px; background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: #ffffff; box-sizing: border-box;">
-                    </div>
-
-                    <!-- 🔓 THE HIDDEN FORGOT PASSWORD BUTTON LINK LINKED HERE -->
-                    <div style="text-align: right; margin-bottom: 20px;">
-                        <button type="button" onclick="switchAuthSubPanel('forgot')" style="background: none; border: none; color: #3b82f6; font-size: 13px; font-weight: 700; cursor: pointer; padding: 0;">Forgot Password? ⚙️</button>
-                    </div>
-                    
-                    <button onclick="executeCustomerLoginAction()" style="width: 100%; background: #3b82f6; color: #ffffff; border: none; padding: 14px; font-weight: 800; border-radius: 8px; font-size: 14px; cursor: pointer;">Login to Store</button>
-                    
-                    <div style="text-align: center; margin-top: 24px; font-size: 13px; color: #64748b;">
-                        New customer? <button type="button" onclick="switchAuthSubPanel('register')" style="background: none; border: none; color: #10b981; font-weight: 800; cursor: pointer; padding: 0; margin-left: 4px;">Create Account</button>
-                    </div>
-                </div>
-
-
-                <!-- 2. REGISTRATION CORE VIEW GRID -->
-                <div id="auth-sub-panel-register" style="display: none;">
-                    <div style="margin-bottom: 12px;">
-                        <label style="display:block; font-size: 11px; font-weight: 700; color: #94a3b8; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Full Name</label>
-                        <input type="text" id="auth-reg-name" placeholder="Nadim Ahmad" style="width: 100%; padding: 12px; background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: #ffffff; box-sizing: border-box;">
-                    </div>
-                    <div style="margin-bottom: 12px;">
-                        <label style="display:block; font-size: 11px; font-weight: 700; color: #94a3b8; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">10-Digit Mobile Number</label>
-                        <input type="tel" id="auth-reg-phone" placeholder="9876543210" style="width: 100%; padding: 12px; background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: #ffffff; box-sizing: border-box;">
-                    </div>
-                    <div style="margin-bottom: 20px;">
-                        <label style="display:block; font-size: 11px; font-weight: 700; color: #94a3b8; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Create Account Password</label>
-                        <input type="password" id="auth-reg-pass" placeholder="Minimum 4 characters..." style="width: 100%; padding: 12px; background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: #ffffff; box-sizing: border-box;">
-                    </div>
-                    <button onclick="executeCustomerRegistrationAction()" style="width: 100%; background: #10b981; color: #ffffff; border: none; padding: 14px; font-weight: 800; border-radius: 8px; font-size: 14px; cursor: pointer;">✨ Create Fresh Profile</button>
-                    <div style="text-align: center; margin-top: 24px; font-size: 13px; color: #64748b;">
-                        Already have an account? <button type="button" onclick="switchAuthSubPanel('login')" style="background: none; border: none; color: #3b82f6; font-weight: 800; cursor: pointer; padding: 0; margin-left: 4px;">Login here</button>
-                    </div>
-                </div>
-
-                <!-- 3. FORGOT PASSWORD CORE VIEW GRID -->
-                <div id="auth-sub-panel-forgot" style="display: none;">
-                    <p style="font-size: 13px; color: #94a3b8; line-height: 1.5; margin: 0 0 16px 0;">Enter your registered 10-digit mobile number below. Our security engine will match your file fields and retrieve your account password right on this screen.</p>
-                    <div style="margin-bottom: 20px;">
-                        <label style="display:block; font-size: 11px; font-weight: 700; color: #94a3b8; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Your Registered Mobile Number</label>
-                        <input type="tel" id="auth-forgot-phone" placeholder="Enter mobile to recover keys..." style="width: 100%; padding: 12px; background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: #ffffff; font-weight: 600; box-sizing: border-box;">
-                    </div>
-                    <button onclick="executePasswordRecoveryAction()" style="width: 100%; background: #f59e0b; color: #0f172a; border: none; padding: 14px; font-weight: 800; border-radius: 8px; font-size: 14px; cursor: pointer;">🔍 Look Up My Password</button>
-                    
-                    <!-- Decoded Security Key Print Slot Container -->
-                    <div id="auth-recovery-display-box" style="margin-top: 20px; padding: 12px; border-radius: 8px; background: rgba(245,158,11,0.05); border: 1px dashed rgba(245,158,11,0.2); display: none; text-align: center;">
-                        <div style="font-size: 12px; color: #f59e0b; font-weight: 700; text-transform: uppercase; margin-bottom: 4px;">Security Key Recovered Successfully!</div>
-                        <div id="auth-recovered-password-target" style="font-size: 20px; font-family: monospace; font-weight: 800; color: #ffffff; letter-spacing: 1px;">-</div>
-                    </div>
-
-                    <div style="text-align: center; margin-top: 24px; font-size: 13px; color: #64748b;">
-                        Remembered it? <button type="button" onclick="switchAuthSubPanel('login')" style="background: none; border: none; color: #3b82f6; font-weight: 800; cursor: pointer; padding: 0; margin-left: 4px;">Back to Login</button>
-                    </div>
-                </div>
-
-            </div>
-
-        </div>
     </div>
-
+    <a target="_blank" href="https://wa.me/919718439786" class="whatsapp-float">💬</a>
     <!-- SAFELY ENCAPSULATED CONTROLLER JAVASCRIPT BLOCK -->
     <script>
-        const API_BASE_ENDPOINT = '/api';
+                const API_BASE_ENDPOINT = '/api';
         let productsList = [];
         
-        // Automatically downloads existing basket contents from browser storage keys on load
+        // 🟢 FIXED: Automatically downloads existing basket contents from browser storage keys on load
         let cart = JSON.parse(localStorage.getItem('IT_STOREFRONT_CART')) || [];
 
-        // 🟢 PASTE THE NEW UPDATED ABANDONED CARTS BROADCASTER ROUTINE DIRECTLY HERE:
-        // =========================================================================
-        // 🟢 EXTEND CART SYNC ROUTINES TO AUTOMATICALLY BROADCAST ABANDONED CARTS
-        // =========================================================================
+        // Helper framework routine updating internal machine storage on layout mutation cycles
         function syncCartToBrowserLocalStorage() {
             localStorage.setItem('IT_STOREFRONT_CART', JSON.stringify(cart));
-            
-            // If a client is logged in, automatically mirror their active basket state to the cloud database rows!
-            if (activeSessionUser && activeSessionUser.phone) {
-                const uniqueClientPhone = String(activeSessionUser.phone || activeSessionUser.contact || '').trim();
-                const cartDataPayload = {
-                    customerName: activeSessionUser.name || "Guest Customer",
-                    phone: uniqueClientPhone,
-                    updatedAt: new Date().toLocaleTimeString(),
-                    items: cart
-                };
-                
-                // Fire and forget transmission directly down onto your server channels
-                fetch(`${API_BASE_ENDPOINT}/admin?type=abandoned_carts&phone=${uniqueClientPhone}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(cartDataPayload)
-                }).catch(e => console.error("Live cart broadcast sync fault:", e));
-            }
         }
 
-        // =========================================================================
-        // CUSTOM NOTIFICATION ENGINE (REPLACES BROWSER ALERT POPUPS)
-        // =========================================================================
-        function showNotification(message, icon = "🚀") {
-            const toast = document.getElementById("ui-toast-notification");
-            const toastMsg = document.getElementById("ui-toast-message");
-            const toastIcon = document.getElementById("ui-toast-icon");
-            
-            if (!toast || !toastMsg || !toastIcon) return;
-            
-            toastMsg.innerText = message;
-            toastIcon.innerText = icon;
-            
-            toast.classList.add("show");
-            
-            // Slide away automatically after 3.5 seconds
-            setTimeout(() => {
-                toast.classList.remove("show");
-            }, 3500);
-        }
-
-        async function fetchLiveInventory() {
+               async function fetchLiveInventory() {
             try {
                 const cacheBusterTimeToken = Date.now();
                 
                 // 🟢 FIXED: Dynamically downloads your live announcement string right on page boot
-                                try {
+                try {
                     const bannerMsgResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=banner_msg&_t=${cacheBusterTimeToken}`);
                     if (bannerMsgResponse.ok) {
                         const parsedBannerPayload = await bannerMsgResponse.json();
@@ -815,13 +613,7 @@
                         return;
                     }
                     
-                                       const newProfilePayload = { 
-                        id: "U_" + Date.now(), 
-                        name: name, 
-                        phone: phone, 
-                        password: pass,
-                        status: "ACTIVE" // 🟢 FIXED: Ensures your old admin layout tracks display them instantly
-                    };
+                    const newProfilePayload = { id: "U_" + Date.now(), name, phone, password: pass };
                     databaseUsersList.push(newProfilePayload);
 
                     await fetch(`${API_BASE_ENDPOINT}/admin?type=users`, {
@@ -831,9 +623,7 @@
                     });
 
                     activeSessionUser = newProfilePayload;
-                    
-                    // 🟢 FIXED: Clean dynamic on-screen slide toast replaces the blocking browser alert box!
-                    showNotification("Account Registered Successfully! Welcome to Indian Telecom.", "🎉");
+                    alert("Account Registered Successfully inside Indian Telecom repository matrix!");
                 }
 
                 localStorage.setItem('IT_ACTIVE_USER', JSON.stringify(activeSessionUser));
@@ -955,155 +745,6 @@
                 }
             } catch (err) {
                 console.error("Client side order verification tracking mapping crash:", err);
-            }
-        }
-
-        // =========================================================================
-        // 🔑 INDEPENDENT ACCESS CONTROLLERS & SECURE PASSWORD RECOVERY RECON
-        // =========================================================================
-        function openCustomerAuthModal() {
-            const modal = document.getElementById("customer-auth-modal");
-            if (modal) {
-                modal.style.display = "flex";
-                switchAuthSubPanel('login'); 
-            }
-        }
-
-        function closeCustomerAuthModal() {
-            const modal = document.getElementById("customer-auth-modal");
-            if (modal) modal.style.display = "none";
-        }
-
-                function switchAuthSubPanel(mode) {
-            const loginPanel = document.getElementById("auth-sub-panel-login");
-            const regPanel = document.getElementById("auth-sub-panel-register");
-            const forgotPanel = document.getElementById("auth-sub-panel-forgot");
-            const titleText = document.getElementById("auth-modal-title-text");
-            const titleIcon = document.getElementById("auth-modal-title-icon");
-            const recoveryDisplay = document.getElementById("auth-recovery-display-box");
-
-            if(!loginPanel || !regPanel || !forgotPanel) return;
-
-            loginPanel.style.display = "none";
-            regPanel.style.display = "none";
-            forgotPanel.style.display = "none";
-            if (recoveryDisplay) recoveryDisplay.style.display = "none";
-
-            if (mode === 'login') {
-                loginPanel.style.display = "block";
-                if(titleText) titleText.innerText = "Customer Login";
-                if(titleIcon) titleIcon.innerText = "🔑";
-                
-                // 🟢 FIXED: Forcefully overrides any lingering registration text labels on screen
-                const passwordLabel = document.querySelector("#auth-sub-panel-login label:nth-of-type(2)");
-                if (passwordLabel) passwordLabel.innerText = "Secure Account Password";
-                
-                const mainActionBtn = document.querySelector("#auth-sub-panel-login button[onclick='executeCustomerLoginAction()']");
-                if (mainActionBtn) mainActionBtn.innerText = "Login to Store";
-            } else if (mode === 'register') {
-                regPanel.style.display = "block";
-                if(titleText) titleText.innerText = "Create Store Account";
-                if(titleIcon) titleIcon.innerText = "✨";
-            } else if (mode === 'forgot') {
-                forgotPanel.style.display = "block";
-                if(titleText) titleText.innerText = "Password Recovery";
-                if(titleIcon) titleIcon.innerText = "⚙️";
-                const forgotPhoneInput = document.getElementById("auth-forgot-phone");
-                if (forgotPhoneInput) forgotPhoneInput.value = "";
-            }
-        }
-
-        async function executeCustomerLoginAction() {
-            const phone = document.getElementById("auth-login-phone").value.trim();
-            const pass = document.getElementById("auth-login-pass").value;
-
-            if (!phone || !pass) return showNotification("Please complete all security validation parameters fields.", "⚠️");
-
-            try {
-                const response = await fetch(`${API_BASE_ENDPOINT}/admin?type=users&_t=${Date.now()}`);
-                if (!response.ok) throw new Error("Database offline mapping exception.");
-                
-                const userRegistry = await response.json();
-                const matchedUser = userRegistry.find(u => String(u.phone || u.contact || '').trim() === String(phone).trim());
-
-                if (!matchedUser || matchedUser.password !== pass) {
-                    return showNotification("Invalid Mobile Number or Security Password combination.", "❌");
-                }
-
-                if (matchedUser.status === 'SUSPENDED') {
-                    return showNotification("ACCESS TERMINATED: Your profile has been suspended by administration.", "🚫");
-                }
-
-                activeSessionUser = matchedUser;
-                localStorage.setItem('IT_ACTIVE_USER', JSON.stringify(activeSessionUser));
-                
-                showNotification(`Welcome back, ${matchedUser.name || 'Customer'}! Access granted.`, "✅");
-                evaluateUserAccessSession();
-                if (typeof fetchAndRenderCustomerOrderTracks === 'function') fetchAndRenderCustomerOrderTracks();
-                closeCustomerAuthModal();
-            } catch (err) {
-                showNotification("Authentication process error: " + err.message, "⚠️");
-            }
-        }
-
-        async function executeCustomerRegistrationAction() {
-            const name = document.getElementById("auth-reg-name").value.trim();
-            const phone = document.getElementById("auth-reg-phone").value.trim();
-            const pass = document.getElementById("auth-reg-pass").value;
-
-            if (!name || !phone || !pass) return showNotification("Please complete all registration parameters fields.", "⚠️");
-            if (phone.length < 10) return showNotification("Please enter a valid 10-digit mobile number.", "📱");
-
-            try {
-                const response = await fetch(`${API_BASE_ENDPOINT}/admin?type=users&_t=${Date.now()}`);
-                let userRegistry = response.ok ? await response.json() : [];
-                
-                const duplicateCheck = userRegistry.find(u => String(u.phone || u.contact || '').trim() === String(phone).trim());
-                if (duplicateCheck) return showNotification("This mobile number is already registered! Please log in instead.", "⚠️");
-
-                const freshAccount = { id: "U_" + Date.now(), name, phone, password: pass, status: "ACTIVE" };
-                userRegistry.push(freshAccount);
-
-                await fetch(`${API_BASE_ENDPOINT}/admin?type=users`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(userRegistry)
-                });
-
-                showNotification("Profile Created! Switching to Login window panel...", "🎉");
-                document.getElementById("auth-login-phone").value = phone;
-                switchAuthSubPanel('login');
-            } catch (err) {
-                showNotification("Registration workflow fault: " + err.message, "⚠️");
-            }
-        }
-
-        async function executePasswordRecoveryAction() {
-            const lookUpPhone = document.getElementById("auth-forgot-phone").value.trim();
-            if (!lookUpPhone) return showNotification("Please enter your registered phone number to look up keys.", "⚠️");
-
-            try {
-                const response = await fetch(`${API_BASE_ENDPOINT}/admin?type=users&_t=${Date.now()}`);
-                if (!response.ok) throw new Error("Data cluster communication exception.");
-                
-                const userRegistry = await response.json();
-                const matchedUser = userRegistry.find(u => String(u.phone || u.contact || '').trim() === String(lookUpPhone).trim());
-
-                const displayBox = document.getElementById("auth-recovery-display-box");
-                const targetText = document.getElementById("auth-recovered-password-target");
-
-                if (!matchedUser) {
-                    if (displayBox) displayBox.style.display = "none";
-                    return showNotification("No customer profile found matching this mobile number records.", "❌");
-                }
-
-                if (displayBox && targetText) {
-                    targetText.innerText = matchedUser.password || "N/A";
-                    displayBox.style.display = "block";
-                    showNotification("Account key matched and extracted successfully!", "🔓");
-                }
-            } catch (err) {
-                showNotification("Recovery script exception: " + err.message, "⚠️");
             }
         }
 
