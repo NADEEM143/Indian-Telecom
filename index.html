@@ -188,6 +188,7 @@
 
     <!-- 🟢 FIXED: Loaded the official EasyQRCode library inside the head template context -->
     <script src="https://cdn.jsdelivr.net/npm/easyqrcodejs@4.6.2/dist/easy.qrcode.min.js"></script>
+    <link rel="manifest" href="manifest.json">
 </head>
 <body>
     <!-- Beautiful UI storefront notification toast container anchor -->
@@ -1086,8 +1087,29 @@ function enterDashboardView() {
             evaluateUserAccessSession();
             fetchLiveInventory();
         };
+       <!-- 🟢 MASTER APPS PLATFORM INITIALIZATION DRIVERS -->
+    <script>
+        window.addEventListener('load', () => {
+            // 1. Fetch and compile dynamic catalog grids from cloud array maps
+            if (typeof fetchLiveCatalogDataTrace === 'function') {
+                fetchLiveCatalogDataTrace();
+            } else if (typeof pullMasterDatabaseArrays === 'function') {
+                pullMasterDatabaseArrays();
+            }
+
+            const formElement = document.getElementById("order-form");
+            if (formElement) formElement.addEventListener("submit", submitOrder);
+
+            // 2. 📱 PROGRESSIVE APP ENGINE ACTIVATION ROUTINE
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('sw.js')
+                    .then(() => console.log("PWA Engine Booted Successfully!"))
+                    .catch((err) => console.error("PWA Initialization Error:", err));
+            }
+        });
     </script>
-        <!-- PREMIUM FOOTER BLOCK FOR ELITE STOREFRONT LOOK -->
+
+    <!-- PREMIUM FOOTER BLOCK FOR ELITE STOREFRONT LOOK -->
     <footer style="background: #0f172a; color: #ffffff; padding: 40px 6% 80px 6%; margin-top: 60px; border-top: 1px solid #1e293b; font-size: 14px;">
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 30px; margin-bottom: 30px;">
             <!-- Brand Column -->
@@ -1102,7 +1124,7 @@ function enterDashboardView() {
                 <p style="color: #94a3b8; margin-bottom: 8px; font-size: 13px;">Do you have any questions about stock, delivery times, or instant payments?</p>
                 <div style="display: flex; flex-direction: column; gap: 8px;">
                     <a href="tel:+919330301096" style="color: #3b82f6; text-decoration: none; font-weight: 600; display: flex; align-items: center; gap: 6px;">📞 Call Helpdesk</a>
-                    <a href="https://wa.me/919330301096" target="_blank" style="color: #25D366; text-decoration: none; font-weight: 600; display: flex; align-items: center; gap: 6px;">💬 Chat on WhatsApp</a>
+                    <a href="https://wa.me" target="_blank" style="color: #25D366; text-decoration: none; font-weight: 600; display: flex; align-items: center; gap: 6px;">💬 Chat on WhatsApp</a>
                 </div>
             </div>
 
@@ -1114,7 +1136,7 @@ function enterDashboardView() {
             </div>
         </div>
 
-               <!-- Divider and Copyright Panel -->
+        <!-- Divider and Copyright Panel -->
         <div style="border-top: 1px solid #1e293b; padding-top: 20px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; font-size: 12px; color: #64748b;">
             <p style="font-weight: 500;">© 2026 Indian Telecom. All Rights Reserved.</p>
             <p style="color: #475569;">100% Secure Shopping Guarantee • NPCI Verified UPI Matrix</p>
