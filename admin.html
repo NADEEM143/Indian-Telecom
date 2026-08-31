@@ -58,47 +58,12 @@
         .ship-btn { color: #2563eb; background: rgba(37, 99, 235, 0.08); }
         .ship-btn:hover { background: rgba(37, 99, 235, 0.15); }
         
-               .row-item-meta { display: flex; align-items: center; gap: 12px; }
+        .row-item-meta { display: flex; align-items: center; gap: 12px; }
         .row-thumb { width: 40px; height: 40px; border-radius: 8px; background: #f8fafc; object-fit: cover; display: flex; align-items: center; justify-content: center; border: 1px solid #e2e8f0; }
         
         .custom-toast-container { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px); background: #ffffff; border: 1px solid #2563eb; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); padding: 16px 24px; border-radius: 12px; color: #0f172a; font-weight: 700; font-size: 14px; z-index: 99999; display: flex; align-items: center; gap: 12px; width: calc(100% - 32px); max-width: 400px; transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .custom-toast-container.show { transform: translateX(-50%) translateY(0); }
         .toast-icon { font-size: 18px; }
-    </style>
-
-    <!-- 🟢 PASTED HERE: RIGHT UNDER YOUR CLOSING STYLE TAG AND ABOVE CLOSING HEAD TAG -->
-    <!-- 🖼️ LOAD CROPPER ENGINE CDNs MATRIX -->
-    <link rel="stylesheet" href="https://cloudflare.com">
-    <script src="https://cloudflare.com"></script>
-
-    <style>
-        /* Sizing container controls cropping box aspect behaviors */
-        .cropper-workspace-wrapper {
-            max-width: 100%;
-            max-height: 260px;
-            margin: 12px 0;
-            display: none;
-            overflow: hidden;
-            border-radius: 12px;
-            border: 1px solid #cbd5e1;
-            background: #f8fafc;
-        }
-        .cropper-workspace-wrapper img { max-width: 100%; display: block; }
-        .crop-control-btn {
-            background: #ffffff;
-            border: 1px solid #cbd5e1;
-            color: #475569;
-            padding: 6px 10px;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: 0.2s;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .crop-control-btn:hover { background: #f1f5f9; border-color: #94a3b8; color: #0f172a; }
     </style>
 </head>
 <body>
@@ -173,7 +138,7 @@
                         <option value="Audio">Wireless Audio</option>
                     </select>
                 </div>
-                                <div class="form-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div class="form-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                     <div>
                         <label>Original Price (₹)</label>
                         <input type="number" id="prod-price" placeholder="1999" required>
@@ -183,35 +148,15 @@
                         <input type="number" id="prod-disc" placeholder="1199" required>
                     </div>
                 </div>
-
-                <!-- 🟢 PASTED HERE: INSIDE YOUR PRODUCT FORM, REPLACING THE OLD UPLOAD ZONE -->
                 <div class="form-group">
                     <label>Product Luxury Media Asset</label>
                     <div class="file-upload-zone">
                         <span style="font-size: 24px; display: block; margin-bottom: 4px;">📸</span>
-                        <p style="font-size: 12px; font-weight: 600; color: #475569;">Browse Image from Phone/Laptop</p>
-                        <input type="file" id="prod-file" accept="image/*" onchange="initializeProductImageCropper(this)">
-                        
-                        <!-- Interactive Cropper Workspace Canvas Target Area -->
-                        <div class="cropper-workspace-wrapper" id="cropper-canvas-box" onclick="event.stopPropagation()">
-                            <img id="cropper-image-target" alt="Workspace Source">
-                        </div>
-
-                        <!-- 🕹️ ADVANCED MANIPULATION CONTROL DECK -->
-                        <div id="cropper-control-deck" style="display: none; gap: 6px; flex-wrap: wrap; justify-content: center; margin-top: 10px;" onclick="event.stopPropagation()">
-                            <button type="button" class="crop-control-btn" onclick="executeCropAction('zoomIn')">➕ Zoom In</button>
-                            <button type="button" class="crop-control-btn" onclick="executeCropAction('zoomOut')">➖ Zoom Out</button>
-                            <button type="button" class="crop-control-btn" onclick="executeCropAction('rotateLeft')">🔄 Rotate Left</button>
-                            <button type="button" class="crop-control-btn" onclick="executeCropAction('rotateRight')">🔄 Rotate Right</button>
-                            <button type="button" class="crop-control-btn" onclick="executeCropAction('flipX')">↔️ Flip</button>
-                            <button type="button" class="crop-control-btn" style="background:#2563eb; color:white; border-color:#2563eb;" onclick="executeCropAction('save')">💾 Lock Crop</button>
-                        </div>
-                        
-                        <!-- Final Preview output container thumbnail -->
-                        <img id="upload-preview" class="preview-box" alt="Final Thumbnail Look" style="margin-top: 12px; border-radius: 12px; display: none; width: 100px; height: 100px; object-fit: cover; margin-left: auto; margin-right: auto;">
+                        <p style="font-size: 12px; font-weight: 600; color: #94a3b8;">Browse Image from Phone/Laptop</p>
+                        <input type="file" id="prod-file" accept="image/*" onchange="generateImagePreview(this)">
+                        <img id="upload-preview" class="preview-box" alt="Preview">
                     </div>
                 </div>
-
                 <button type="submit" class="submit-btn">Publish to Live Storefront</button>
             </form>
         </aside>
@@ -552,11 +497,9 @@
             }
         }
 
-                // =========================================================================
-        // 💾 CLOUD STORAGE INTEGRATION ENGINES
-        // =========================================================================
         async function pushInventoryStateToCloud() {
             try {
+                // 🟢 FIXED: Keeps the 'asset' parameter intact so images save globally to the cloud
                 const fullInventoryWithImages = liveInventoryState.map(item => ({
                     id: item.id, 
                     name: item.name, 
@@ -564,8 +507,9 @@
                     price: item.price, 
                     discountPrice: item.discountPrice, 
                     isLive: item.isLive,
-                    asset: item.asset 
+                    asset: item.asset // <-- Attaches the photo data globally
                 }));
+                
                 await fetch(`${API_BASE_ENDPOINT}/admin?type=products`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -574,90 +518,23 @@
             } catch (err) { console.error("Cloud data writing exception:", err); }
         }
 
-        // 🟢 PASTED HERE: RIGHT BELOW PUSHINVENTORYSTATETOCLOUD AND REPLACING GENERATEIMAGEPREVIEW
-        // =========================================================================
-        // 🖼️ PREMIUM 100% CONTROL ADVANCED IMAGE CROPPER CORE ENGINE
-        // =========================================================================
-        let activeCropperInstance = null;
-        let activeFlipValueX = 1;
-
-        function initializeProductImageCropper(inputElement) {
-            const workspaceBox = document.getElementById("cropper-canvas-box");
-            const imageTarget = document.getElementById("cropper-image-target");
-            const controlDeck = document.getElementById("cropper-control-deck");
-            const finalPreview = document.getElementById("upload-preview");
-
+        // 🌟 ADD THIS EXACT PIECE TO FIXED SYSTEM GALLERY UPLOADS
+        function generateImagePreview(inputElement) {
+            const preview = document.getElementById("upload-preview");
             if (inputElement.files && inputElement.files[0]) {
                 const fileReaderEngine = new FileReader();
                 fileReaderEngine.onload = function (e) {
-                    if (activeCropperInstance) {
-                        activeCropperInstance.destroy();
+                    temporaryImageBase64 = e.target.result;
+                    if (preview) {
+                        preview.src = temporaryImageBase64;
+                        preview.style.display = "block";
                     }
-
-                    imageTarget.src = e.target.result;
-                    if (workspaceBox) workspaceBox.style.display = "block";
-                    if (controlDeck) controlDeck.style.display = "flex";
-                    if (finalPreview) finalPreview.style.display = "none";
-
-                    // Start up cropper handler with uniform 1:1 aspect parameters for product grid cards
-                    activeCropperInstance = new Cropper(imageTarget, {
-                        aspectRatio: 1, 
-                        viewMode: 1,
-                        background: false,
-                        autoCropArea: 1,
-                        responsive: true
-                    });
                 };
                 fileReaderEngine.readAsDataURL(inputElement.files[0]);
             }
         }
-
-        function executeCropAction(actionCommand) {
-            if (!activeCropperInstance) return;
-
-            switch (actionCommand) {
-                case 'zoomIn':
-                    activeCropperInstance.zoom(0.1);
-                    break;
-                case 'zoomOut':
-                    activeCropperInstance.zoom(-0.1);
-                    break;
-                case 'rotateLeft':
-                    activeCropperInstance.rotate(-90);
-                    break;
-                case 'rotateRight':
-                    activeCropperInstance.rotate(90);
-                    break;
-                case 'flipX':
-                    // 🟢 FIXED: Removed the invalid keyInstance variable to prevent operational app crashes
-                    activeFlipValueX = activeFlipValueX === 1 ? -1 : 1;
-                    activeCropperInstance.scaleX(activeFlipValueX);
-                    break;
-                case 'save':
-                    // Compile canvas coordinates down to high-performance compressed square format string
-                    const canvasResult = activeCropperInstance.getCroppedCanvas({
-                        width: 400,
-                        height: 400
-                    });
-                    
-                    temporaryImageBase64 = canvasResult.toDataURL("image/jpeg", 0.85);
-                    
-                    // Show final cropped look to administrative console panel layout
-                    const finalPreview = document.getElementById("upload-preview");
-                    if (finalPreview) {
-                        finalPreview.src = temporaryImageBase64;
-                        finalPreview.style.display = "block";
-                    }
-                    
-                    // Collapse staging workspace to clear up workspace view cards screen space
-                    if (document.getElementById("cropper-canvas-box")) document.getElementById("cropper-canvas-box").style.display = "none";
-                    if (document.getElementById("cropper-control-deck")) document.getElementById("cropper-control-deck").style.display = "none";
-                    break;
-            }
-        }
-
-        // Your existing global memory variables follow cleanly right below...
-        let activeEditingProductIndex = null;
+        // GLOBAL TEMPORARY MEMORY TRACKER KEY FOR DYNAMIC EDITING STATE POINTERS
+let activeEditingProductIndex = null;
 
 // 🟢 FIXED: High-contrast light theme text styles ensure products read beautifully
 async function renderAdminInventory() {
@@ -1041,7 +918,7 @@ async function renderAdminInventory() {
                 asset: temporaryImageBase64 || null // <-- MAKE SURE THIS LINE IS PRESENT
             };
 
-                          liveInventoryState.push(newProductItem);
+                liveInventoryState.push(newProductItem);
                 await pushInventoryStateToCloud();
                 alert(`Success: "${name}" uploaded with high-res media storage locked successfully!`);
             }
@@ -1050,29 +927,19 @@ async function renderAdminInventory() {
             document.getElementById("product-upload-form").reset();
             document.getElementById("upload-preview").style.display = "none";
             temporaryImageBase64 = "";
-
-            // 🟢 FIXED: Destroys crop instance sessions to ensure the workspace drops cleanly on upload success
-            if (activeCropperInstance) {
-                activeCropperInstance.destroy();
-                activeCropperInstance = null;
-            }
-            if (document.getElementById("cropper-canvas-box")) document.getElementById("cropper-canvas-box").style.display = "none";
-            if (document.getElementById("cropper-control-deck")) document.getElementById("cropper-control-deck").style.display = "none";
         }
-
         async function toggleProductVisibility(index) {
             liveInventoryState[index].isLive = !liveInventoryState[index].isLive;
             await pushInventoryStateToCloud();
         }
 
-        async function deleteInventoryItem(index) {
+              async function deleteInventoryItem(index) {
             if (confirm("Remove this accessory from active storefront?")) {
                 liveInventoryState.splice(index, 1);
                 await pushInventoryStateToCloud();
                 await renderAdminInventory();
             }
         }
-
 
         // 🟢 FIXED: Modern fulfillment handler archives orders to permanent histories instead of erasing them
         async function fulfillOrder(index) {
