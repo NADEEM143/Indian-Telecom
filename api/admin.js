@@ -35,13 +35,26 @@ export default async function handler(req, res) {
                 }
                 break;
 
+                        // 🟢 PASTED HERE: INSIDE YOUR FULL-STACK ENDPOINT SWITCH BLOCK IN ADMIN.JS
             case 'orders':
                 if (req.method === 'GET') {
                     const orders = await kv.get('it_orders') || [];
                     return res.status(200).json(orders);
                 }
                 if (req.method === 'POST') {
-                    await kv.set('it_orders', req.body);
+                    // 🟢 FIXED: Fallback array parsing checks prevent backend array pushing crash loops
+                    let currentOrders = await kv.get('it_orders');
+                    if (!Array.isArray(currentOrders)) {
+                        currentOrders = [];
+                    }
+
+                    if (Array.isArray(req.body)) {
+                        currentOrders = req.body;
+                    } else if (req.body && typeof req.body === 'object') {
+                        currentOrders.push(req.body);
+                    }
+
+                    await kv.set('it_orders', currentOrders);
                     return res.status(200).json({ success: true });
                 }
                 break;
@@ -52,7 +65,19 @@ export default async function handler(req, res) {
                     return res.status(200).json(users);
                 }
                 if (req.method === 'POST') {
-                    await kv.set('it_users', req.body);
+                    // 🟢 FIXED: Server-side check appends single user records without erasing old registers
+                    let currentUsers = await kv.get('it_users');
+                    if (!Array.isArray(currentUsers)) {
+                        currentUsers = [];
+                    }
+
+                    if (Array.isArray(req.body)) {
+                        currentUsers = req.body;
+                    } else if (req.body && typeof req.body === 'object') {
+                        currentUsers.push(req.body);
+                    }
+
+                    await kv.set('it_users', currentUsers);
                     return res.status(200).json({ success: true });
                 }
                 break;
