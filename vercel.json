@@ -1,4 +1,16 @@
 {
+  "version": 2,
+  "cleanUrls": true,
+  "rewrites": [
+    { 
+      "source": "/api/admin", 
+      "destination": "/admin.js" 
+    },
+    { 
+      "source": "/master-admin-console", 
+      "destination": "/admin.html" 
+    }
+  ],
   "headers": [
     {
       "source": "/manifest.json",
