@@ -391,6 +391,7 @@
                 }
 
                 // Render dynamic inventory arrays onto their target tables
+                                // Render dynamic inventory arrays onto their target tables
                 await renderAdminInventory();
                 renderAdminOrders();
                 renderAdminHistoryLog(); // Load permanent tracker rows onto the UI
@@ -402,45 +403,67 @@
         // =========================================================================
         // 👥 CUSTOMER COMPLIANCE AND PROFILE EDIT ENGINE MODULES
         // =========================================================================
+        let currentEditingUserIndexToken = null;
+        let currentUsersListCache = [];
+
         async function triggerInlineUserEdit(index) {
             try {
-                // Download a temporary fresh array stack directly from the server to prevent editing stale rows
                 const response = await fetch(`${API_BASE_ENDPOINT}/admin?type=users&_t=${Date.now()}`);
                 if (!response.ok) return alert("Failed to fetch current user records stack.");
-                let currentUsersList = await response.json();
+                currentUsersListCache = await response.json();
                 
-                const client = currentUsersList[index];
+                const client = currentUsersListCache[index];
                 if (!client) return alert("Account record data trace missing.");
 
-                // Prompt management entries using clear, secure modal popups
-                const targetName = prompt("Modify Customer Full Name:", client.name);
-                if (targetName === null) return; // Action terminated by administrator
-                
-                const targetPhone = prompt("Modify Verified 10-Digit Mobile Number:", client.phone || client.contact);
-                if (targetPhone === null) return;
-                
-                const targetPass = prompt("Modify Security Password Key Reference:", client.password);
-                if (targetPass === null) return;
+                currentEditingUserIndexToken = index;
 
-                if (!targetName.trim() || !targetPhone.trim() || !targetPass.trim()) {
-                    alert("Operation Denied: Input validation fields cannot be empty parameters.");
-                    return;
-                }
+                // Pre-fill on-screen form fields layout parameters smoothly
+                document.getElementById("edit-modal-user-name").value = client.name || "";
+                document.getElementById("edit-modal-user-phone").value = client.phone || client.contact || "";
+                document.getElementById("edit-modal-user-pass").value = client.password || "";
 
-                // Inject modified values right back into target index parameters map
-                client.name = targetName.trim();
-                client.phone = targetPhone.trim();
-                client.contact = targetPhone.trim();
-                client.password = targetPass.trim();
+                // Display modal overlay
+                document.getElementById("admin-user-edit-modal").style.display = "flex";
+            } catch (err) {
+                alert("Cloud tracking verification pipeline error: " + err.message);
+            }
+        }
 
-                // Save updated record matrix directly back up to your Vercel KV cloud cell
+        function closeInlineUserEditModal() {
+            document.getElementById("admin-user-edit-modal").style.display = "none";
+            document.getElementById("admin-user-edit-form").reset();
+            currentEditingUserIndexToken = null;
+        }
+
+        async function saveInlineUserEditChanges(e) {
+            e.preventDefault();
+            if (currentEditingUserIndexToken === null) return;
+
+            const targetName = document.getElementById("edit-modal-user-name").value.trim();
+            const targetPhone = document.getElementById("edit-modal-user-phone").value.trim();
+            const targetPass = document.getElementById("edit-modal-user-pass").value.trim();
+
+            if (!targetName || !targetPhone || !targetPass) {
+                alert("Operation Denied: Input validation fields cannot be empty parameters.");
+                return;
+            }
+
+            const client = currentUsersListCache[currentEditingUserIndexToken];
+            client.name = targetName;
+            client.phone = targetPhone;
+            client.contact = targetPhone;
+            client.password = targetPass;
+
+            try {
+                // Save updated record matrix directly back up to cloud
                 await fetch(`${API_BASE_ENDPOINT}/admin?type=users`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(currentUsersList)
+                    body: JSON.stringify(currentUsersListCache)
                 });
 
-                alert(`SUCCESS: Profile metrics for "${client.name}" saved globally across database registers!`);
+                closeInlineUserEditModal();
+                showNotification(`SUCCESS: Metrics for "${targetName}" saved globally!`, "📝");
                 pullMasterDatabaseArrays(); // Force layout tables reload instantly
             } catch (err) {
                 alert("Cloud updating verification pipeline crash error: " + err.message);
@@ -1014,11 +1037,40 @@ async function renderAdminInventory() {
         }
 
         // 🟢 FIXED: Non-destructive event-listener ensures fluid background framework boot loops
+               // 🟢 FIXED: Kept scripts and HTML markup layers cleanly separated to prevent syntax failures
         window.addEventListener('load', () => {
             pullMasterDatabaseArrays();
             const formElement = document.getElementById("product-upload-form");
             if (formElement) formElement.addEventListener("submit", processNewProduct);
         });
     </script>
+
+    <!-- 🔒 HTML SEGMENT: PREMIUM ON-SCREEN CLIENT EDIT MODAL CARD LAYOUT -->
+    <div id="admin-user-edit-modal" style="position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); z-index: 999999; display: none; align-items: center; justify-content: center; font-family: system-ui, sans-serif;">
+        <div style="background: #ffffff; border: 1px solid rgba(15, 23, 42, 0.08); width: 90%; max-width: 440px; border-radius: 24px; padding: 28px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #f1f5f9; padding-bottom: 12px;">
+                <h3 style="font-size: 18px; font-weight: 800; color: #0f172a;">Modify Customer Profile</h3>
+                <button type="button" onclick="closeInlineUserEditModal()" style="background: none; border: none; font-size: 18px; color: #94a3b8; cursor: pointer;">❌</button>
+            </div>
+            <form id="admin-user-edit-form" onsubmit="saveInlineUserEditChanges(event)">
+                <div class="form-group">
+                    <label>Customer Full Name</label>
+                    <input type="text" id="edit-modal-user-name" required style="width: 100%; padding: 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; font-size: 14px; color: #0f172a; box-sizing: border-box;">
+                </div>
+                <div class="form-group">
+                    <label>Verified Mobile Number</label>
+                    <input type="text" id="edit-modal-user-phone" required style="width: 100%; padding: 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; font-size: 14px; color: #0f172a; box-sizing: border-box;">
+                </div>
+                <div class="form-group" style="margin-bottom: 24px;">
+                    <label>Security Password Key Reference</label>
+                    <input type="text" id="edit-modal-user-pass" required style="width: 100%; padding: 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; font-size: 14px; color: #0f172a; box-sizing: border-box;">
+                </div>
+                <div style="display: flex; gap: 12px;">
+                    <button type="button" onclick="closeInlineUserEditModal()" style="flex: 1; background: transparent; border: 1px solid #cbd5e1; color: #475569; padding: 12px; border-radius: 12px; font-weight: 700; font-size: 14px; cursor: pointer;">Cancel</button>
+                    <button type="submit" class="submit-btn" style="flex: 1; margin-top: 0; background: #2563eb; padding: 12px; border-radius: 12px;">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </body>
 </html>
