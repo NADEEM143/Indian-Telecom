@@ -317,7 +317,7 @@
         </div>
     </div>
 
-    <div class="modal" id="checkout-modal">
+   <div class="modal" id="checkout-modal">
         <div class="modal-content">
             <div class="drawer-header" style="padding: 0 0 16px 0; margin-bottom: 20px;">
                 <h3>Delivery Details</h3>
@@ -348,22 +348,44 @@
                     </div>
                 </div>
 
-              <!-- DYNAMIC SECURE NPCI-COMPLIANT UPI HUB CONTAINER -->
-                <div id="qr-section">
-                    <!-- TARGET CONTAINER AREA FOR YOUR GEN ENGINE LIBRARY -->
-                    <div id="qrcode-canvas" style="background:white; width:140px; height:140px; margin:0 auto 12px auto; padding:5px; border-radius:12px; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 10px rgba(0,0,0,0.02);"></div>
+                <!-- 🟢 FIXED: Dual-mode sub-payment selection layout with a PERMANENT shared UTR enforcement block -->
+                <div id="qr-section" style="display: none; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 20px; margin-top: 16px; box-shadow: 0 4px 10px rgba(0,0,0,0.02);">
                     
-                    <!-- LOAD THE SYSTEM SCRIPT CDN ENGINE LAYER -->
-                    <script src="https://cdn.jsdelivr.net/npm/easyqrcodejs@4.6.2/dist/easy.qrcode.min.js"></script>
-                    
-                    <p style="font-size: 14px; font-weight: 800; color: #1e293b; margin: 4px 0 12px 0; text-align: center;">
-                        Scan to Pay: <span id="qr-amount-display" style="color: #2563eb;">₹0.00</span>
-                    </p>
-                    <p style="font-size: 11px; font-weight: 700; color: #94a3b8; margin-bottom: 12px; text-align: center; text-transform: uppercase; letter-spacing: 0.5px;">Merchant ID: exple@ybl</p>
-                    
-                    <div class="form-group" style="text-align: left;">
-                        <label>Enter 12-Digit Bank UTR Number</label>
-                        <input type="text" id="pay-utr" placeholder="Enter Reference ID after paying">
+                    <!-- Choice Tabs -->
+                    <div style="display: flex; background: #f1f5f9; padding: 4px; border-radius: 10px; gap: 4px; margin-bottom: 20px;">
+                        <button type="button" id="sub-mode-qr-btn" onclick="switchOnlineSubMethod('QR')" style="flex: 1; border: none; padding: 8px; font-weight: 700; font-size: 13px; border-radius: 8px; cursor: pointer; transition: 0.2s; background: #ffffff; color: #0f172a;">
+                            🖼️ QR Code Payment
+                        </button>
+                        <button type="button" id="sub-mode-app-btn" onclick="switchOnlineSubMethod('APP')" style="flex: 1; border: none; padding: 8px; font-weight: 700; font-size: 13px; border-radius: 8px; cursor: pointer; transition: 0.2s; background: transparent; color: #64748b;">
+                            📱 Pay via UPI App
+                        </button>
+                    </div>
+
+                    <!-- SUB-OPTION A: QR CODE CONTAINER -->
+                    <div id="qr-code-graphics-wrapper" style="text-align: center;">
+                        <div id="qrcode-canvas" style="background: white; width: 130px; height: 130px; margin: 0 auto 12px auto; display: flex; align-items: center; justify-content: center; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.02);"></div>
+                        <p style="font-size: 14px; font-weight: 800; color: #0f172a; margin-bottom: 4px;">
+                            Scan to Pay: <span style="color: #2563eb;" id="qr-amount-display">₹0.00</span>
+                        </p>
+                        <p style="font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 16px;">
+                            Merchant ID: exple@ybl
+                        </p>
+                    </div>
+
+                    <!-- SUB-OPTION B: MOBILE UPI INTENT LINK CONTAINER -->
+                    <div id="mobile-upi-intent-container" style="display: none; text-align: center; padding: 10px 0 20px 0;">
+                        <span style="font-size: 40px; display: block; margin-bottom: 10px;">📲</span>
+                        <p style="font-size: 14px; font-weight: 700; color: #0f172a; margin-bottom: 4px;">Direct App Checkout</p>
+                        <p style="font-size: 12px; color: #64748b; margin-bottom: 16px;">Click below to launch your phone's payment apps directly.</p>
+                        <a id="mobile-upi-intent-link" href="#" style="display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; background: #2563eb; color: white; text-decoration: none; padding: 14px; border-radius: 12px; font-weight: 700; font-size: 14px; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2); transition: 0.2s;">
+                            🚀 Open Installed UPI Apps
+                        </a>
+                    </div>
+
+                    <!-- 🔒 LOCKED SHARED INPUT FIELD: REQUIRED REGARDLESS OF TAB CHOICE -->
+                    <div class="form-group" style="text-align: left; border-top: 1px solid #f1f5f9; padding-top: 16px; margin-top: 10px;">
+                        <label style="display: block; font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px;">Enter 12-Digit Bank UTR Number</label>
+                        <input type="text" id="pay-utr" placeholder="Enter Reference ID after paying" maxlength="12" style="width: 100%; padding: 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; font-size: 14px; color: #0f172a; box-sizing: border-box;">
                     </div>
                 </div>
 
@@ -677,6 +699,11 @@ function closeCheckout() {
 }
 
                 // 🟢 FIXED: 100% NPCI-Compliant payment toggle engine. Added app switching deep link while keeping QR Code generation & UTR matching identical.
+               // =========================================================================
+        // 💳 DUAL-MODE ONSCREEN PAYMENT METHOD TOGGLE ROUTINES (100% NPCI-COMPLIANT)
+        // =========================================================================
+        let strictNpciUpiString = ""; // Exposed globally to keep values synced across tabs cleanly
+
         function togglePaymentMode(mode) {
             const qrSection = document.getElementById("qr-section");
             const utrInput = document.getElementById("pay-utr");
@@ -700,13 +727,11 @@ function closeCheckout() {
                     canvasBox.innerHTML = ""; // Clear out previous cache boxes to avoid rendering bugs
                     
                     // ⚠️ MANDATORY PARAMETERS INTEGRATED FOR COMPLIANCE TO ELIMINATE RISK DECLINES:
-                    // mc=5732 explicitly flags this to Google Pay/PhonePe as an Electronics/Telecom Retail Business.
-                    // tr= uniqueness ensures the deep link handles are verified and drops double-submit security flags.
                     const merchantMCC = "5732";
                     const uniqueTrackingRefId = "TXN" + Date.now() + Math.floor(100 + Math.random() * 900);
                     
                     // 3. Official NPCI Specification Uniform Link Protocol Format
-                    const strictNpciUpiString = `upi://pay?pa=exple@ybl&pn=INDIAN%20TELECOM&mc=${merchantMCC}&tr=${uniqueTrackingRefId}&am=${npciFormattedAmount}&cu=INR&tn=Shopping%20Payment`;
+                    strictNpciUpiString = `upi://pay?pa=exple@ybl&pn=INDIAN%20TELECOM&mc=${merchantMCC}&tr=${uniqueTrackingRefId}&am=${npciFormattedAmount}&cu=INR&tn=Shopping%20Payment`;
                     
                     qrCodeInstance = new QRCode(canvasBox, {
                         text: strictNpciUpiString,
@@ -717,27 +742,61 @@ function closeCheckout() {
                         correctLevel: QRCode.CorrectLevel.M // NPCI optimization parameter for fluid camera scans
                     });
 
-                    // 4. 📱 AUTOMATED MOBILE DEEP-LINK INTERCEPTOR ENGINE
-                    const isMobileDevice = /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent);
-                    const intentContainer = document.getElementById("mobile-upi-intent-container");
-                    const intentLink = document.getElementById("mobile-upi-intent-link");
-
-                    if (isMobileDevice && intentContainer && intentLink) {
-                        intentContainer.style.display = "block";
-                        intentLink.href = strictNpciUpiString; // Pass the safe compliant string down directly
-                    } else if (intentContainer) {
-                        intentContainer.style.display = "none";
-                    }
+                    // Reset sub-method tabs cleanly back onto standard QR layout visibility upon entry
+                    switchOnlineSubMethod('QR');
                 }
             } else {
                 qrSection.style.display = "none";
                 utrInput.removeAttribute("required");
+                utrInput.value = "";
+                strictNpciUpiString = "";
                 const intentContainer = document.getElementById("mobile-upi-intent-container");
                 if (intentContainer) intentContainer.style.display = "none";
             }
         }
 
-        // 🟢 FIXED: Standalone checkout engine sending payload strings seamlessly while preserving strict UTR validation rules.
+        // 🟢 FIXED: Coordinates display states between scannable QR maps and mobile application launchers
+        function switchOnlineSubMethod(targetMethod) {
+            const qrViewBox = document.getElementById("qr-code-graphics-wrapper");
+            const appViewBox = document.getElementById("mobile-upi-intent-container");
+            const qrTabBtn = document.getElementById("sub-mode-qr-btn");
+            const appTabBtn = document.getElementById("sub-mode-app-btn");
+            const intentLink = document.getElementById("mobile-upi-intent-link");
+
+            if (!qrViewBox || !appViewBox || !qrTabBtn || !appTabBtn) return;
+
+            if (targetMethod === 'QR') {
+                qrViewBox.style.display = "block";
+                appViewBox.style.display = "none";
+                
+                qrTabBtn.style.background = "#ffffff";
+                qrTabBtn.style.color = "#0f172a";
+                appTabBtn.style.background = "transparent";
+                appTabBtn.style.color = "#64748b";
+            } else {
+                qrViewBox.style.display = "none";
+                appViewBox.style.display = "block";
+                
+                qrTabBtn.style.background = "transparent";
+                qrTabBtn.style.color = "#64748b";
+                appTabBtn.style.background = "#ffffff";
+                appTabBtn.style.color = "#0f172a";
+
+                if (intentLink) {
+                    intentLink.href = strictNpciUpiString;
+                }
+
+                // 📱 Desktop Fallback Warning: Alerts administrators if clicking intents from a static computer layout
+                const isMobileDevice = /Android|iPhone|iPad|iPod|IEMobile/i.test(navigator.userAgent);
+                if (!isMobileDevice) {
+                    if (intentLink) intentLink.href = "javascript:alert('UPI App Linking is natively available on mobile smartphones! Please switch to QR code tab mode to scan from your phone camera.');";
+                }
+            }
+        }
+
+        // =========================================================================
+        // 🚀 STANDALONE CHECKOUT ORDER PLACEMENT DISPATCH ENGINE
+        // =========================================================================
         async function submitOrder(e) {
             e.preventDefault();
             const mode = document.querySelector('input[name="mop"]:checked').value;
@@ -748,7 +807,7 @@ function closeCheckout() {
                 return;
             }
 
-                        // 🟢 FIXED: Kept your exact parameters intact while appending your active shopping cart contents
+            // 🟢 FIXED: Kept your exact parameters intact while appending your active shopping cart contents
             const freshCheckoutOrder = {
                 id: "ORD-" + Math.floor(1000 + Math.random() * 9000),
                 name: document.getElementById("cust-name").value,
