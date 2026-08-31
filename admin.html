@@ -643,9 +643,8 @@
             }
         }
 
-        // =========================================================================
-        // 📦 FIXED: ARCHIVAL LOGGER MAPPING ENGINE MATCHING EXACT HTML DOM IDS
-        // =========================================================================
+
+               // 🟢 FINAL FIX: Safe-fallback mapping logic ensures text properties render flawlessly
         function renderAdminHistoryLog() {
             const targetTableBody = document.getElementById("history-log-target");
             if (!targetTableBody) return;
@@ -654,7 +653,7 @@
                 targetTableBody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#64748b; padding:30px;">No historical shipped logs captured yet.</td></tr>`;
                 return;
             }
-            
+
             targetTableBody.innerHTML = completedHistoryState.map(order => {
                 const orderId = order.id || 'ORD';
                 const clientName = order.name || 'N/A';
@@ -854,7 +853,7 @@
             await pushInventoryStateToCloud();
         }
 
-        async function deleteInventoryItem(index) {
+              async function deleteInventoryItem(index) {
             if (confirm("Remove this accessory from active storefront?")) {
                 liveInventoryState.splice(index, 1);
                 await pushInventoryStateToCloud();
@@ -862,20 +861,55 @@
             }
         }
 
+        // 🟢 FIXED: Modern fulfillment handler archives orders to permanent histories instead of erasing them
         async function fulfillOrder(index) {
-            alert("Fulfilling order logs.");
+            if (!confirm("Are you sure you want to mark this package as shipped and archive it permanently?")) return;
+            
+            const shippedOrderInfo = liveOrdersState[index];
+            if (!shippedOrderInfo) return alert("Order data reference missing!");
+            
+            const trueCustomerPhone = shippedOrderInfo.phone || shippedOrderInfo.contact || "";
+            const trueCustomerAddress = shippedOrderInfo.address || shippedOrderInfo.location || "N/A";
+            
+            const cleanArchivePayload = {
+                id: shippedOrderInfo.id || 'ORD',
+                name: shippedOrderInfo.name || 'N/A',
+                phone: String(trueCustomerPhone).trim(),
+                contact: String(trueCustomerPhone).trim(),
+                address: String(trueCustomerAddress).trim(),
+                location: String(trueCustomerAddress).trim(),
+                mop: shippedOrderInfo.mop || 'N/A',
+                utr: shippedOrderInfo.utr || 'N/A'
+            };
+            
+            completedHistoryState.push(cleanArchivePayload);
             liveOrdersState.splice(index, 1);
+            
             try {
+                // 1. Update active pending orders database array matrix
                 await fetch(`${API_BASE_ENDPOINT}/admin?type=orders`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(liveOrdersState)
                 });
-            } catch (e) { console.error(e); }
-            renderAdminOrders();
+                
+                // 2. Stream and append the order directly inside permanent cloud historical tables
+                await fetch(`${API_BASE_ENDPOINT}/admin?type=history`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(completedHistoryState)
+                });
+                
+                alert(`SUCCESS: Order #${shippedOrderInfo.id} safely archived into permanent history database registries!`);
+                renderAdminOrders();
+                renderAdminHistoryLog();
+            } catch (e) { 
+                console.error("Historical cluster syncing execution crash error:", e);
+                alert("Server connection failed. Order could not be archived successfully.");
+            }
         }
 
-                // DYNAMIC PREVIEW CONTROLLER MODULE HOOK
+        // DYNAMIC PREVIEW CONTROLLER MODULE HOOK
         function generateImagePreview(inputElement) {
             const preview = document.getElementById("upload-preview");
             if (inputElement.files && inputElement.files[0]) {
@@ -922,11 +956,12 @@
             }).join('');
         }
 
-        window.onload = function() {
+        // 🟢 FIXED: Non-destructive event-listener ensures fluid background framework boot loops
+        window.addEventListener('load', () => {
             pullMasterDatabaseArrays();
             const formElement = document.getElementById("product-upload-form");
             if (formElement) formElement.addEventListener("submit", processNewProduct);
-        };
+        });
     </script>
 </body>
 </html>
