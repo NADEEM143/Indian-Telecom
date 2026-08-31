@@ -74,7 +74,7 @@
             transform: translateX(-50%) translateY(0);
         }
         .toast-icon { font-size: 18px; }
-    </style>
+   </style>
 </head>
 <body>
 
@@ -84,12 +84,39 @@
         <span id="ui-toast-message">Notification Message</span>
     </div>
 
+    <!-- 🔒 NEW: PREMIUM ON-SCREEN ADMIN GATEKEEPER MODAL LAYER -->
+    <div id="admin-auth-modal-screen" style="position: fixed; inset: 0; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(8px); z-index: 999999; display: flex; align-items: center; justify-content: center; font-family: system-ui, sans-serif;">
+        <div style="background: #1e293b; border: 1px solid #334155; width: 90%; max-width: 420px; border-radius: 24px; padding: 32px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);">
+            <div style="text-align: center; margin-bottom: 24px;">
+                <span style="font-size: 40px; display: block; margin-bottom: 10px;">🛡️</span>
+                <h3 style="font-size: 20px; font-weight: 800; color: #ffffff;">Master Admin Terminal</h3>
+                <p style="font-size: 13px; color: #94a3b8; margin-top: 4px;">INDIAN TELECOM SECURITY GATEWAY</p>
+            </div>
+            <form id="admin-gatekeeper-form" onsubmit="executeAdminAuthLogin(event)">
+                <div class="form-group">
+                    <label>Master Username</label>
+                    <input type="text" id="admin-login-user" placeholder="Enter administrative handle" required style="width: 100%; padding: 12px; background: #0f172a; border: 1px solid #334155; border-radius: 12px; font-size: 14px; color: #ffffff; outline: none;">
+                </div>
+                <div class="form-group" style="margin-bottom: 24px;">
+                    <label>Security Pin Code</label>
+                    <input type="password" id="admin-login-pass" placeholder="••••" required style="width: 100%; padding: 12px; background: #0f172a; border: 1px solid #334155; border-radius: 12px; font-size: 14px; color: #ffffff; outline: none;">
+                </div>
+                <button type="submit" class="submit-btn" style="margin-top: 0; background: #3b82f6;">Verify Identity & Unlock</button>
+                <button type="button" onclick="window.location.href='index.html'" style="width: 100%; background: transparent; border: 1px solid #475569; color: #94a3b8; padding: 12px; border-radius: 12px; font-weight: 700; font-size: 14px; cursor: pointer; margin-top: 10px;">Return to Storefront 🛒</button>
+            </form>
+        </div>
+    </div>
+
     <header>
         <div class="brand-meta">
             <h1>INDIAN <span>TELECOM</span></h1>
             <p>Proprietor Console Platform • Welcome Nadim Ahmad</p>
         </div>
-        <div class="secure-badge">🛡️ Secure Session Connected</div>
+        <div style="display: flex; align-items: center; gap: 14px;">
+            <div class="secure-badge">🛡️ Secure Session</div>
+            <!-- 🚪 NEW: SECURE LOGOUT TERMINAL TRIGGER -->
+            <button onclick="executeAdminLogout()" style="background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); padding: 8px 16px; border-radius: 12px; font-weight: 700; font-size: 13px; cursor: pointer; transition: 0.2s;" onmouseover="this.style.background='rgba(239, 68, 68, 0.25)'" onmouseout="this.style.background='rgba(239, 68, 68, 0.15)'">Logout Terminal 🚪</button>
+        </div>
     </header>
 
     <!-- 📢 NEW DYNAMIC MARQUEE OFFER BANNER MESSAGE CONTROLLER CARD -->
@@ -101,11 +128,10 @@
                     <label style="display: block; font-size: 13px; color: #94a3b8; font-weight: 600; margin-bottom: 6px;">Dynamic Marquee Header Text Message String</label>
                     <input type="text" id="live-banner-message-field" placeholder="Type hot mega announcement text deals here..." required style="width: 100%; padding: 12px; background: #1e293b; border: 1px solid #334155; border-radius: 8px; color: #ffffff; font-weight: 600; box-sizing: border-box;">
                 </div>
-                <button onclick="pushNewMarqueeOfferMessage()" class="ship-btn" style="border: none; font-size: 14px; cursor: pointer; padding: 10px 20px; border-radius: 8px; font-weight: bold; background: rgba(245,158,11,0.1); color: #f59e0b; transition: 0.2s;" onmouseover="this.style.background='rgba(245,158,11,0.2)'" onmouseout sabotage="this.style.background='rgba(245,158,11,0.1)'">📢 Push Live Offer</button>
+                <button onclick="pushNewMarqueeOfferMessage()" class="ship-btn" style="border: none; font-size: 14px; cursor: pointer; padding: 10px 20px; border-radius: 8px; font-weight: bold; background: rgba(245,158,11,0.1); color: #f59e0b; transition: 0.2s;" onmouseover="this.style.background='rgba(245,158,11,0.2)'" onmouseout="this.style.background='rgba(245,158,11,0.1)'">📢 Push Live Offer</button>
             </div>
         </section>
     </div>
-
     <div class="dashboard-grid">
         <aside class="admin-card">
             <div class="card-title">📦 Add New Premium Accessory</div>
@@ -230,44 +256,45 @@
                 </div>
             </section>
 
-    <!-- SAFELY ENCAPSULATED CONTROLLER JAVASCRIPT BLOCK -->
+        <!-- SAFELY ENCAPSULATED CONTROLLER JAVASCRIPT BLOCK -->
     <script>
-                // =========================================================================
-        // 🔒 SECURE ADMIN PANEL PROTECTION GATEKEEPER
         // =========================================================================
-        (function enforceAdminAuthenticationGate() {
-            // Check if a valid administration session token already exists in current tab memory
+        // 🔒 SECURE ON-SCREEN ADMINISTRATIVE SECURITY CONTROLLER
+        // =========================================================================
+        window.addEventListener('DOMContentLoaded', () => {
+            const authModal = document.getElementById("admin-auth-modal-screen");
             if (sessionStorage.getItem('IT_ADMIN_AUTHENTICATED') === 'true') {
-                return; // Access granted, exit setup smoothly
+                if (authModal) authModal.style.display = "none";
+            } else {
+                if (authModal) authModal.style.display = "flex";
             }
+        });
 
-            // Loop verification prompt until correct combinations match or user cancels out
-            while (true) {
-                const enteredUser = prompt("INDIAN TELECOM SECURITY ALERT\n\nEnter Master Admin Username:");
-                if (enteredUser === null) {
-                    // Force redirect back to public store front if operator cancels out
-                    window.location.href = 'index.html';
-                    return;
-                }
+        function executeAdminAuthLogin(e) {
+            e.preventDefault();
+            const userField = document.getElementById("admin-login-user").value.trim();
+            const passField = document.getElementById("admin-login-pass").value.trim();
 
-                const enteredPass = prompt("INDIAN TELECOM SECURITY ALERT\n\nEnter 4-Digit Administration Pin Code:");
-                if (enteredPass === null) {
-                    window.location.href = 'index.html';
-                    return;
-                }
-
-                // Strict matching authentication condition validation
-                if (enteredUser.trim() === 'admin' && enteredPass.trim() === '9999') {
-                    sessionStorage.setItem('IT_ADMIN_AUTHENTICATED', 'true');
-                    alert("ACCESS GRANTED: Syncing live full-stack telemetry channels...");
-                    break; 
-                } else {
-                    alert("ACCESS DENIED: Invalid administrator credentials configuration string! Please try again.");
-                }
+            if (userField === 'admin' && passField === '9999') {
+                sessionStorage.setItem('IT_ADMIN_AUTHENTICATED', 'true');
+                const authModal = document.getElementById("admin-auth-modal-screen");
+                if (authModal) authModal.style.display = "none";
+                
+                showNotification("ACCESS GRANTED: Syncing live data models...", "🔓");
+                if (typeof pullMasterDatabaseArrays === 'function') pullMasterDatabaseArrays();
+            } else {
+                alert("ACCESS DENIED: Invalid administrative user credentials configuration string!");
+                document.getElementById("admin-gatekeeper-form").reset();
             }
-        })();
+        }
 
-                        const API_BASE_ENDPOINT = '/api';
+        function executeAdminLogout() {
+            if (!confirm("Are you sure you want to securely disconnect and close this administrative management terminal?")) return;
+            sessionStorage.removeItem('IT_ADMIN_AUTHENTICATED');
+            window.location.href = 'index.html'; // Clear credentials and return safely to index storefront page
+        }
+
+        const API_BASE_ENDPOINT = '/api';
         let liveInventoryState = [];
         let liveOrdersState = [];
         let completedHistoryState = []; // <-- 🟢 FIXED: Safe array container initialization for order logs history
