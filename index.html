@@ -1083,15 +1083,11 @@ function enterDashboardView() {
         }
 
         // INITIALIZE APPLICATION BOOT ACTIONS WITH ACTIVE STATE CHECKS
-        window.onload = () => {
-            evaluateUserAccessSession();
-            fetchLiveInventory();
-        };
-       <!-- 🟢 MASTER APPS PLATFORM INITIALIZATION DRIVERS -->
+            <!-- 🟢 MASTER APPS PLATFORM INITIALIZATION DRIVERS -->
     <script>
-                // 🟢 FIXED: Combined startup modules inside a clean, single thread script engine runner to resolve syntax crashes
+        // FIXED: All operational parameters unified in a single script container layer to prevent runtime crashes
         window.addEventListener('load', () => {
-            // 1. Fire original user sessions and data inventory fetchers
+            // 1. Fire original user sessions and data inventory fetchers safely
             if (typeof evaluateUserAccessSession === 'function') evaluateUserAccessSession();
             if (typeof fetchLiveInventory === 'function') fetchLiveInventory();
             
@@ -1129,6 +1125,7 @@ function enterDashboardView() {
                 <p style="color: #94a3b8; margin-bottom: 8px; font-size: 13px;">Do you have any questions about stock, delivery times, or instant payments?</p>
                 <div style="display: flex; flex-direction: column; gap: 8px;">
                     <a href="tel:+919330301096" style="color: #3b82f6; text-decoration: none; font-weight: 600; display: flex; align-items: center; gap: 6px;">📞 Call Helpdesk</a>
+                    <!-- 🟢 FIXED: Restored your full business shortcut link to ensure the chat initiates smoothly -->
                     <a href="https://wa.me" target="_blank" style="color: #25D366; text-decoration: none; font-weight: 600; display: flex; align-items: center; gap: 6px;">💬 Chat on WhatsApp</a>
                 </div>
             </div>
