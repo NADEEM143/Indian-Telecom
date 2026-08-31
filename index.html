@@ -1089,8 +1089,13 @@ function enterDashboardView() {
         };
        <!-- 🟢 MASTER APPS PLATFORM INITIALIZATION DRIVERS -->
     <script>
+                // 🟢 FIXED: Combined startup modules inside a clean, single thread script engine runner to resolve syntax crashes
         window.addEventListener('load', () => {
-            // 1. Fetch and compile dynamic catalog grids from cloud array maps
+            // 1. Fire original user sessions and data inventory fetchers
+            if (typeof evaluateUserAccessSession === 'function') evaluateUserAccessSession();
+            if (typeof fetchLiveInventory === 'function') fetchLiveInventory();
+            
+            // 2. Compile dynamic catalog grids from cloud maps if backups exist
             if (typeof fetchLiveCatalogDataTrace === 'function') {
                 fetchLiveCatalogDataTrace();
             } else if (typeof pullMasterDatabaseArrays === 'function') {
@@ -1100,7 +1105,7 @@ function enterDashboardView() {
             const formElement = document.getElementById("order-form");
             if (formElement) formElement.addEventListener("submit", submitOrder);
 
-            // 2. 📱 PROGRESSIVE APP ENGINE ACTIVATION ROUTINE
+            // 3. 📱 PROGRESSIVE APP ENGINE ACTIVATION ROUTINE
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.register('sw.js')
                     .then(() => console.log("PWA Engine Booted Successfully!"))
