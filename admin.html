@@ -100,7 +100,7 @@
     <header>
         <div class="brand-meta">
             <h1>INDIAN <span>TELECOM</span></h1>
-            <p>Proprietor Console Platform • Welcome Nadim Ahmad</p>
+            <p>Proprietor Console Platform • Welcome lalu bhai🤣</p>
         </div>
         <div style="display: flex; align-items: center; gap: 14px;">
             <div class="secure-badge">🛡️ Secure Session</div>
@@ -374,7 +374,7 @@
                                 <td style="font-family:monospace; color:#a1a1aa; padding:12px 8px;">${u.password || 'N/A'}</td>
                                 <td style="text-align: right; padding:12px 8px; white-space: nowrap;">
                                     <button class="action-icon-btn" style="color: #f59e0b; background: rgba(245,158,11,0.1); margin-right: 5px; font-weight: bold;" onclick="triggerInlineUserEdit(${idx})">📝 Edit</button>
-                                    <button class="action-icon-btn" style="color: #ef4444; background: rgba(239,68,68,0.1); font-weight: bold;" onclick="suspendCustomerAccount(${idx})">🚫 Suspend</button>
+                                    <button class="action-icon-btn" style="color: #ef4444; background: rgba(239,68,68,0.1); font-weight: bold;" onclick="suspendCustomerAccount(${idx})">🚫 Delete</button>
                                 </td>
                             </tr>
                         `).join('');
@@ -653,7 +653,7 @@ async function renderAdminInventory() {
                                         <td style="font-family:monospace; color:#475569; padding:12px 8px; font-weight: 600;">${u.password || 'N/A'}</td>
                                         <td style="text-align: right; padding:12px 8px; white-space: nowrap;">
                                             <button class="action-icon-btn" style="color: #b45309; background: rgba(245,158,11,0.08); margin-right: 5px; font-weight: bold;" onclick="triggerInlineUserEdit(${masterIdx})">📝 Edit</button>
-                                            <button class="action-icon-btn" style="color: #ef4444; background: rgba(239,68,68,0.08); font-weight: bold;" onclick="suspendCustomerAccount(${masterIdx})">🚫 Suspend</button>
+                                            <button class="action-icon-btn" style="color: #ef4444; background: rgba(239,68,68,0.08); font-weight: bold;" onclick="suspendCustomerAccount(${masterIdx})">🚫 Delete</button>
                                         </td>
                                     </tr>
                                 `;
@@ -729,7 +729,7 @@ async function renderAdminInventory() {
                         <td style="max-width: 220px; font-size: 13px; color: #334155; padding: 12px 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${clientLocation}</td>
                         <td style="padding: 12px 8px;"><span class="badge" style="background: rgba(100,116,139,0.06); color:#475569; padding: 4px 8px; border-radius: 4px; font-size: 12px;">${payMethod}</span></td>
                         <td style="font-family: monospace; color: #b45309; padding: 12px 8px; font-weight: bold;">${bankUtr}</td>
-                        <td style="padding: 12px 8px;"><span class="badge badge-success" style="font-weight: bold; padding: 4px 8px; border-radius: 4px; font-size: 12px;">📦 SHIPPED</span></td>
+                        <td style="padding: 12px 8px;"><span class="badge badge-success" style="font-weight: bold; padding: 4px 8px; border-radius: 4px; font-size: 12px;">📦 DELIVERED</span></td>
                     </tr>
                 `;
             }).join('');
