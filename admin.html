@@ -232,6 +232,41 @@
 
     <!-- SAFELY ENCAPSULATED CONTROLLER JAVASCRIPT BLOCK -->
     <script>
+                // =========================================================================
+        // 🔒 SECURE ADMIN PANEL PROTECTION GATEKEEPER
+        // =========================================================================
+        (function enforceAdminAuthenticationGate() {
+            // Check if a valid administration session token already exists in current tab memory
+            if (sessionStorage.getItem('IT_ADMIN_AUTHENTICATED') === 'true') {
+                return; // Access granted, exit setup smoothly
+            }
+
+            // Loop verification prompt until correct combinations match or user cancels out
+            while (true) {
+                const enteredUser = prompt("INDIAN TELECOM SECURITY ALERT\n\nEnter Master Admin Username:");
+                if (enteredUser === null) {
+                    // Force redirect back to public store front if operator cancels out
+                    window.location.href = 'index.html';
+                    return;
+                }
+
+                const enteredPass = prompt("INDIAN TELECOM SECURITY ALERT\n\nEnter 4-Digit Administration Pin Code:");
+                if (enteredPass === null) {
+                    window.location.href = 'index.html';
+                    return;
+                }
+
+                // Strict matching authentication condition validation
+                if (enteredUser.trim() === 'admin' && enteredPass.trim() === '9999') {
+                    sessionStorage.setItem('IT_ADMIN_AUTHENTICATED', 'true');
+                    alert("ACCESS GRANTED: Syncing live full-stack telemetry channels...");
+                    break; 
+                } else {
+                    alert("ACCESS DENIED: Invalid administrator credentials configuration string! Please try again.");
+                }
+            }
+        })();
+
                         const API_BASE_ENDPOINT = '/api';
         let liveInventoryState = [];
         let liveOrdersState = [];
