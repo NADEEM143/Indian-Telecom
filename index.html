@@ -21,9 +21,45 @@
         .cart-trigger:hover { color: #2563eb; }
         .cart-badge { position: absolute; top: -2px; right: -2px; background: #2563eb; color: white; font-size: 11px; font-weight: 700; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
 
-        .hero-banner { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: white; padding: 40px; border-radius: 24px; margin: 24px 6%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 10px 25px -5px rgba(15,23,42,0.15); }
+               /* 🎨 DYNAMIC HERO REVOLUTION ENGINE */
+        .hero-banner { 
+            background: linear-gradient(-45deg, #0f172a, #1e293b, #1e3a8a, #030712); 
+            background-size: 400% 400%;
+            animation: elegantMeshShift 15s ease infinite;
+            color: white; 
+            padding: 50px 40px; 
+            border-radius: 24px; 
+            margin: 24px 6%; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            box-shadow: 0 20px 40px -15px rgba(15,23,42,0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        @keyframes elegantMeshShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
         .hero-text h2 { font-size: 32px; font-weight: 800; margin-bottom: 10px; line-height: 1.2; }
         .hero-text p { color: #94a3b8; font-size: 15px; max-width: 500px; }
+
+        /* Continuous subtle float effect for the armor emblem shield */
+        .hero-shield-emblem {
+            font-size: 72px; 
+            opacity: 0.4;
+            animation: shieldFloat 3s ease-in-out infinite;
+            user-select: none;
+        }
+
+        @keyframes shieldFloat {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-8px) rotate(3deg); }
+        }
+
         .categories-container { padding: 0 6%; margin-bottom: 20px; overflow-x: auto; display: flex; gap: 10px; }
         .cat-btn { background: white; border: 1px solid #e2e8f0; padding: 10px 20px; border-radius: 12px; cursor: pointer; font-weight: 600; font-size: 14px; color: #475569; white-space: nowrap; transition: all 0.2s; }
         .cat-btn.active, .cat-btn:hover { background: #0f172a; color: white; border-color: #0f172a; box-shadow: 0 4px 12px rgba(15,23,42,0.1); }
@@ -108,12 +144,15 @@
         </div>
     </header>
 
+       <!-- 🟢 FIXED: Linked the animated floating class handle directly onto your shield emblem layer -->
     <section class="hero-banner">
-        <div class="hero-text">
-            <h2>Luxury Armor For Your Devices</h2>
-            <p>Explore an elite range of mobile accessories handpicked by Indian Telecom for premium drop protection and super fast charging performance.</p>
+        <div class="hero-text" style="position: relative; z-index: 2;">
+            <h2 style="font-size: 32px; font-weight: 800; margin-bottom: 12px; line-height: 1.2; letter-spacing: -0.5px;">
+                Luxury Armor For <span style="color: #3b82f6; text-shadow: 0 0 15px rgba(59,130,246,0.3);">Your Devices</span>
+            </h2>
+            <p style="color: #94a3b8; font-size: 15px; max-width: 500px; line-height: 1.6;">Explore an elite range of mobile accessories handpicked by Indian Telecom for premium drop protection and super fast charging performance.</p>
         </div>
-        <div style="font-size: 72px; opacity: 0.3;">🛡️</div>
+        <div class="hero-shield-emblem">🛡️</div>
     </section> <!-- This is the closing tag of your hero banner area -->
 
     <!-- 🟢 PASTE THE DYNAMIC CLIENT ACCOUNT DASHBOARD BLOCK DIRECTLY HERE! -->
