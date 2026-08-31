@@ -1,10 +1,13 @@
 const CACHE_NAME = 'it-storefront-cache-v1';
 const ASSETS_TO_CACHE = [
-  'index.html',
-  'https://jsdelivr.net'
+  '/',
+  '/index.html',
+  '/manifest.json',
+  '/icon-512.png'
+  // 🟢 FIXED: Removed the external website homepage link entirely to guarantee 100% stable PWA caching loops!
 ];
 
-// Initialize and bake core assets into local hardware memory storage
+// Initialize and bake core assets into local hardware memory storage cleanly
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
