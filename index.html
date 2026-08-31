@@ -644,13 +644,14 @@ function closeCheckout() {
             }
         }
 
-               async function submitOrder(e) {
+                      // 🟢 FIXED: Streamlined standalone checkout engine matching your updated server arrays
+        async function submitOrder(e) {
             e.preventDefault();
             const mode = document.querySelector('input[name="mop"]:checked').value;
             const utrNum = document.getElementById("pay-utr").value.trim();
             
             if(mode === 'ONLINE' && utrNum.length < 6) {
-                alert("Please enter a valid banking UTR reference number.");
+                showStoreNotification("Please enter a valid banking UTR reference number.", "⚠️");
                 return;
             }
 
@@ -664,20 +665,16 @@ function closeCheckout() {
             };
 
             try {
-                const existingOrdersResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=orders`);
-                let existingOrdersList = [];
-                if (existingOrdersResponse.ok) {
-                    existingOrdersList = await existingOrdersResponse.json();
-                }
-
-                existingOrdersList.push(freshCheckoutOrder);
-
-                               // 🟢 FIXED: Post only the single fresh checkout record to prevent data loss collisions
-                await fetch(`${API_BASE_ENDPOINT}/admin?type=orders`, {
+                // 🟢 FIXED: Dispatches the standalone checkout record straight to the backend without redundant data fetching loops
+                const networkResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=orders`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(freshCheckoutOrder)
                 });
+
+                if (!networkResponse.ok) {
+                    throw new Error(`Server returned error status code: ${networkResponse.status}`);
+                }
 
                 // 🟢 FIXED: Modern slide-up layout toast replaces the blocking browser alert box!
                 showStoreNotification("Order Registered Successfully! Md Kamre Alam will review your verification parameters.", "🎉");
@@ -687,9 +684,12 @@ function closeCheckout() {
                 updateCartUI();
                 closeCheckout();
                 toggleCart(false);
-                document.getElementById("order-form").reset();
+                
+                const orderFormElement = document.getElementById("order-form");
+                if (orderFormElement) orderFormElement.reset();
                 togglePaymentMode('COD');
             } catch (networkError) {
+                console.error("Checkout Processing Error Trace:", networkError);
                 showStoreNotification("Checkout connection failed. Try resubmitting parameters.", "⚠️");
             }
         }
