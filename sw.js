@@ -21,6 +21,13 @@ self.addEventListener('activate', (event) => {
 
 // Cache-First with Network-Fallback execution pipeline strategy
 self.addEventListener('fetch', (event) => {
+  const requestUrl = new URL(event.request.url);
+
+  // 🛑 SAFETY GATEKEEPER: Bypass cache logic entirely for API functions and external domains
+  if (requestUrl.pathname.startsWith('/api') || !event.request.url.startsWith(self.location.origin)) {
+    return event.respondWith(fetch(event.request));
+  }
+
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       if (cachedResponse) {
