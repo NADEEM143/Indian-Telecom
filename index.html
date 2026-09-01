@@ -734,12 +734,6 @@ function closeCheckout() {
     document.getElementById("checkout-modal").style.display = "none"; 
 }
 
-                // 🟢 FIXED: 100% NPCI-Compliant payment toggle engine. Added app switching deep link while keeping QR Code generation & UTR matching identical.
-               // =========================================================================
-        // 💳 DUAL-MODE ONSCREEN PAYMENT METHOD TOGGLE ROUTINES (100% NPCI-COMPLIANT)
-        // =========================================================================
-        let strictNpciUpiString = ""; // Exposed globally to keep values synced across tabs cleanly
-
         function togglePaymentMode(mode) {
             const qrSection = document.getElementById("qr-section");
             const utrInput = document.getElementById("pay-utr");
