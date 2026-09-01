@@ -457,8 +457,18 @@
     </div>
     <a target="_blank" href="https://wa.me/919330301096" class="whatsapp-float">💬</a>
     <!-- SAFELY ENCAPSULATED CONTROLLER JAVASCRIPT BLOCK -->
-     <script>
-        // 🟢 PASTED HERE: RIGHT AT THE TOP OF YOUR SCRIPT TAG IN INDEX.HTML
+        <!-- SAFELY ENCAPSULATED CONTROLLER JAVASCRIPT BLOCK -->
+    <script>
+        // =========================================================================
+        // 🌐 GLOBAL STATE PARAMETERS & ENGINE INITIALIZATION MATRIX (FIXED HOSTING)
+        // =========================================================================
+        const API_BASE_ENDPOINT = '/api';
+        let productsList = [];
+        let cart = JSON.parse(localStorage.getItem('IT_STOREFRONT_CART')) || [];
+        let isLoginMode = false;
+        let activeSessionUser = JSON.parse(localStorage.getItem('IT_ACTIVE_USER')) || null;
+        let strictNpciUpiString = ""; 
+
         // 🚀 CUSTOM NOTIFICATION ENGINE (REPLACES BROWSER ALERT POPUPS)
         function showStoreNotification(message, icon = "🚀") {
             const toast = document.getElementById("store-toast-notification");
@@ -476,17 +486,12 @@
             }, 4500);
         }
 
-        const API_BASE_ENDPOINT = '/api';
-        let productsList = [];
-        let cart = JSON.parse(localStorage.getItem('IT_STOREFRONT_CART')) || [];
-        // ... (rest of your existing script elements continue safely down here)
-
         // Helper framework routine updating internal machine storage on layout mutation cycles
         function syncCartToBrowserLocalStorage() {
             localStorage.setItem('IT_STOREFRONT_CART', JSON.stringify(cart));
         }
 
-               async function fetchLiveInventory() {
+        async function fetchLiveInventory() {
             try {
                 const cacheBusterTimeToken = Date.now();
                 
@@ -870,7 +875,7 @@ function closeCheckout() {
                 closeCheckout();
                 toggleCart(false);
                 
-                const orderFormElement = document.getElementById("order-form");
+                               const orderFormElement = document.getElementById("order-form");
                 if (orderFormElement) orderFormElement.reset();
                 togglePaymentMode('COD');
             } catch (networkError) {
@@ -881,8 +886,6 @@ function closeCheckout() {
         // =========================================================================
         // 👥 CUSTOMER REGISTER & LOGIN CONTROLLER LOGIC ENGINE
         // =========================================================================
-        let isLoginMode = false;
-        let activeSessionUser = JSON.parse(localStorage.getItem('IT_ACTIVE_USER')) || null;
 
         function toggleAuthMode() {
             isLoginMode = !isLoginMode;
@@ -1130,11 +1133,18 @@ function enterDashboardView() {
             if (formElement) formElement.addEventListener("submit", submitOrder);
 
             // 3. 📱 PROGRESSIVE APP ENGINE ACTIVATION ROUTINE
-            if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register('sw.js')
-                    .then(() => console.log("PWA Engine Booted Successfully!"))
-                    .catch((err) => console.error("PWA Initialization Error:", err));
-            }
+            // 📱 FORCE UPDATE LOGIC: Append a live version token to completely destroy Android ghost memory loops
+if ('serviceWorker' in navigator) {
+    // Appends a unique build version marker (?v=2) to force Chrome to download the clean file
+    navigator.serviceWorker.register('/sw.js?v=2')
+        .then((registration) => {
+            console.log("PWA Engine Booted Successfully!");
+            
+            // Instantly checks for code changes on Vercel without waiting for standard browser timeouts
+            registration.update(); 
+        })
+        .catch((err) => console.error("PWA Initialization Error:", err));
+}
         });
 
         // 🟢 NEW: Native system interceptor catches phone installation readiness tokens cleanly
