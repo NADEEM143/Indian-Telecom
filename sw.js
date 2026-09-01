@@ -1,4 +1,5 @@
-const CACHE_NAME = 'it-storefront-cache-v1';
+// 🟢 CHANGED CACHE VALUE: Forces your phone to purge old memory registries instantly
+const CACHE_NAME = 'it-storefront-cache-v2';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
@@ -7,6 +8,9 @@ const ASSETS_TO_CACHE = [
 
 // Initialize and bake core assets into local hardware memory storage cleanly
 self.addEventListener('install', (event) => {
+  // Forces the waiting new service worker to become the active service worker instantly
+  self.skipWaiting();
+  
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       return cache.addAll(ASSETS_TO_CACHE);
@@ -16,7 +20,18 @@ self.addEventListener('install', (event) => {
 
 // Force active control interceptors instantly without waiting for app reboots
 self.addEventListener('activate', (event) => {
-  event.waitUntil(self.clients.claim());
+  event.waitUntil(
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames.map((cache) => {
+          if (cache !== CACHE_NAME) {
+            console.log('Clearing ancient ghost memory strings... 🗑️');
+            return caches.delete(cache);
+          }
+        })
+      );
+    }).then(() => self.clients.claim())
+  );
 });
 
 // Cache-First with Network-Fallback execution pipeline strategy
