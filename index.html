@@ -491,38 +491,65 @@
             localStorage.setItem('IT_STOREFRONT_CART', JSON.stringify(cart));
         }
 
-        async function fetchLiveInventory() {
-            try {
-                const cacheBusterTimeToken = Date.now();
-                
-                // 🟢 FIXED: Dynamically downloads your live announcement string right on page boot
-                try {
-                    const bannerMsgResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=banner_msg&_t=${cacheBusterTimeToken}`);
-                    if (bannerMsgResponse.ok) {
-                        const parsedBannerPayload = await bannerMsgResponse.json();
-                        const activeBannerText = parsedBannerPayload.message || "MEGA OFFER: FLAT 30% OFF ON PREMIUM CHARGERS & COVERS! LIMITED STOCK!";
-                        
-                        const marqueeContainerElement = document.getElementById("mega-offer-banner");
-                        if (marqueeContainerElement) {
-                            marqueeContainerElement.innerHTML = `🔥 ${activeBannerText}`;
-                        }
-                    }
-                } catch (bannerErr) {
-                    console.error("Banner download exception skipped:", bannerErr);
-                }
+              async function fetchLiveInventory() {
+            let currentSyncAttempts = 0;
+            const maxSyncAttempts = 3;
 
-                // Injects a dynamic timestamp token to destroy browser cache limits for a true live catalog sync
-                const response = await fetch(`${API_BASE_ENDPOINT}/admin?type=products&_t=${cacheBusterTimeToken}`);
-                if (response.ok) {
-                    const databaseItems = await response.json();
-                    productsList = databaseItems.filter(item => item.isLive !== false);
+            async function executePipelineFetch() {
+                try {
+                    const cacheBusterTimeToken = Date.now();
+                    
+                    // 🟢 FIXED: Dynamically downloads your live announcement string right on page boot
+                    try {
+                        const bannerMsgResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=banner_msg&_t=${cacheBusterTimeToken}`);
+                        if (bannerMsgResponse.ok) {
+                            const parsedBannerPayload = await bannerMsgResponse.json();
+                            const activeBannerText = parsedBannerPayload.message || "MEGA OFFER: FLAT 30% OFF ON PREMIUM CHARGERS & COVERS! LIMITED STOCK!";
+                            
+                            const marqueeContainerElement = document.getElementById("mega-offer-banner");
+                            if (marqueeContainerElement) {
+                                marqueeContainerElement.innerHTML = `🔥 ${activeBannerText}`;
+                            }
+                        }
+                    } catch (bannerErr) {
+                        console.error("Banner download exception skipped:", bannerErr);
+                    }
+
+                    // Injects a dynamic timestamp token to destroy browser cache limits for a true live catalog sync
+                    const response = await fetch(`${API_BASE_ENDPOINT}/admin?type=products&_t=${cacheBusterTimeToken}`);
+                    if (response.ok) {
+                        const databaseItems = await response.json();
+                        productsList = databaseItems.filter(item => item.isLive !== false);
+                        await renderProducts(productsList);
+                        
+                        // Keeps the basket count badges accurate if a returning buyer refreshes the site
+                        updateCartUI();
+                        return true;
+                    } else {
+                        throw new Error(`Server returned error status code: ${response.status}`);
+                    }
+                } catch (err) {
+                    console.error(`Pipeline Sync Attempt ${currentSyncAttempts + 1} Failed:`, err.message);
+                    return false;
                 }
-                await renderProducts(productsList);
+            }
+
+            // Loop execution gatekeeper: Automatically re-triggers the network if a cold start block occurs
+            while (currentSyncAttempts < maxSyncAttempts) {
+                const isSyncSuccessful = await executePipelineFetch();
+                if (isSyncSuccessful) break;
                 
-                // Keeps the basket count badges accurate if a returning buyer refreshes the site
-                updateCartUI();
-            } catch (err) {
-                console.error("Pipeline Sync Error:", err.message);
+                currentSyncAttempts++;
+                if (currentSyncAttempts < maxSyncAttempts) {
+                    // Exponential backoff: waits 400ms before forcing a clean network reload pass
+                    await new Promise(resolve => setTimeout(resolve, 400));
+                }
+            }
+
+            // Fallback render engine: Prevents a completely empty screen if all network channels timeout
+            if (productsList.length === 0) {
+                const grid = document.getElementById("product-grid");
+                if (grid) grid.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding: 40px; color:#94a3b8; font-weight:bold;">Connecting to server pool... Please check your internet connection or pull down to refresh.</div>`;
             }
         }
 
@@ -546,7 +573,7 @@
                     req.onsuccess = () => res(req.result ? req.result.data : null);
                     req.onerror = () => res(null);
                 });
-} catch (e) { return null; }
+            } catch (e) { return null; }
         }
 
         // 🟢 FIXED: Added cursor handles and zoom event anchors directly to product photos
