@@ -1,6 +1,13 @@
 {
   "version": 2,
   "cleanUrls": true,
+  "builds": [
+    { "src": "api/admin.js", "use": "@vercel/node" },
+    { "src": "*.html", "use": "@vercel/static" },
+    { "src": "*.json", "use": "@vercel/static" },
+    { "src": "*.js", "use": "@vercel/static" },
+    { "src": "*.png", "use": "@vercel/static" }
+  ],
   "rewrites": [
     { 
       "source": "/api/admin", 
@@ -9,10 +16,6 @@
     { 
       "source": "/master-admin-console", 
       "destination": "/admin.html" 
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
     }
   ],
   "headers": [
