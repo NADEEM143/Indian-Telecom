@@ -1,37 +1,74 @@
-{
-  "version": 2,
-  "cleanUrls": true,
-  "builds": [
-    { "src": "api/admin.js", "use": "@vercel/node" },
-    { "src": "*.html", "use": "@vercel/static" },
-    { "src": "*.json", "use": "@vercel/static" },
-    { "src": "*.js", "use": "@vercel/static" },
-    { "src": "*.png", "use": "@vercel/static" }
-  ],
-  "rewrites": [
-    { 
-      "source": "/api/admin", 
-      "destination": "/api/admin.js" 
-    },
-    { 
-      "source": "/master-admin-console", 
-      "destination": "/admin.html" 
-    }
-  ],
-  "headers": [
-    {
-      "source": "/manifest.json",
-      "headers": [
-        { "key": "Content-Type", "value": "application/manifest+json" },
-        { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
-      ]
-    },
-    {
-      "source": "/sw.js",
-      "headers": [
-        { "key": "Content-Type", "value": "application/javascript" },
-        { "key": "Cache-Control", "value": "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0" }
-      ]
-    }
-  ]
-}
+// 🟢 CACHE VERSION: Incremented to force your phone to purge the old broken memory instantly
+const CACHE_NAME = 'it-storefront-cache-v4';
+const ASSETS_TO_CACHE = [
+  '/',
+  '/index.html',
+  '/manifest.json'
+];
+
+// Initialize and bake core assets into local hardware memory storage cleanly
+self.addEventListener('install', (event) => {
+  // Forces the waiting new service worker to become the active service worker instantly
+  self.skipWaiting();
+  
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => {
+      return cache.addAll(ASSETS_TO_CACHE);
+    })
+  );
+});
+
+// Force active control interceptors instantly without waiting for app reboots
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames.map((cache) => {
+          if (cache !== CACHE_NAME) {
+            console.log('Clearing ancient ghost memory strings... 🗑️');
+            return caches.delete(cache);
+          }
+        })
+      );
+    }).then(() => self.clients.claim())
+  );
+});
+
+// Optimized Stale-While-Revalidate execution pipeline strategy
+self.addEventListener('fetch', (event) => {
+  // Create a URL object to cleanly parse incoming web path domains
+  const requestUrl = new URL(event.request.url);
+
+  // 🛑 BYPASS GATEWAY: If the route is an API request or external link, send it straight to the network
+  if (requestUrl.pathname.startsWith('/api') || !event.request.url.startsWith(self.location.origin)) {
+    return event.respondWith(fetch(event.request));
+  }
+
+  // Handle static assets safely without burning request streams
+  event.respondWith(
+    caches.match(event.request).then((cachedResponse) => {
+      // 🟢 FIX: Clone the request because a stream can only be read once
+      const fetchRequest = event.request.clone();
+
+      const networkFetch = fetch(fetchRequest).then((networkResponse) => {
+        // Ensure we got a valid response back before trying to cache it
+        if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
+          return networkResponse;
+        }
+
+        // 🟢 FIX: Clone the response because it can only be read once before serving
+        const responseToCache = networkResponse.clone();
+        caches.open(CACHE_NAME).then((cache) => {
+          cache.put(event.request, responseToCache);
+        });
+
+        return networkResponse;
+      }).catch(() => {
+        // Fallback silently if phone is offline and network request fails
+      });
+
+      // Return cached response instantly if available, otherwise fallback to network fetch
+      return cachedResponse || networkFetch;
+    })
+  );
+});
