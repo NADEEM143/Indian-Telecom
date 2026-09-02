@@ -1,5 +1,5 @@
-// 🟢 CACHE VERSION: Incremented to force your phone to purge the old broken memory instantly
-const CACHE_NAME = 'it-storefront-cache-v4';
+// 🟢 CHANGED CACHE VALUE: Forces your phone to purge old memory registries instantly
+const CACHE_NAME = 'it-storefront-cache-v2';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
@@ -34,41 +34,28 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Optimized Stale-While-Revalidate execution pipeline strategy
+// Cache-First with Network-Fallback execution pipeline strategy
 self.addEventListener('fetch', (event) => {
   // Create a URL object to cleanly parse incoming web path domains
   const requestUrl = new URL(event.request.url);
 
-  // 🛑 BYPASS GATEWAY: If the route is an API request or external link, send it straight to the network
+  // 🛑 BYPASS GATEWAY: If the route is an API request, send it straight to the network and exit!
   if (requestUrl.pathname.startsWith('/api') || !event.request.url.startsWith(self.location.origin)) {
     return event.respondWith(fetch(event.request));
   }
 
-  // Handle static assets safely without burning request streams
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
-      // 🟢 FIX: Clone the request because a stream can only be read once
-      const fetchRequest = event.request.clone();
-
-      const networkFetch = fetch(fetchRequest).then((networkResponse) => {
-        // Ensure we got a valid response back before trying to cache it
-        if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
-          return networkResponse;
-        }
-
-        // 🟢 FIX: Clone the response because it can only be read once before serving
-        const responseToCache = networkResponse.clone();
-        caches.open(CACHE_NAME).then((cache) => {
-          cache.put(event.request, responseToCache);
-        });
-
-        return networkResponse;
-      }).catch(() => {
-        // Fallback silently if phone is offline and network request fails
-      });
-
-      // Return cached response instantly if available, otherwise fallback to network fetch
-      return cachedResponse || networkFetch;
+      if (cachedResponse) {
+        fetch(event.request).then((networkResponse) => {
+          if (networkResponse.status === 200) {
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, networkResponse));
+          }
+        }).catch(() => {});
+        
+        return cachedResponse;
+      }
+      return fetch(event.request);
     })
   );
 });
