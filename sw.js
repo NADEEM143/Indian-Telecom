@@ -1,5 +1,5 @@
 // 🟢 CHANGED CACHE VALUE: Forces your phone to purge old memory registries instantly
-const CACHE_NAME = 'it-storefront-cache-v5'; // Incremented version to clear previous bad state
+const CACHE_NAME = 'it-storefront-cache-v6'; // Incremented version to push a clean update stream
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
@@ -44,13 +44,18 @@ self.addEventListener('fetch', (event) => {
     return event.respondWith(fetch(event.request));
   }
 
+  // 🛡️ FIXED VERCEL CLEAN URL ROOT FALLBACK: Maps naked requests safely directly to index.html
+  let targetRequest = event.request;
+  if (requestUrl.pathname === '/' || requestUrl.pathname === '/index.html') {
+    targetRequest = new Request('/index.html');
+  }
+
   event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
+    caches.match(targetRequest).then((cachedResponse) => {
       if (cachedResponse) {
         // Fetch a fresh version in the background to update the cache for next time
         fetch(event.request).then((networkResponse) => {
           if (networkResponse.status === 200) {
-            // SAFE CHECK: If Vercel returns a redirect response, do not try to put it in cache
             if (networkResponse.redirected) {
               return;
             }
