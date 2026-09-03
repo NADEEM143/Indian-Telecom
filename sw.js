@@ -1,5 +1,5 @@
 // 🟢 CHANGED CACHE VALUE: Forces your phone to purge old memory registries instantly
-const CACHE_NAME = 'it-storefront-cache-v9'; // Incremented to v9 to discard previous broken cache layers
+const CACHE_NAME = 'it-storefront-cache-v11'; // Incremented version to completely dump past bad cache registries
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
@@ -41,25 +41,22 @@ self.addEventListener('fetch', (event) => {
     return event.respondWith(fetch(event.request));
   }
 
-  // 🛡️ NATIVE PWA ROOT LOOKUP MATRIX
-  // Determine if the incoming route is the naked root or index path string
-  const isRootRoute = requestUrl.pathname === '/' || requestUrl.pathname === '/index.html';
-  
-  // Use the safe request fallback rule or point directly to the cached path string
-  const cacheQueryTarget = isRootRoute ? '/index.html' : event.request;
-  const backgroundFetchTarget = isRootRoute ? '/index.html' : event.request;
+  // 🛡️ SAFE METADATA MAPS: Map naked directory structures back onto physical request signatures cleanly
+  const isRootPath = requestUrl.pathname === '/' || requestUrl.pathname === '/index.html';
+  const cacheQueryKey = isRootPath ? '/index.html' : event.request;
 
   event.respondWith(
-    caches.match(cacheQueryTarget).then((cachedResponse) => {
+    caches.match(cacheQueryKey).then((cachedResponse) => {
       if (cachedResponse) {
         // Fetch a fresh version in the background to update the cache for next time securely
-        fetch(backgroundFetchTarget).then((networkResponse) => {
+        fetch(event.request).then((networkResponse) => {
           if (networkResponse.status === 200) {
             if (networkResponse.redirected) {
               return;
             }
             caches.open(CACHE_NAME).then((cache) => {
-              cache.put(backgroundFetchTarget, networkResponse.clone());
+              // FIXED: We now pass event.request directly so the caching utility receives a valid Request object instead of a text string
+              cache.put(event.request, networkResponse.clone());
             });
           }
         }).catch(() => {});
