@@ -1,5 +1,5 @@
 // 🟢 CHANGED CACHE VALUE: Forces your phone to purge old memory registries instantly
-const CACHE_NAME = 'it-storefront-cache-v8'; // Incremented to v8 to discard previous broken cache
+const CACHE_NAME = 'it-storefront-cache-v9'; // Incremented to v9 to discard previous broken cache layers
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
@@ -8,9 +8,7 @@ const ASSETS_TO_CACHE = [
 
 // Initialize and bake core assets into local hardware memory storage cleanly
 self.addEventListener('install', (event) => {
-  // Forces the waiting new service worker to become the active service worker instantly
   self.skipWaiting();
-  
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       return cache.addAll(ASSETS_TO_CACHE);
@@ -36,7 +34,6 @@ self.addEventListener('activate', (event) => {
 
 // Cache-First with Network-Fallback execution pipeline strategy
 self.addEventListener('fetch', (event) => {
-  // Create a URL object to cleanly parse incoming web path domains
   const requestUrl = new URL(event.request.url);
 
   // 🛑 BYPASS GATEWAY: If the route is an API request, send it straight to the network and exit!
@@ -44,23 +41,25 @@ self.addEventListener('fetch', (event) => {
     return event.respondWith(fetch(event.request));
   }
 
-  // 🛡️ FIXED VERCEL CLEAN URL ROOT FALLBACK: Maps naked requests safely directly to index.html
-  let targetRequest = event.request;
-  if (requestUrl.pathname === '/' || requestUrl.pathname === '/index.html') {
-    targetRequest = new Request('/index.html');
-  }
+  // 🛡️ NATIVE PWA ROOT LOOKUP MATRIX
+  // Determine if the incoming route is the naked root or index path string
+  const isRootRoute = requestUrl.pathname === '/' || requestUrl.pathname === '/index.html';
+  
+  // Use the safe request fallback rule or point directly to the cached path string
+  const cacheQueryTarget = isRootRoute ? '/index.html' : event.request;
+  const backgroundFetchTarget = isRootRoute ? '/index.html' : event.request;
 
   event.respondWith(
-    caches.match(targetRequest).then((cachedResponse) => {
+    caches.match(cacheQueryTarget).then((cachedResponse) => {
       if (cachedResponse) {
-        // FIXED: Fetch the clean targetRequest instead of the raw event.request to bypass Vercel's 307 internal redirects
-        fetch(targetRequest.clone()).then((networkResponse) => {
+        // Fetch a fresh version in the background to update the cache for next time securely
+        fetch(backgroundFetchTarget).then((networkResponse) => {
           if (networkResponse.status === 200) {
             if (networkResponse.redirected) {
               return;
             }
             caches.open(CACHE_NAME).then((cache) => {
-              cache.put(targetRequest, networkResponse.clone());
+              cache.put(backgroundFetchTarget, networkResponse.clone());
             });
           }
         }).catch(() => {});
