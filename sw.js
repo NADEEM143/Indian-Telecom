@@ -1,5 +1,5 @@
 // 🟢 CHANGED CACHE VALUE: Forces your phone to purge old memory registries instantly
-const CACHE_NAME = 'it-storefront-cache-v11'; // Incremented version to completely dump past bad cache registries
+const CACHE_NAME = 'it-storefront-cache-v12'; // Incremented version to completely dump past bad cache registries
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
@@ -48,14 +48,16 @@ self.addEventListener('fetch', (event) => {
   event.respondWith(
     caches.match(cacheQueryKey).then((cachedResponse) => {
       if (cachedResponse) {
-        // Fetch a fresh version in the background to update the cache for next time securely
+        // Fetch a fresh version in the background to update the cache safely
         fetch(event.request).then((networkResponse) => {
           if (networkResponse.status === 200) {
+            // 🛑 CRITICAL FIXED LAYER: If Vercel redirects the clean URL request, stop immediately!
+            // This prevents the redirect security error from ever crashing your script pipeline.
             if (networkResponse.redirected) {
               return;
             }
+            
             caches.open(CACHE_NAME).then((cache) => {
-              // FIXED: We now pass event.request directly so the caching utility receives a valid Request object instead of a text string
               cache.put(event.request, networkResponse.clone());
             });
           }
