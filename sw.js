@@ -1,5 +1,5 @@
 // 🟢 CHANGED CACHE VALUE: Forces your phone to purge old memory registries instantly
-const CACHE_NAME = 'it-storefront-cache-v2';
+const CACHE_NAME = 'it-storefront-cache-v3'; // Incremented version to clear previous bad state
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
@@ -47,9 +47,13 @@ self.addEventListener('fetch', (event) => {
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       if (cachedResponse) {
+        // Fetch a fresh version in the background to update the cache for next time
         fetch(event.request).then((networkResponse) => {
           if (networkResponse.status === 200) {
-            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, networkResponse));
+            caches.open(CACHE_NAME).then((cache) => {
+              // FIXED: Added .clone() so the stream can be written to cache without breaking
+              cache.put(event.request, networkResponse.clone());
+            });
           }
         }).catch(() => {});
         
