@@ -1,5 +1,5 @@
 // 🟢 CHANGED CACHE VALUE: Forces your phone to purge old memory registries instantly
-const CACHE_NAME = 'it-storefront-cache-v6'; // Incremented version to push a clean update stream
+const CACHE_NAME = 'it-storefront-cache-v8'; // Incremented to v8 to discard previous broken cache
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
@@ -53,14 +53,14 @@ self.addEventListener('fetch', (event) => {
   event.respondWith(
     caches.match(targetRequest).then((cachedResponse) => {
       if (cachedResponse) {
-        // Fetch a fresh version in the background to update the cache for next time
-        fetch(event.request).then((networkResponse) => {
+        // FIXED: Fetch the clean targetRequest instead of the raw event.request to bypass Vercel's 307 internal redirects
+        fetch(targetRequest.clone()).then((networkResponse) => {
           if (networkResponse.status === 200) {
             if (networkResponse.redirected) {
               return;
             }
             caches.open(CACHE_NAME).then((cache) => {
-              cache.put(event.request, networkResponse.clone());
+              cache.put(targetRequest, networkResponse.clone());
             });
           }
         }).catch(() => {});
