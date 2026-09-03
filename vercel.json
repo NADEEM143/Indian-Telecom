@@ -9,6 +9,14 @@
     { "src": "*.png", "use": "@vercel/static" }
   ],
   "rewrites": [
+    {
+      "source": "/manifest.json",
+      "destination": "/manifest.json"
+    },
+    {
+      "source": "/sw.js",
+      "destination": "/sw.js"
+    },
     { 
       "source": "/api/admin", 
       "destination": "/api/admin.js" 
@@ -35,3 +43,4 @@
     }
   ]
 }
+
