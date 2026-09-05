@@ -783,16 +783,12 @@ function togglePaymentMode(mode) {
                const amountDisplay = document.getElementById("qr-amount-display");
         if (amountDisplay) amountDisplay.innerText = `₹${npciFormattedAmount}`;
 
-                      const canvasBox = document.getElementById("qrcode-canvas");
+        const canvasBox = document.getElementById("qrcode-canvas");
         if (canvasBox) {
             canvasBox.innerHTML = ""; // Clear out previous cache boxes to avoid rendering bugs
             
-            // 💡 CRITICAL STEP: Replace this placeholder with your official PhonePe Business Merchant UPI ID!
-            // Example format: mab01234567@ybl or indiantelecom@ybl (Personal mobile number IDs will always be blocked here).
-            const officialMerchantVPA = "YOUR_PHONEPE_MERCHANT_ID_HERE@ybl"; 
-            
-            // 🟢 FIXED: Prefilled amount restored cleanly using official NPCI Merchant whitelist standards
-            strictNpciUpiString = `upi://pay?pa=${officialMerchantVPA}&pn=INDIAN%20TELECOM&am=${npciFormattedAmount}&cu=INR&tn=Shopping%20Payment`;
+            // 🟢 FIXED: Kept your personal peer link format safely assigned here so the QR code generates perfectly
+            strictNpciUpiString = `upi://pay?pa=9718439786@ybl&pn=Nadim%20Ahmad&cu=INR`;
             
             qrCodeInstance = new QRCode(canvasBox, {
                 text: strictNpciUpiString,
@@ -844,11 +840,10 @@ function switchOnlineSubMethod(targetMethod) {
                 appTabBtn.style.background = "#ffffff";
                 appTabBtn.style.color = "#0f172a";
 
-               if (intentLink) {
-    // 🟢 FIXED: Bypasses PhonePe's external link filter by using the dedicated app platform intent uri format
-    intentLink.href = `phonepe://pay?pa=9718439786@ybl&pn=Nadim%20Ahmad&cu=INR`;
-}
-
+                if (intentLink) {
+                    // 🟢 FIXED: Kept safely here inside the proper scope to launch PhonePe natively on button clicks
+                    intentLink.href = `phonepe://pay?pa=9718439786@ybl&pn=Nadim%20Ahmad&cu=INR`;
+                }
 
                 // 📱 Desktop Fallback Warning: Alerts administrators if clicking intents from a static computer layout
                 const isMobileDevice = /Android|iPhone|iPad|iPod|IEMobile/i.test(navigator.userAgent);
@@ -857,7 +852,6 @@ function switchOnlineSubMethod(targetMethod) {
                 }
             }
         }
-
         // =========================================================================
         // 🚀 STANDALONE CHECKOUT ORDER PLACEMENT DISPATCH ENGINE
         // =========================================================================
