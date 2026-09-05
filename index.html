@@ -844,9 +844,11 @@ function switchOnlineSubMethod(targetMethod) {
                 appTabBtn.style.background = "#ffffff";
                 appTabBtn.style.color = "#0f172a";
 
-                if (intentLink) {
-                    intentLink.href = strictNpciUpiString;
-                }
+               if (intentLink) {
+    // 🟢 FIXED: Bypasses PhonePe's external link filter by using the dedicated app platform intent uri format
+    intentLink.href = `phonepe://pay?pa=9718439786@ybl&pn=Nadim%20Ahmad&cu=INR`;
+}
+
 
                 // 📱 Desktop Fallback Warning: Alerts administrators if clicking intents from a static computer layout
                 const isMobileDevice = /Android|iPhone|iPad|iPod|IEMobile/i.test(navigator.userAgent);
