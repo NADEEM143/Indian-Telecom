@@ -858,7 +858,7 @@ function closeCheckout() {
 
 
         // 🟢 FIXED: Coordinates display states between scannable QR maps and mobile application launchers
-        function switchOnlineSubMethod(targetMethod) {
+                function switchOnlineSubMethod(targetMethod) {
             const qrViewBox = document.getElementById("qr-code-graphics-wrapper");
             const appViewBox = document.getElementById("mobile-upi-intent-container");
             const qrTabBtn = document.getElementById("sub-mode-qr-btn");
@@ -885,9 +885,9 @@ function closeCheckout() {
                 appTabBtn.style.color = "#0f172a";
 
                 if (intentLink) {
-                    // 🟢 FIXED: Because you are using a whitelisted merchant token handle string, 
-                    // raw standard upi protocol calls will load successfully across all apps seamlessly!
-                    intentLink.href = strictNpciUpiString;
+                    // 🟢 FIXED: Safe string fallback pulls the live calculated price layout counter instantly on button tap actions
+                    const extractedNumericAmount = document.getElementById("qr-amount-display")?.innerText.replace(/[^0-9.]/g, '') || '0.00';
+                    intentLink.href = `phonepe://pay?pa=nadimsbi147@ybl&pn=Nadim%20Ahmad&am=${extractedNumericAmount}&cu=INR`;
                 }
 
                 // 📱 Desktop Fallback Warning: Alerts administrators if clicking intents from a static computer layout
@@ -897,6 +897,7 @@ function closeCheckout() {
                 }
             }
         }
+        
         // =========================================================================
         // 🚀 STANDALONE CHECKOUT ORDER PLACEMENT DISPATCH ENGINE
         // =========================================================================
@@ -942,7 +943,7 @@ function closeCheckout() {
                 closeCheckout();
                 toggleCart(false);
                 
-                               const orderFormElement = document.getElementById("order-form");
+                const orderFormElement = document.getElementById("order-form");
                 if (orderFormElement) orderFormElement.reset();
                 togglePaymentMode('COD');
             } catch (networkError) {
@@ -950,10 +951,10 @@ function closeCheckout() {
                 showStoreNotification("Checkout connection failed. Try resubmitting parameters.", "⚠️");
             }
         }
+        
         // =========================================================================
         // 👥 CUSTOMER REGISTER & LOGIN CONTROLLER LOGIC ENGINE
         // =========================================================================
-
         function toggleAuthMode() {
             isLoginMode = !isLoginMode;
             document.getElementById("auth-title").innerText = isLoginMode ? "Customer Login" : "Customer Registration";
@@ -975,6 +976,7 @@ function closeCheckout() {
 
             document.getElementById("auth-form").reset();
         }
+
 
 
                function closeAuthModal() {
