@@ -765,59 +765,56 @@ function closeCheckout() {
     document.getElementById("checkout-modal").style.display = "none"; 
 }
 
-        function togglePaymentMode(mode) {
-            const qrSection = document.getElementById("qr-section");
-            const utrInput = document.getElementById("pay-utr");
+function togglePaymentMode(mode) {
+    const qrSection = document.getElementById("qr-section");
+    const utrInput = document.getElementById("pay-utr");
+    
+    if (mode === 'ONLINE') {
+        qrSection.style.display = "block";
+        utrInput.setAttribute("required", "required");
+
+        // 1. Calculate live basket total sum
+        const rawTotal = cart.reduce((acc, current) => acc + (current.discountPrice * current.qty), 0);
+        
+        // 2. Strict NPCI Formatter: Forces integer values into a 2-decimal financial string (e.g. 1199 -> 1199.00)
+        const npciFormattedAmount = Number(rawTotal).toFixed(2);
+        
+        // Update your front-end text layout counter view
+        const amountDisplay = document.getElementById("qr-amount-display");
+        if (amountDisplay) amountDisplay.innerText = `₹${npciFormattedAmount}`;
+
+        const canvasBox = document.getElementById("qrcode-canvas");
+        if (canvasBox) {
+            canvasBox.innerHTML = ""; // Clear out previous cache boxes to avoid rendering bugs
             
-                   function togglePaymentMode(mode) {
-            const qrSection = document.getElementById("qr-section");
-            const utrInput = document.getElementById("pay-utr");
+            // 3. Official NPCI Specification Uniform Link Protocol Format (Cleaned for active P2P Handle compliance)
+            strictNpciUpiString = `upi://pay?pa=9718439786@ybl&pn=INDIAN%20TELECOM&am=${npciFormattedAmount}&cu=INR&tn=Shopping%20Payment`;
             
-            if (mode === 'ONLINE') {
-                qrSection.style.display = "block";
-                utrInput.setAttribute("required", "required");
+            qrCodeInstance = new QRCode(canvasBox, {
+                text: strictNpciUpiString,
+                width: 130,
+                height: 130,
+                colorDark: "#0f172a",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.M // NPCI optimization parameter for fluid camera scans
+            });
 
-                // 1. Calculate live basket total sum
-                const rawTotal = cart.reduce((acc, current) => acc + (current.discountPrice * current.qty), 0);
-                
-                // 2. Strict NPCI Formatter: Forces integer values into a 2-decimal financial string (e.g. 1199 -> 1199.00)
-                const npciFormattedAmount = Number(rawTotal).toFixed(2);
-                
-                // Update your front-end text layout counter view
-                const amountDisplay = document.getElementById("qr-amount-display");
-                if (amountDisplay) amountDisplay.innerText = `₹${npciFormattedAmount}`;
-
-                const canvasBox = document.getElementById("qrcode-canvas");
-                if (canvasBox) {
-                    canvasBox.innerHTML = ""; // Clear out previous cache boxes to avoid rendering bugs
-                    
-                    // 3. Official NPCI Specification Uniform Link Protocol Format (Cleaned for active P2P Handle compliance)
-                    strictNpciUpiString = `upi://pay?pa=9718439786@ybl&pn=INDIAN%20TELECOM&am=${npciFormattedAmount}&cu=INR&tn=Shopping%20Payment`;
-                    
-                    qrCodeInstance = new QRCode(canvasBox, {
-                        text: strictNpciUpiString,
-                        width: 130,
-                        height: 130,
-                        colorDark: "#0f172a",
-                        colorLight: "#ffffff",
-                        correctLevel: QRCode.CorrectLevel.M // NPCI optimization parameter for fluid camera scans
-                    });
-
-                    // Reset sub-method tabs cleanly back onto standard QR layout visibility upon entry
-                    switchOnlineSubMethod('QR');
-                }
-            } else {
-                qrSection.style.display = "none";
-                utrInput.removeAttribute("required");
-                utrInput.value = "";
-                strictNpciUpiString = "";
-                const intentContainer = document.getElementById("mobile-upi-intent-container");
-                if (intentContainer) intentContainer.style.display = "none";
-            }
+            // Reset sub-method tabs cleanly back onto standard QR layout visibility upon entry
+            switchOnlineSubMethod('QR');
         }
+    } else {
+        qrSection.style.display = "none";
+        utrInput.removeAttribute("required");
+        utrInput.value = "";
+        strictNpciUpiString = "";
+        const intentContainer = document.getElementById("mobile-upi-intent-container");
+        if (intentContainer) intentContainer.style.display = "none";
+    }
+}
 
-        // 🟢 FIXED: Coordinates display states between scannable QR maps and mobile application launchers
-        function switchOnlineSubMethod(targetMethod) {
+// 🟢 FIXED: Coordinates display states between scannable QR maps and mobile application launchers
+function switchOnlineSubMethod(targetMethod) {
+
             const qrViewBox = document.getElementById("qr-code-graphics-wrapper");
             const appViewBox = document.getElementById("mobile-upi-intent-container");
             const qrTabBtn = document.getElementById("sub-mode-qr-btn");
