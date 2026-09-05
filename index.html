@@ -767,7 +767,7 @@ function closeCheckout() {
     document.getElementById("checkout-modal").style.display = "none"; 
 }
 
-                function togglePaymentMode(mode) {
+                      function togglePaymentMode(mode) {
             const qrSection = document.getElementById("qr-section");
             const utrInput = document.getElementById("pay-utr");
             
@@ -789,8 +789,8 @@ function closeCheckout() {
                 if (canvasBox) {
                     canvasBox.innerHTML = ""; // Clear out previous cache boxes to avoid rendering bugs
                     
-                    // 🟢 FIXED: Your exact Paytm Business parameters linked with fallback text alignment
-                    strictNpciUpiString = `upi://pay?pa=paytmqr5koqw8@ptys&pn=Paytm%20Merchant&am=${npciFormattedAmount}&cu=INR&tn=Shopping%20Payment`;
+                    // 🟢 FIXED: Wrapped directly into Paytm's native merchant deep link schema to parse ptys tokens perfectly
+                    strictNpciUpiString = `paytmmp://pay?pa=paytmqr5koqw8@ptys&pn=INDIAN%20TELECOM&am=${npciFormattedAmount}&cu=INR&tn=Shopping%20Payment`;
                     
                     qrCodeInstance = new QRCode(canvasBox, {
                         text: strictNpciUpiString,
@@ -843,8 +843,7 @@ function closeCheckout() {
                 appTabBtn.style.color = "#0f172a";
 
                 if (intentLink) {
-                    // 🟢 FIXED: Because you are using a whitelisted merchant token handle string, 
-                    // raw standard upi protocol calls will load successfully across all apps seamlessly!
+                    // 🟢 FIXED: Directs your checkout button flow straight through your verified Paytm application runtime path
                     intentLink.href = strictNpciUpiString;
                 }
 
@@ -855,6 +854,7 @@ function closeCheckout() {
                 }
             }
         }
+
         // =========================================================================
         // 🚀 STANDALONE CHECKOUT ORDER PLACEMENT DISPATCH ENGINE
         // =========================================================================
