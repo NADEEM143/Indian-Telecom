@@ -783,12 +783,16 @@ function togglePaymentMode(mode) {
                const amountDisplay = document.getElementById("qr-amount-display");
         if (amountDisplay) amountDisplay.innerText = `₹${npciFormattedAmount}`;
 
-               const canvasBox = document.getElementById("qrcode-canvas");
+                      const canvasBox = document.getElementById("qrcode-canvas");
         if (canvasBox) {
             canvasBox.innerHTML = ""; // Clear out previous cache boxes to avoid rendering bugs
             
-            // 🟢 FIXED: Updated to matching active registered name to bypass security blocks
-            strictNpciUpiString = `upi://pay?pa=9718439786@ybl&pn=Nadim%20Ahmad&cu=INR`;
+            // 💡 CRITICAL STEP: Replace this placeholder with your official PhonePe Business Merchant UPI ID!
+            // Example format: mab01234567@ybl or indiantelecom@ybl (Personal mobile number IDs will always be blocked here).
+            const officialMerchantVPA = "YOUR_PHONEPE_MERCHANT_ID_HERE@ybl"; 
+            
+            // 🟢 FIXED: Prefilled amount restored cleanly using official NPCI Merchant whitelist standards
+            strictNpciUpiString = `upi://pay?pa=${officialMerchantVPA}&pn=INDIAN%20TELECOM&am=${npciFormattedAmount}&cu=INR&tn=Shopping%20Payment`;
             
             qrCodeInstance = new QRCode(canvasBox, {
                 text: strictNpciUpiString,
