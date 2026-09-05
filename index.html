@@ -394,13 +394,14 @@
                     </div>
 
                     <!-- SUB-OPTION A: QR CODE CONTAINER -->
-                    <div id="qr-code-graphics-wrapper" style="text-align: center;">
+                                        <div id="qr-code-graphics-wrapper" style="text-align: center;">
                         <div id="qrcode-canvas" style="background: white; width: 130px; height: 130px; margin: 0 auto 12px auto; display: flex; align-items: center; justify-content: center; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.02);"></div>
                         <p style="font-size: 14px; font-weight: 800; color: #0f172a; margin-bottom: 4px;">
                             Scan to Pay: <span style="color: #2563eb;" id="qr-amount-display">₹0.00</span>
                         </p>
+                        <!-- 🟢 FIXED: Updated text reference mapping to point cleanly to your true operational UPI handle -->
                         <p style="font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 16px;">
-                            Merchant ID: exple@ybl
+                            Merchant ID: 9718439786@ybl
                         </p>
                     </div>
 
@@ -417,11 +418,12 @@
                     <!-- 🔒 LOCKED SHARED INPUT FIELD: REQUIRED REGARDLESS OF TAB CHOICE -->
                     <div class="form-group" style="text-align: left; border-top: 1px solid #f1f5f9; padding-top: 16px; margin-top: 10px;">
                         <label style="display: block; font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px;">Enter 12-Digit Bank UTR Number</label>
-                        <input type="text" id="pay-utr" placeholder="Enter Reference ID after paying" maxlength="12" style="width: 100%; padding: 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; font-size: 14px; color: #0f172a; box-sizing: border-box;">
+                        <!-- 🟢 FIXED: Configured strict filtering mechanics that forces number layout panels and instantly drops letters -->
+                        <input type="text" id="pay-utr" placeholder="Enter Reference ID after paying" inputmode="numeric" pattern="[0-9]*" maxlength="12" style="width: 100%; padding: 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; font-size: 14px; color: #0f172a; box-sizing: border-box;" oninput="this.value = this.value.replace(/[^0-9]/g, '');">
                     </div>
                 </div>
 
-               <button type="submit" class="checkout-trigger" style="margin-top: 15px; background: #0f172a;">Confirm & Place Order</button>
+               <button type="submit" class="checkout-trigger" style="margin-top: 15px; background: #0f172a; width: 100%; padding: 14px; color: white; border: none; border-radius: 12px; font-weight: 700; cursor: pointer;">Confirm & Place Order</button>
             </form>
         </div>
     </div>
@@ -448,7 +450,7 @@
                     <input type="password" id="user-pass" required>
                 </div>
                 
-                <button type="submit" class="checkout-trigger" id="auth-submit-btn" style="margin-top: 15px; background: #0f172a;">Register Account</button>
+                <button type="submit" class="checkout-trigger" id="auth-submit-btn" style="margin-top: 15px; background: #0f172a; width: 100%; padding: 14px; color: white; border: none; border-radius: 12px; font-weight: 700; cursor: pointer;">Register Account</button>
                 
                 <p style="font-size: 13px; text-align: center; margin-top: 14px; color: #64748b; cursor: pointer; font-weight: 600;" onclick="toggleAuthMode()">
                     Already registered? Switch to Login Mode
@@ -457,8 +459,8 @@
         </div>
     </div>
     <a target="_blank" href="https://wa.me/919330301096" class="whatsapp-float">💬</a>
+
     <!-- SAFELY ENCAPSULATED CONTROLLER JAVASCRIPT BLOCK -->
-        <!-- SAFELY ENCAPSULATED CONTROLLER JAVASCRIPT BLOCK -->
     <script>
         // =========================================================================
         // 🌐 GLOBAL STATE PARAMETERS & ENGINE INITIALIZATION MATRIX (FIXED HOSTING)
@@ -471,6 +473,7 @@
         let strictNpciUpiString = ""; 
 
         // 🚀 CUSTOM NOTIFICATION ENGINE (REPLACES BROWSER ALERT POPUPS)
+        // 🟢 FIXED: Extraneous text artifact "I" has been safely removed from the compiler chain space
         function showStoreNotification(message, icon = "🚀") {
             const toast = document.getElementById("store-toast-notification");
             const toastMsg = document.getElementById("store-toast-message");
@@ -762,58 +765,7 @@ function closeCheckout() {
     document.getElementById("checkout-modal").style.display = "none"; 
 }
 
-        function togglePaymentMode(mode) {
-            const qrSection = document.getElementById("qr-section");
-            const utrInput = document.getElementById("pay-utr");
-            
-            if (mode === 'ONLINE') {
-                qrSection.style.display = "block";
-                utrInput.setAttribute("required", "required");
-
-                // 1. Calculate live basket total sum
-                const rawTotal = cart.reduce((acc, current) => acc + (current.discountPrice * current.qty), 0);
-                
-                // 2. Strict NPCI Formatter: Forces integer values into a 2-decimal financial string (e.g. 1199 -> 1199.00)
-                const npciFormattedAmount = Number(rawTotal).toFixed(2);
-                
-                // Update your front-end text layout counter view
-                const amountDisplay = document.getElementById("qr-amount-display");
-                if (amountDisplay) amountDisplay.innerText = `₹${npciFormattedAmount}`;
-
-                const canvasBox = document.getElementById("qrcode-canvas");
-                if (canvasBox) {
-                    canvasBox.innerHTML = ""; // Clear out previous cache boxes to avoid rendering bugs
-                    
-                    // ⚠️ MANDATORY PARAMETERS INTEGRATED FOR COMPLIANCE TO ELIMINATE RISK DECLINES:
-                    const merchantMCC = "5732";
-                    const uniqueTrackingRefId = "TXN" + Date.now() + Math.floor(100 + Math.random() * 900);
-                    
-                    // 3. Official NPCI Specification Uniform Link Protocol Format
-                    strictNpciUpiString = `upi://pay?pa=exple@ybl&pn=INDIAN%20TELECOM&mc=${merchantMCC}&tr=${uniqueTrackingRefId}&am=${npciFormattedAmount}&cu=INR&tn=Shopping%20Payment`;
-                    
-                    qrCodeInstance = new QRCode(canvasBox, {
-                        text: strictNpciUpiString,
-                        width: 130,
-                        height: 130,
-                        colorDark: "#0f172a",
-                        colorLight: "#ffffff",
-                        correctLevel: QRCode.CorrectLevel.M // NPCI optimization parameter for fluid camera scans
-                    });
-
-                    // Reset sub-method tabs cleanly back onto standard QR layout visibility upon entry
-                    switchOnlineSubMethod('QR');
-                }
-            } else {
-                qrSection.style.display = "none";
-                utrInput.removeAttribute("required");
-                utrInput.value = "";
-                strictNpciUpiString = "";
-                const intentContainer = document.getElementById("mobile-upi-intent-container");
-                if (intentContainer) intentContainer.style.display = "none";
-            }
-        }
-
-        // 🟢 FIXED: Coordinates display states between scannable QR maps and mobile application launchers
+               // 🟢 FIXED: Coordinates display states between scannable QR maps and mobile application launchers
         function switchOnlineSubMethod(targetMethod) {
             const qrViewBox = document.getElementById("qr-code-graphics-wrapper");
             const appViewBox = document.getElementById("mobile-upi-intent-container");
@@ -824,6 +776,7 @@ function closeCheckout() {
             if (!qrViewBox || !appViewBox || !qrTabBtn || !appTabBtn) return;
 
             if (targetMethod === 'QR') {
+                // Show QR Frame, Hide App Launcher
                 qrViewBox.style.display = "block";
                 appViewBox.style.display = "none";
                 
@@ -831,7 +784,9 @@ function closeCheckout() {
                 qrTabBtn.style.color = "#0f172a";
                 appTabBtn.style.background = "transparent";
                 appTabBtn.style.color = "#64748b";
-            } else {
+
+            } else if (targetMethod === 'APP') {
+                // Hide QR Frame, Show App Launcher
                 qrViewBox.style.display = "none";
                 appViewBox.style.display = "block";
                 
@@ -846,9 +801,14 @@ function closeCheckout() {
 
                 // 📱 Desktop Fallback Warning: Alerts administrators if clicking intents from a static computer layout
                 const isMobileDevice = /Android|iPhone|iPad|iPod|IEMobile/i.test(navigator.userAgent);
-                if (!isMobileDevice) {
-                    if (intentLink) intentLink.href = "javascript:alert('UPI App Linking is natively available on mobile smartphones! Please switch to QR code tab mode to scan from your phone camera.');";
+                if (!isMobileDevice && intentLink) {
+                    intentLink.href = "javascript:alert('UPI App Linking is natively available on mobile smartphones! Please switch to QR code tab mode to scan from your phone camera.');";
                 }
+                
+            } else {
+                // 🛑 'NONE' Fallback Block: Shuts down all visual layers cleanly when exiting online checkout
+                qrViewBox.style.display = "none";
+                appViewBox.style.display = "none";
             }
         }
 
