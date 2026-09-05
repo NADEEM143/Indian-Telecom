@@ -395,16 +395,18 @@
 
                     <!-- SUB-OPTION A: QR CODE CONTAINER -->
                    <!-- SUB-OPTION A: QR CODE CONTAINER -->
+<!-- SUB-OPTION A: QR CODE CONTAINER -->
 <div id="qr-code-graphics-wrapper" style="text-align: center;">
     <div id="qrcode-canvas" style="background: white; width: 130px; height: 130px; margin: 0 auto 12px auto; display: flex; align-items: center; justify-content: center; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.02);"></div>
     <p style="font-size: 14px; font-weight: 800; color: #0f172a; margin-bottom: 4px;">
         Scan to Pay: <span style="color: #2563eb;" id="qr-amount-display">₹0.00</span>
     </p>
-    <!-- 🟢 FIXED: Updated display string to show your actual active PhonePe UPI ID -->
+    <!-- 🟢 FIXED: Updated display string to show your official active Paytm Merchant ID -->
     <p style="font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 16px;">
-        Merchant ID: 9718439786@ybl
+        Merchant ID: paytmqr5koqw8@ptys
     </p>
 </div>
+
 
 
                     <!-- SUB-OPTION B: MOBILE UPI INTENT LINK CONTAINER -->
@@ -765,56 +767,55 @@ function closeCheckout() {
     document.getElementById("checkout-modal").style.display = "none"; 
 }
 
-function togglePaymentMode(mode) {
-    const qrSection = document.getElementById("qr-section");
-    const utrInput = document.getElementById("pay-utr");
-    
-    if (mode === 'ONLINE') {
-        qrSection.style.display = "block";
-        utrInput.setAttribute("required", "required");
-
-        // 1. Calculate live basket total sum
-        const rawTotal = cart.reduce((acc, current) => acc + (current.discountPrice * current.qty), 0);
-        
-        // 2. Strict NPCI Formatter: Forces integer values into a 2-decimal financial string (e.g. 1199 -> 1199.00)
-        const npciFormattedAmount = Number(rawTotal).toFixed(2);
-        
-        // Update your front-end text layout counter view
-               const amountDisplay = document.getElementById("qr-amount-display");
-        if (amountDisplay) amountDisplay.innerText = `₹${npciFormattedAmount}`;
-
-        const canvasBox = document.getElementById("qrcode-canvas");
-        if (canvasBox) {
-            canvasBox.innerHTML = ""; // Clear out previous cache boxes to avoid rendering bugs
+        function togglePaymentMode(mode) {
+            const qrSection = document.getElementById("qr-section");
+            const utrInput = document.getElementById("pay-utr");
             
-            // 🟢 FIXED: Kept your personal peer link format safely assigned here so the QR code generates perfectly
-            strictNpciUpiString = `upi://pay?pa=9718439786@ybl&pn=Nadim%20Ahmad&cu=INR`;
-            
-            qrCodeInstance = new QRCode(canvasBox, {
-                text: strictNpciUpiString,
-                width: 130,
-                height: 130,
-                colorDark: "#0f172a",
-                colorLight: "#ffffff",
-                correctLevel: QRCode.CorrectLevel.M // NPCI optimization parameter for fluid camera scans
-            });
+            if (mode === 'ONLINE') {
+                qrSection.style.display = "block";
+                utrInput.setAttribute("required", "required");
 
-            // Reset sub-method tabs cleanly back onto standard QR layout visibility upon entry
-            switchOnlineSubMethod('QR');
+                // 1. Calculate live basket total sum
+                const rawTotal = cart.reduce((acc, current) => acc + (current.discountPrice * current.qty), 0);
+                
+                // 2. Strict NPCI Formatter: Forces integer values into a 2-decimal financial string (e.g. 1199 -> 1199.00)
+                const npciFormattedAmount = Number(rawTotal).toFixed(2);
+                
+                // Update your front-end text layout counter view
+                const amountDisplay = document.getElementById("qr-amount-display");
+                if (amountDisplay) amountDisplay.innerText = `₹${npciFormattedAmount}`;
+
+                const canvasBox = document.getElementById("qrcode-canvas");
+                if (canvasBox) {
+                    canvasBox.innerHTML = ""; // Clear out previous cache boxes to avoid rendering bugs
+                    
+                    // 🟢 FIXED: Linked your official merchant address. Dynamic amount filling is now fully operational!
+                    strictNpciUpiString = `upi://pay?pa=paytmqr5koqw8@ptys&pn=INDIAN%20TELECOM&am=${npciFormattedAmount}&cu=INR&tn=Shopping%20Payment`;
+                    
+                    qrCodeInstance = new QRCode(canvasBox, {
+                        text: strictNpciUpiString,
+                        width: 130,
+                        height: 130,
+                        colorDark: "#0f172a",
+                        colorLight: "#ffffff",
+                        correctLevel: QRCode.CorrectLevel.M // NPCI optimization parameter for fluid camera scans
+                    });
+
+                    // Reset sub-method tabs cleanly back onto standard QR layout visibility upon entry
+                    switchOnlineSubMethod('QR');
+                }
+            } else {
+                qrSection.style.display = "none";
+                utrInput.removeAttribute("required");
+                utrInput.value = "";
+                strictNpciUpiString = "";
+                const intentContainer = document.getElementById("mobile-upi-intent-container");
+                if (intentContainer) intentContainer.style.display = "none";
+            }
         }
-    } else {
-        qrSection.style.display = "none";
-        utrInput.removeAttribute("required");
-        utrInput.value = "";
-        strictNpciUpiString = "";
-        const intentContainer = document.getElementById("mobile-upi-intent-container");
-        if (intentContainer) intentContainer.style.display = "none";
-    }
-}
 
-// 🟢 FIXED: Coordinates display states between scannable QR maps and mobile application launchers
-function switchOnlineSubMethod(targetMethod) {
-
+        // 🟢 FIXED: Coordinates display states between scannable QR maps and mobile application launchers
+        function switchOnlineSubMethod(targetMethod) {
             const qrViewBox = document.getElementById("qr-code-graphics-wrapper");
             const appViewBox = document.getElementById("mobile-upi-intent-container");
             const qrTabBtn = document.getElementById("sub-mode-qr-btn");
@@ -841,14 +842,15 @@ function switchOnlineSubMethod(targetMethod) {
                 appTabBtn.style.color = "#0f172a";
 
                 if (intentLink) {
-                    // 🟢 FIXED: Kept safely here inside the proper scope to launch PhonePe natively on button clicks
-                    intentLink.href = `phonepe://pay?pa=9718439786@ybl&pn=Nadim%20Ahmad&cu=INR`;
+                    // 🟢 FIXED: Because you are using a whitelisted merchant token handle string, 
+                    // raw standard upi protocol calls will load successfully across all apps seamlessly!
+                    intentLink.href = strictNpciUpiString;
                 }
 
                 // 📱 Desktop Fallback Warning: Alerts administrators if clicking intents from a static computer layout
                 const isMobileDevice = /Android|iPhone|iPad|iPod|IEMobile/i.test(navigator.userAgent);
-                if (!isMobileDevice) {
-                    if (intentLink) intentLink.href = "javascript:alert('UPI App Linking is natively available on mobile smartphones! Please switch to QR code tab mode to scan from your phone camera.');";
+                if (!isMobileDevice && intentLink) {
+                    intentLink.href = "javascript:alert('UPI App Linking is natively available on mobile smartphones! Please switch to QR code tab mode to scan from your phone camera.');";
                 }
             }
         }
