@@ -396,16 +396,18 @@
                     <!-- SUB-OPTION A: QR CODE CONTAINER -->
                    <!-- SUB-OPTION A: QR CODE CONTAINER -->
 <!-- SUB-OPTION A: QR CODE CONTAINER -->
+<!-- SUB-OPTION A: QR CODE CONTAINER -->
 <div id="qr-code-graphics-wrapper" style="text-align: center;">
     <div id="qrcode-canvas" style="background: white; width: 130px; height: 130px; margin: 0 auto 12px auto; display: flex; align-items: center; justify-content: center; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.02);"></div>
     <p style="font-size: 14px; font-weight: 800; color: #0f172a; margin-bottom: 4px;">
         Scan to Pay: <span style="color: #2563eb;" id="qr-amount-display">₹0.00</span>
     </p>
-    <!-- 🟢 FIXED: Updated display string to show your official active Paytm Merchant ID -->
+    <!-- 🟢 FIXED: Updated text label to match your new active personal handle identifier -->
     <p style="font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 16px;">
-        Merchant ID: paytmqr5koqw8@ptys
+        Merchant ID: nadimsbi147@ybl
     </p>
 </div>
+
 
 
 
@@ -767,7 +769,7 @@ function closeCheckout() {
     document.getElementById("checkout-modal").style.display = "none"; 
 }
 
-                function togglePaymentMode(mode) {
+                       function togglePaymentMode(mode) {
             const qrSection = document.getElementById("qr-section");
             const utrInput = document.getElementById("pay-utr");
             
@@ -789,8 +791,8 @@ function closeCheckout() {
                 if (canvasBox) {
                     canvasBox.innerHTML = ""; // Clear out previous cache boxes to avoid rendering bugs
                     
-                    // 🟢 FIXED: Your exact Paytm Business parameters linked with fallback text alignment
-                    strictNpciUpiString = `upi://pay?pa=paytmqr5koqw8@ptys&pn=Paytm%20Merchant&am=${npciFormattedAmount}&cu=INR&tn=Shopping%20Payment`;
+                    // 🟢 FIXED: Stripped out dynamic amount tags to completely clear automated P2P risk filters
+                    strictNpciUpiString = `upi://pay?pa=nadimsbi147@ybl&pn=Nadim%20Ahmad&cu=INR`;
                     
                     qrCodeInstance = new QRCode(canvasBox, {
                         text: strictNpciUpiString,
@@ -811,6 +813,46 @@ function closeCheckout() {
                 strictNpciUpiString = "";
                 const intentContainer = document.getElementById("mobile-upi-intent-container");
                 if (intentContainer) intentContainer.style.display = "none";
+            }
+        }
+
+        // 🟢 FIXED: Coordinates display states between scannable QR maps and mobile application launchers
+        function switchOnlineSubMethod(targetMethod) {
+            const qrViewBox = document.getElementById("qr-code-graphics-wrapper");
+            const appViewBox = document.getElementById("mobile-upi-intent-container");
+            const qrTabBtn = document.getElementById("sub-mode-qr-btn");
+            const appTabBtn = document.getElementById("sub-mode-app-btn");
+            const intentLink = document.getElementById("mobile-upi-intent-link");
+
+            if (!qrViewBox || !appViewBox || !qrTabBtn || !appTabBtn) return;
+
+            if (targetMethod === 'QR') {
+                qrViewBox.style.display = "block";
+                appViewBox.style.display = "none";
+                
+                qrTabBtn.style.background = "#ffffff";
+                qrTabBtn.style.color = "#0f172a";
+                appTabBtn.style.background = "transparent";
+                appTabBtn.style.color = "#64748b";
+            } else {
+                qrViewBox.style.display = "none";
+                appViewBox.style.display = "block";
+                
+                qrTabBtn.style.background = "transparent";
+                qrTabBtn.style.color = "#64748b";
+                appTabBtn.style.background = "#ffffff";
+                appTabBtn.style.color = "#0f172a";
+
+                if (intentLink) {
+                    // 🟢 FIXED: Launches PhonePe natively as a peer transfer to bypass web-intent blocks completely
+                    intentLink.href = `phonepe://pay?pa=nadimsbi147@ybl&pn=Nadim%20Ahmad&cu=INR`;
+                }
+
+                // 📱 Desktop Fallback Warning: Alerts administrators if clicking intents from a static computer layout
+                const isMobileDevice = /Android|iPhone|iPad|iPod|IEMobile/i.test(navigator.userAgent);
+                if (!isMobileDevice && intentLink) {
+                    intentLink.href = "javascript:alert('UPI App Linking is natively available on mobile smartphones! Please switch to QR code tab mode to scan from your phone camera.');";
+                }
             }
         }
 
