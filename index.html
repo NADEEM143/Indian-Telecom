@@ -505,49 +505,46 @@
             const maxSyncAttempts = 3;
 
             async function executePipelineFetch() {
-try {
-    const cacheBusterTimeToken = Date.now();
-    
-    // 🟢 FIXED: Dynamically downloads your live announcement string right on page boot
     try {
-        const bannerMsgResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=banner_msg&_t=${cacheBusterTimeToken}`);
-        if (bannerMsgResponse.ok) {
-            const parsedBannerPayload = await bannerMsgResponse.json();
-            const activeBannerText = parsedBannerPayload.message || "";
-            
-            // FIXED: Added this line back so JavaScript knows where to look on the page
-            const marqueeContainerElement = document.getElementById("mega-offer-banner");
-            
-            if (marqueeContainerElement) {
-                // FIXED: Only adds the fire emoji if your admin panel actually has text
-                marqueeContainerElement.innerHTML = activeBannerText ? `🔥 ${activeBannerText}` : "";
-            }
-        }
-    } catch (bannerErr) {
-        console.error("Banner download exception skipped:", bannerErr);
-    }
-} catch (globalErr) {
-    console.error("Global engine tracking exception:", globalErr);
-}
-
-                    // Injects a dynamic timestamp token to destroy browser cache limits for a true live catalog sync
-                    const response = await fetch(`${API_BASE_ENDPOINT}/admin?type=products&_t=${cacheBusterTimeToken}`);
-                    if (response.ok) {
-                        const databaseItems = await response.json();
-                        productsList = databaseItems.filter(item => item.isLive !== false);
-                        await renderProducts(productsList);
-                        
-                        // Keeps the basket count badges accurate if a returning buyer refreshes the site
-                        updateCartUI();
-                        return true;
-                    } else {
-                        throw new Error(`Server returned error status code: ${response.status}`);
-                    }
-                } catch (err) {
-                    console.error(`Pipeline Sync Attempt ${currentSyncAttempts + 1} Failed:`, err.message);
-                    return false;
+        const cacheBusterTimeToken = Date.now();
+        
+        // 🟢 FIXED: Dynamically downloads your live announcement string right on page boot
+        try {
+            const bannerMsgResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=banner_msg&_t=${cacheBusterTimeToken}`);
+            if (bannerMsgResponse.ok) {
+                const parsedBannerPayload = await bannerMsgResponse.json();
+                const activeBannerText = parsedBannerPayload.message || "";
+                
+                // FIXED: Added this line back so JavaScript knows where to look on the page
+                const marqueeContainerElement = document.getElementById("mega-offer-banner");
+                
+                if (marqueeContainerElement) {
+                    // FIXED: Only adds the fire emoji if your admin panel actually has text
+                    marqueeContainerElement.innerHTML = activeBannerText ? `🔥 ${activeBannerText}` : "";
                 }
             }
+        } catch (bannerErr) {
+            console.error("Banner download exception skipped:", bannerErr);
+        }
+
+        // Injects a dynamic timestamp token to destroy browser cache limits for a true live catalog sync
+        const response = await fetch(`${API_BASE_ENDPOINT}/admin?type=products&_t=${cacheBusterTimeToken}`);
+        if (response.ok) {
+            const databaseItems = await response.json();
+            productsList = databaseItems.filter(item => item.isLive !== false);
+            await renderProducts(productsList);
+            
+            // Keeps the basket count badges accurate if a returning buyer refreshes the site
+            updateCartUI();
+            return true;
+        } else {
+            throw new Error(`Server returned error status code: ${response.status}`);
+        }
+    } catch (err) {
+        console.error(`Pipeline Sync Attempt ${currentSyncAttempts + 1} Failed:`, err.message);
+        return false;
+    }
+}
 
             // Loop execution gatekeeper: Automatically re-triggers the network if a cold start block occurs
             while (currentSyncAttempts < maxSyncAttempts) {
