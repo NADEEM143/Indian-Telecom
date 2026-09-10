@@ -465,17 +465,17 @@
                     <!-- SUB-OPTION A: QR CODE CONTAINER -->
                    <!-- SUB-OPTION A: QR CODE CONTAINER -->
 <!-- SUB-OPTION A: QR CODE CONTAINER -->
+<!-- SUB-OPTION A: QR CODE CONTAINER -->
 <div id="qr-code-graphics-wrapper" style="text-align: center;">
     <div id="qrcode-canvas" style="background: white; width: 130px; height: 130px; margin: 0 auto 12px auto; display: flex; align-items: center; justify-content: center; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.02);"></div>
     <p style="font-size: 14px; font-weight: 800; color: #0f172a; margin-bottom: 4px;">
         Scan to Pay: <span style="color: #2563eb;" id="qr-amount-display">₹0.00</span>
     </p>
-    <!-- 🟢 FIXED: Updated display string to show your official active Paytm Merchant ID -->
+    <!-- 🟢 FIXED: Updated label to match your personal active address handle -->
     <p style="font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 16px;">
-        Merchant ID: paytmqr5koqw8@ptys
+        UPI ID: nadimsbi147@ybl
     </p>
 </div>
-
 
 
                     <!-- SUB-OPTION B: MOBILE UPI INTENT LINK CONTAINER -->
@@ -838,7 +838,7 @@ function closeCheckout() {
     document.getElementById("checkout-modal").style.display = "none"; 
 }
 
-                      function togglePaymentMode(mode) {
+        function togglePaymentMode(mode) {
             const qrSection = document.getElementById("qr-section");
             const utrInput = document.getElementById("pay-utr");
             
@@ -860,8 +860,8 @@ function closeCheckout() {
                 if (canvasBox) {
                     canvasBox.innerHTML = ""; // Clear out previous cache boxes to avoid rendering bugs
                     
-                    // 🟢 FIXED: Wrapped directly into Paytm's native merchant deep link schema to parse ptys tokens perfectly
-                    strictNpciUpiString = `paytmmp://pay?pa=paytmqr5koqw8@ptys&pn=INDIAN%20TELECOM&am=${npciFormattedAmount}&cu=INR&tn=Shopping%20Payment`;
+                    // 🟢 FIXED & UPDATED: Formatted completely using your personal SBI handle following strict NPCI guidelines
+                    strictNpciUpiString = `upi://pay?pa=nadimsbi147@ybl&pn=INDIAN%20TELECOM&am=${npciFormattedAmount}&cu=INR&tn=Accessories%20Purchase`;
                     
                     qrCodeInstance = new QRCode(canvasBox, {
                         text: strictNpciUpiString,
