@@ -862,11 +862,11 @@ function togglePaymentMode(mode) {
         if (canvasBox) {
             canvasBox.innerHTML = ""; // Clear out previous cache boxes to avoid rendering bugs
             
-            // 🟢 QR CODE STRING: Kept locked to your personal UPI ID for manual on-screen scanning
+            // 🟢 QR Code Canvas String: Formatted directly to your personal active handle for camera scanning
             const personalQrCodeUpiString = `upi://pay?pa=nadimsbi147@ybl&pn=INDIAN%20TELECOM&am=${npciFormattedAmount}&cu=INR`;
             
-            // 🚀 BUSINESS APP LINK INTENT: Bound to your business merchant account to bypass device security blocks
-            strictNpciUpiString = `upi://pay?pa=paytmqr5koqw8@ptys&pn=INDIAN%20TELECOM&am=${npciFormattedAmount}&cu=INR&tn=Accessories%20Purchase`;
+            // 🚀 APP INTENT PATHWAY: Bound onto your active Paytm Business handle for link button triggers
+            strictNpciUpiString = `pa=paytmqr5koqw8@ptys&pn=INDIAN%20TELECOM&am=${npciFormattedAmount}&cu=INR&tn=Accessories%20Purchase`;
             
             qrCodeInstance = new QRCode(canvasBox, {
                 text: personalQrCodeUpiString, // Renders the canvas using your personal handle
@@ -879,10 +879,10 @@ function togglePaymentMode(mode) {
 
             // Reset sub-method tabs cleanly back onto standard QR layout visibility upon entry
             switchOnlineSubMethod('QR');
-        }
+                }
     } else {
         qrSection.style.display = "none";
-        utrInput.removeAttribute("required");
+        utrInput.removeAttribute("required", "required");
         utrInput.value = "";
         strictNpciUpiString = "";
         const intentContainer = document.getElementById("mobile-upi-intent-container");
@@ -890,7 +890,7 @@ function togglePaymentMode(mode) {
     }
 }
 
-// 🟢 CO-ORDINATES CORRESPONDING VALUES BETWEEN MOBILE APP SHORTCUTS AND ON-SCREEN QR CODES
+// 🟢 BYPASS ENGINE: Automatically routes parameters into a hardware-deep intent to bypass security blocks
 function switchOnlineSubMethod(targetMethod) {
     const qrViewBox = document.getElementById("qr-code-graphics-wrapper");
     const appViewBox = document.getElementById("mobile-upi-intent-container");
@@ -920,14 +920,20 @@ function switchOnlineSubMethod(targetMethod) {
         if (intentLink) {
             const isMobileDevice = /Android|iPhone|iPad|iPod|IEMobile/i.test(navigator.userAgent);
             if (isMobileDevice) {
-                // 🚀 FIXED: Pass the verified merchant deep link so clicking the link launches ALL active phone apps smoothly
-                intentLink.href = strictNpciUpiString;
+                if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+                    // Apple iOS web-intent routing structure
+                    intentLink.href = `upi://pay?${strictNpciUpiString}`;
+                } else {
+                    // 🚀 NATIVE ANDROID CHROME INTENT MACHINE: Routes via system package triggers to bypass the whitelisting error block
+                    intentLink.href = `intent://pay?${strictNpciUpiString}#Intent;scheme=upi;package=net.one97.paytm;id=pay;end`;
+                }
             } else {
                 intentLink.href = "javascript:alert('UPI App Checkout is natively optimized for mobile smartphones! Please switch to the QR code tab to scan from your phone camera.'); switchOnlineSubMethod('QR');";
             }
         }
     }
 }
+
 
 
         // =========================================================================
