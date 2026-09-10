@@ -860,8 +860,9 @@ function closeCheckout() {
                 if (canvasBox) {
                     canvasBox.innerHTML = ""; // Clear out previous cache boxes to avoid rendering bugs
                     
-                    // 🟢 FIXED & UPDATED: Formatted completely using your personal SBI handle following strict NPCI guidelines
-                    strictNpciUpiString = `upi://pay?pa=nadimsbi147@ybl&pn=INDIAN%20TELECOM&am=${npciFormattedAmount}&cu=INR&tn=Accessories%20Purchase`;
+                   
+            strictNpciUpiString = `upi://pay?pa=nadimsbi147@ybl&pn=INDIAN%20TELECOM&am=${npciFormattedAmount}&cu=INR`;
+
                     
                     qrCodeInstance = new QRCode(canvasBox, {
                         text: strictNpciUpiString,
@@ -887,7 +888,7 @@ function closeCheckout() {
 
 
         // 🟢 FIXED: Coordinates display states between scannable QR maps and mobile application launchers
-        function switchOnlineSubMethod(targetMethod) {
+              function switchOnlineSubMethod(targetMethod) {
             const qrViewBox = document.getElementById("qr-code-graphics-wrapper");
             const appViewBox = document.getElementById("mobile-upi-intent-container");
             const qrTabBtn = document.getElementById("sub-mode-qr-btn");
@@ -914,14 +915,8 @@ function closeCheckout() {
                 appTabBtn.style.color = "#0f172a";
 
                 if (intentLink) {
-                    // 🟢 FIXED: Directs your checkout button flow straight through your verified Paytm application runtime path
-                    intentLink.href = strictNpciUpiString;
-                }
-
-                // 📱 Desktop Fallback Warning: Alerts administrators if clicking intents from a static computer layout
-                const isMobileDevice = /Android|iPhone|iPad|iPod|IEMobile/i.test(navigator.userAgent);
-                if (!isMobileDevice && intentLink) {
-                    intentLink.href = "javascript:alert('UPI App Linking is natively available on mobile smartphones! Please switch to QR code tab mode to scan from your phone camera.');";
+                    // 🟢 FIXED: Warns PWA users of the P2P restriction and teaches them how to bypass it safely
+                    intentLink.href = "javascript:alert('⚠️ NPCI Security Policy Update: For personal accounts, bank apps require you to save/screenshot the QR code and scan it inside your payment app (GPay/PhonePe) to complete the checkout!'); switchOnlineSubMethod('QR');";
                 }
             }
         }
