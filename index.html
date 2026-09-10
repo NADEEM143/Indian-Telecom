@@ -466,16 +466,18 @@
                    <!-- SUB-OPTION A: QR CODE CONTAINER -->
 <!-- SUB-OPTION A: QR CODE CONTAINER -->
 <!-- SUB-OPTION A: QR CODE CONTAINER -->
+<!-- SUB-OPTION A: QR CODE CONTAINER -->
 <div id="qr-code-graphics-wrapper" style="text-align: center;">
     <div id="qrcode-canvas" style="background: white; width: 130px; height: 130px; margin: 0 auto 12px auto; display: flex; align-items: center; justify-content: center; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.02);"></div>
     <p style="font-size: 14px; font-weight: 800; color: #0f172a; margin-bottom: 4px;">
         Scan to Pay: <span style="color: #2563eb;" id="qr-amount-display">₹0.00</span>
     </p>
-    <!-- 🟢 FIXED: Updated label to match your personal active address handle -->
+    <!-- 🟢 FIXED: Kept your personal UPI ID visible for customers who prefer manual scanning -->
     <p style="font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 16px;">
         UPI ID: nadimsbi147@ybl
     </p>
 </div>
+
 
 
                     <!-- SUB-OPTION B: MOBILE UPI INTENT LINK CONTAINER -->
@@ -838,88 +840,95 @@ function closeCheckout() {
     document.getElementById("checkout-modal").style.display = "none"; 
 }
 
-        function togglePaymentMode(mode) {
-            const qrSection = document.getElementById("qr-section");
-            const utrInput = document.getElementById("pay-utr");
+function togglePaymentMode(mode) {
+    const qrSection = document.getElementById("qr-section");
+    const utrInput = document.getElementById("pay-utr");
+    
+    if (mode === 'ONLINE') {
+        qrSection.style.display = "block";
+        utrInput.setAttribute("required", "required");
+
+        // 1. Calculate live basket total sum
+        const rawTotal = cart.reduce((acc, current) => acc + (current.discountPrice * current.qty), 0);
+        
+        // 2. Strict NPCI Formatter: Forces integer values into a 2-decimal financial string (e.g. 1199 -> 1199.00)
+        const npciFormattedAmount = Number(rawTotal).toFixed(2);
+        
+        // Update your front-end text layout counter view
+        const amountDisplay = document.getElementById("qr-amount-display");
+        if (amountDisplay) amountDisplay.innerText = `₹${npciFormattedAmount}`;
+
+        const canvasBox = document.getElementById("qrcode-canvas");
+        if (canvasBox) {
+            canvasBox.innerHTML = ""; // Clear out previous cache boxes to avoid rendering bugs
             
-            if (mode === 'ONLINE') {
-                qrSection.style.display = "block";
-                utrInput.setAttribute("required", "required");
+            // 🟢 QR CODE STRING: Kept locked to your personal UPI ID for manual on-screen scanning
+            const personalQrCodeUpiString = `upi://pay?pa=nadimsbi147@ybl&pn=INDIAN%20TELECOM&am=${npciFormattedAmount}&cu=INR`;
+            
+            // 🚀 BUSINESS APP LINK INTENT: Bound to your business merchant account to bypass device security blocks
+            strictNpciUpiString = `upi://pay?pa=paytmqr5koqw8@ptys&pn=INDIAN%20TELECOM&am=${npciFormattedAmount}&cu=INR&tn=Accessories%20Purchase`;
+            
+            qrCodeInstance = new QRCode(canvasBox, {
+                text: personalQrCodeUpiString, // Renders the canvas using your personal handle
+                width: 130,
+                height: 130,
+                colorDark: "#0f172a",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.M // NPCI optimization parameter for fluid camera scans
+            });
 
-                // 1. Calculate live basket total sum
-                const rawTotal = cart.reduce((acc, current) => acc + (current.discountPrice * current.qty), 0);
-                
-                // 2. Strict NPCI Formatter: Forces integer values into a 2-decimal financial string (e.g. 1199 -> 1199.00)
-                const npciFormattedAmount = Number(rawTotal).toFixed(2);
-                
-                // Update your front-end text layout counter view
-                const amountDisplay = document.getElementById("qr-amount-display");
-                if (amountDisplay) amountDisplay.innerText = `₹${npciFormattedAmount}`;
+            // Reset sub-method tabs cleanly back onto standard QR layout visibility upon entry
+            switchOnlineSubMethod('QR');
+        }
+    } else {
+        qrSection.style.display = "none";
+        utrInput.removeAttribute("required");
+        utrInput.value = "";
+        strictNpciUpiString = "";
+        const intentContainer = document.getElementById("mobile-upi-intent-container");
+        if (intentContainer) intentContainer.style.display = "none";
+    }
+}
 
-                const canvasBox = document.getElementById("qrcode-canvas");
-                if (canvasBox) {
-                    canvasBox.innerHTML = ""; // Clear out previous cache boxes to avoid rendering bugs
-                    
-                   
-            strictNpciUpiString = `upi://pay?pa=nadimsbi147@ybl&pn=INDIAN%20TELECOM&am=${npciFormattedAmount}&cu=INR`;
+// 🟢 CO-ORDINATES CORRESPONDING VALUES BETWEEN MOBILE APP SHORTCUTS AND ON-SCREEN QR CODES
+function switchOnlineSubMethod(targetMethod) {
+    const qrViewBox = document.getElementById("qr-code-graphics-wrapper");
+    const appViewBox = document.getElementById("mobile-upi-intent-container");
+    const qrTabBtn = document.getElementById("sub-mode-qr-btn");
+    const appTabBtn = document.getElementById("sub-mode-app-btn");
+    const intentLink = document.getElementById("mobile-upi-intent-link");
 
-                    
-                    qrCodeInstance = new QRCode(canvasBox, {
-                        text: strictNpciUpiString,
-                        width: 130,
-                        height: 130,
-                        colorDark: "#0f172a",
-                        colorLight: "#ffffff",
-                        correctLevel: QRCode.CorrectLevel.M // NPCI optimization parameter for fluid camera scans
-                    });
+    if (!qrViewBox || !appViewBox || !qrTabBtn || !appTabBtn) return;
 
-                    // Reset sub-method tabs cleanly back onto standard QR layout visibility upon entry
-                    switchOnlineSubMethod('QR');
-                }
+    if (targetMethod === 'QR') {
+        qrViewBox.style.display = "block";
+        appViewBox.style.display = "none";
+        
+        qrTabBtn.style.background = "#ffffff";
+        qrTabBtn.style.color = "#0f172a";
+        appTabBtn.style.background = "transparent";
+        appTabBtn.style.color = "#64748b";
+    } else {
+        qrViewBox.style.display = "none";
+        appViewBox.style.display = "block";
+        
+        qrTabBtn.style.background = "transparent";
+        qrTabBtn.style.color = "#64748b";
+        appTabBtn.style.background = "#ffffff";
+        appTabBtn.style.color = "#0f172a";
+
+        if (intentLink) {
+            const isMobileDevice = /Android|iPhone|iPad|iPod|IEMobile/i.test(navigator.userAgent);
+            if (isMobileDevice) {
+                // 🚀 FIXED: Pass the verified merchant deep link so clicking the link launches ALL active phone apps smoothly
+                intentLink.href = strictNpciUpiString;
             } else {
-                qrSection.style.display = "none";
-                utrInput.removeAttribute("required");
-                utrInput.value = "";
-                strictNpciUpiString = "";
-                const intentContainer = document.getElementById("mobile-upi-intent-container");
-                if (intentContainer) intentContainer.style.display = "none";
+                intentLink.href = "javascript:alert('UPI App Checkout is natively optimized for mobile smartphones! Please switch to the QR code tab to scan from your phone camera.'); switchOnlineSubMethod('QR');";
             }
         }
+    }
+}
 
-
-        // 🟢 FIXED: Coordinates display states between scannable QR maps and mobile application launchers
-              function switchOnlineSubMethod(targetMethod) {
-            const qrViewBox = document.getElementById("qr-code-graphics-wrapper");
-            const appViewBox = document.getElementById("mobile-upi-intent-container");
-            const qrTabBtn = document.getElementById("sub-mode-qr-btn");
-            const appTabBtn = document.getElementById("sub-mode-app-btn");
-            const intentLink = document.getElementById("mobile-upi-intent-link");
-
-            if (!qrViewBox || !appViewBox || !qrTabBtn || !appTabBtn) return;
-
-            if (targetMethod === 'QR') {
-                qrViewBox.style.display = "block";
-                appViewBox.style.display = "none";
-                
-                qrTabBtn.style.background = "#ffffff";
-                qrTabBtn.style.color = "#0f172a";
-                appTabBtn.style.background = "transparent";
-                appTabBtn.style.color = "#64748b";
-            } else {
-                qrViewBox.style.display = "none";
-                appViewBox.style.display = "block";
-                
-                qrTabBtn.style.background = "transparent";
-                qrTabBtn.style.color = "#64748b";
-                appTabBtn.style.background = "#ffffff";
-                appTabBtn.style.color = "#0f172a";
-
-                if (intentLink) {
-                    // 🟢 FIXED: Warns PWA users of the P2P restriction and teaches them how to bypass it safely
-                    intentLink.href = "javascript:alert('⚠️ NPCI Security Policy Update: For personal accounts, bank apps require you to save/screenshot the QR code and scan it inside your payment app (GPay/PhonePe) to complete the checkout!'); switchOnlineSubMethod('QR');";
-                }
-            }
-        }
 
         // =========================================================================
         // 🚀 STANDALONE CHECKOUT ORDER PLACEMENT DISPATCH ENGINE
