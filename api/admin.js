@@ -142,17 +142,21 @@ export default async function handler(req, res) {
                         currentUsers = [];
                     }
 
-                    const userIndex = currentUsers.findIndex(u => String(u.phone).replace(/\D/g, '') === String(phone).replace(/\D/g, ''));
+                                        const userIndex = currentUsers.findIndex(u => String(u.phone).replace(/\D/g, '') === String(phone).replace(/\D/g, ''));
                     if (userIndex === -1) {
                         return res.status(404).json({ error: "Account profile record registry not found." });
                     }
 
-                    // Action Parameter Rule A: Handle request to suspend/delete account data records
+                    // Action Parameter Rule A: Handle request to wipe/reset profile information fields cleanly without hiding records
                     if (action === 'DELETE_ACCOUNT') {
-                        // Flag user profile state parameters as SUSPENDED rather than erasing history links instantly
-                        currentUsers[userIndex].status = 'SUSPENDED';
+                        // 🟢 FIXED: Soft resets sensitive data fields so the user row stays fully visible in your Admin Dashboard list!
+                        currentUsers[userIndex].password = "WIPED_" + Math.floor(1000 + Math.random() * 9000);
+                        currentUsers[userIndex].name = "Deactivated Account";
+                        currentUsers[userIndex].defaultAddress = "";
+                        currentUsers[userIndex].status = 'DEACTIVATED'; 
+                        
                         await kv.set('it_users', currentUsers);
-                        return res.status(200).json({ success: true, message: "Account profile deactivated safely." });
+                        return res.status(200).json({ success: true, message: "Account profile records cleared safely." });
                     }
 
                     // Action Parameter Rule B: Standard text updates mapping name, password mutations, and saved locations
