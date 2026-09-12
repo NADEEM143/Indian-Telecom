@@ -840,7 +840,7 @@
         }
 
         // 🟢 FIXED: Injects interactive plus and minus controls to update item counts instantly
-                function updateCartUI() {
+                        function updateCartUI() {
             const badge = document.getElementById("cart-badge");
             const totalStr = document.getElementById("cart-total");
             const count = cart.reduce((acc, current) => acc + current.qty, 0);
@@ -857,27 +857,33 @@
                 return;
             }
             
-            container.innerHTML = cart.map(i => `
-                <div class="cart-item" style="display: flex; align-items: center; gap: 14px; padding-bottom: 16px; border-bottom: 1px solid #f1f5f9; margin-bottom: 16px;">
-                    <div class="cart-item-img" style="width: 50px; height: 50px; background: #f8fafc; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #94a3b8; border: 1px solid #e2e8f0; overflow: hidden; flex-shrink: 0;">
-                        ${i.asset ? `<img src="${i.asset}" style="width:100%;height:100%;object-fit:cover;">` : '📱'}
-                    </div>
-                    <div style="flex:1;">
-                        <h5 style="font-size:14px;font-weight:700;color:#0f172a;margin-bottom:4px;">${i.name}</h5>
-                        <div style="display: flex; align-items: center; gap: 8px; margin-top: 4px;">
-                            <button onclick="changeBasketItemQty('${i.id}', -1)" style="width: 24px; height: 24px; border-radius: 6px; border: 1px solid #cbd5e1; background: #ffffff; color: #0f172a; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; transition: 0.2s;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='#ffffff'">−</button>
-                            <span style="font-size: 13px; font-weight: 700; color: #0f172a; min-width: 16px; text-align: center;">${i.qty}</span>
-                            <button onclick="changeBasketItemQty('${i.id}', 1)" style="width: 24px; height: 24px; border-radius: 6px; border: 1px solid #cbd5e1; background: #ffffff; color: #0f172a; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; transition: 0.2s;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='#ffffff'">+</button>
-                            
-                            <!-- 🟢 FIXED & ADDED: Strikethrough original price appears cleanly right here next to the active discount price -->
-                            <span style="font-size:12px;color:#64748b;margin-left:6px;">
-                                × ₹${i.discountPrice} <span style="text-decoration: line-through; color: #94a3b8; font-size: 11px; margin-left: 4px;">₹${i.price || i.discountPrice}</span>
-                            </span>
+            container.innerHTML = cart.map(i => {
+                // 🟢 FIXED SAFETY CHECK: Ensure we always print the higher value as the crossed-out original price
+                const realOriginalPrice = Math.max(Number(i.price || 0), Number(i.discountPrice || 0));
+                const realDiscountPrice = Math.min(Number(i.price || 0), Number(i.discountPrice || 0));
+
+                return `
+                    <div class="cart-item" style="display: flex; align-items: center; gap: 14px; padding-bottom: 16px; border-bottom: 1px solid #f1f5f9; margin-bottom: 16px;">
+                        <div class="cart-item-img" style="width: 50px; height: 50px; background: #f8fafc; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #94a3b8; border: 1px solid #e2e8f0; overflow: hidden; flex-shrink: 0;">
+                            ${i.asset ? `<img src="${i.asset}" style="width:100%;height:100%;object-fit:cover;">` : '📱'}
                         </div>
+                        <div style="flex:1;">
+                            <h5 style="font-size:14px;font-weight:700;color:#0f172a;margin-bottom:4px;">${i.name}</h5>
+                            <div style="display: flex; align-items: center; gap: 8px; margin-top: 4px;">
+                                <button onclick="changeBasketItemQty('${i.id}', -1)" style="width: 24px; height: 24px; border-radius: 6px; border: 1px solid #cbd5e1; background: #ffffff; color: #0f172a; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; transition: 0.2s;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='#ffffff'">−</button>
+                                <span style="font-size: 13px; font-weight: 700; color: #0f172a; min-width: 16px; text-align: center;">${i.qty}</span>
+                                <button onclick="changeBasketItemQty('${i.id}', 1)" style="width: 24px; height: 24px; border-radius: 6px; border: 1px solid #cbd5e1; background: #ffffff; color: #0f172a; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; transition: 0.2s;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='#ffffff'">+</button>
+                                
+                                <!-- 🟢 FIXED MATRIX: Places the lower sales price first and forces the higher value to cross out second -->
+                                <span style="font-size:12px;color:#64748b;margin-left:6px;">
+                                    × ₹${realDiscountPrice} <span style="text-decoration: line-through; color: #94a3b8; font-size: 11px; margin-left: 4px;">₹${realOriginalPrice}</span>
+                                </span>
+                            </div>
+                        </div>
+                        <button style="border:none;background:none;font-size:16px;cursor:pointer;padding:4px;" onclick="removeItem('${i.id}')">🗑️</button>
                     </div>
-                    <button style="border:none;background:none;font-size:16px;cursor:pointer;padding:4px;" onclick="removeItem('${i.id}')">🗑️</button>
-                </div>
-            `).join('');
+                `;
+            }).join('');
         }
 
         // 🟢 NEW: Handles inline calculation logic updating or splicing cart arrays cleanly
