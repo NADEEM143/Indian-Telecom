@@ -59,10 +59,29 @@ export default async function handler(req, res) {
                 }
                 break;
 
-                        case 'users':
+                                    case 'users':
                 if (req.method === 'GET') {
-                    const users = await kv.get('it_users') || [];
-                    return res.status(200).json(users);
+                    // 1. Download the master user array list from your storage pool
+                    let currentUsers = await kv.get('it_users') || [];
+                    let databaseHasChanged = false;
+
+                    // 2. GLOBAL RECOVERY CORE: Sweeps through EVERY customer record automatically.
+                    // If any user deleted their account, it resets their status back to ACTIVE 
+                    // so they NEVER disappear from your admin panel grid and can log in normally.
+                    currentUsers = currentUsers.map(user => {
+                        if (user.status === 'SUSPENDED' || user.status === 'DEACTIVATED' || !user.status) {
+                            user.status = 'ACTIVE';
+                            databaseHasChanged = true;
+                        }
+                        return user;
+                    });
+
+                    // 3. Save the restored state back to Vercel KV if any hidden records were fixed
+                    if (databaseHasChanged) {
+                        await kv.set('it_users', currentUsers);
+                    }
+
+                    return res.status(200).json(currentUsers);
                 }
                 if (req.method === 'POST') {
                     let currentUsers = await kv.get('it_users');
@@ -79,17 +98,7 @@ export default async function handler(req, res) {
                     await kv.set('it_users', currentUsers);
                     return res.status(200).json({ success: true });
                 }
-                break; // 👈 FIND THIS CLOSING BREAK STATEMENT INSIDE YOUR ADMIN.JS FILE
-
-            // =========================================================================
-            // 🚀 PASTE THE SAFE PROFILE RECOVERY TOOL ROUTER CASE SEGMENT RIGHT HERE
-            // =========================================================================
-                       // =========================================================================
-            // 🚀 TARGETED ACCOUNT RECOVERY SEGMENT (REPAIRS SUSPENDED RECORDS)
-            // =========================================================================
-                      // =========================================================================
-            // 🚀 FORCE INJECTION ENGINE: CREATES OR RESTORES YOUR PRIMARY ACCOUNT NATIVELY
-            // =========================================================================
+                break;
             case 'recover_accounts':
                 if (req.method === 'GET') {
                     let currentUsers = await kv.get('it_users');
