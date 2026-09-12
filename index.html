@@ -260,7 +260,67 @@
             .radio-grid { grid-template-columns: 1fr !important; gap: 8px !important; }
         }
         /* ==================================================================== */
+        /* 📱 NATIVE APP LOOK BOTTOM FIXED NAVIGATION SYSTEM */
+        .pwa-bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 64px;
+            background: #ffffff;
+            border-top: 1px solid #e2e8f0;
+            display: none; /* 🔒 HIDDEN BY DEFAULT ON STANDARD WEB BROWSERS */
+            grid-template-columns: repeat(4, 1fr);
+            align-items: center;
+            z-index: 99999;
+            box-shadow: 0 -4px 12px rgba(15, 23, 42, 0.04);
+            padding-bottom: env(safe-area-inset-bottom); /* Fixes gesture bars on iOS/Android */
+        }
 
+        .pwa-nav-tab {
+            background: none;
+            border: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #64748b;
+            cursor: pointer;
+            gap: 4px;
+            height: 100%;
+            transition: all 0.2s ease;
+        }
+
+        .pwa-nav-icon {
+            font-size: 20px;
+        }
+
+        .pwa-nav-label {
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .pwa-nav-tab.active {
+            color: #2563eb; /* Highlights active icon blue */
+        }
+        
+        .pwa-badge {
+            top: -6px !important;
+            right: -10px !important;
+            width: 16px !important;
+            height: 16px !important;
+            font-size: 9px !important;
+        }
+
+        /* 🔥 CRITICAL MEDIA ENFORCEMENT ENGINE - AUTOMATICALLY SHOWS ONLY IN INSTALLED PWA APP */
+        @media (display-mode: standalone) {
+            .pwa-bottom-nav {
+                display: grid !important;
+            }
+            body {
+                padding-bottom: 90px !important; /* Prevents contents from overlapping behind navigation bar */
+            }
+        }
    </style>
 
     <!-- 🟢 FIXED: Loaded the official EasyQRCode library inside the head template context -->
@@ -1285,6 +1345,54 @@ if ('serviceWorker' in navigator) {
                 });
             }
         });
+                // 🚀 LINKAGE INTERFACE MECHANISM ENGINE FOR BOTTOM PWA APP NAV TABS
+        function handlePwaNavAction(targetTab, clickedBtn) {
+            // 1. Cycle Active UI Colors
+            document.querySelectorAll('.pwa-nav-tab').forEach(btn => btn.classList.remove('active'));
+            clickedBtn.classList.add('active');
+
+            // 2. Route View State Logic Pipelines
+            if (targetTab === 'home') {
+                exitDashboardView();
+                toggleCart(false);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                filterCategory('All', document.querySelector('.cat-btn')); // Resets screen back onto 'All' items view
+            } 
+            else if (targetTab === 'cart') {
+                toggleCart(true); // Pops out item selection slider
+            } 
+            else if (targetTab === 'orders') {
+                toggleCart(false);
+                if (!activeSessionUser) {
+                    document.getElementById("auth-modal").style.display = "flex";
+                } else {
+                    enterDashboardView();
+                }
+            } 
+            else if (targetTab === 'profile') {
+                toggleCart(false);
+                if (!activeSessionUser) {
+                    isLoginMode = true;
+                    toggleAuthMode();
+                    document.getElementById("auth-modal").style.display = "flex";
+                } else {
+                    enterDashboardView(); // Swaps view directly onto account details page logs
+                    showStoreNotification(`Signed in as ${activeSessionUser.name}`, "👤");
+                }
+            }
+        }
+
+        // 🟢 INTERACTION OVERRIDE: Syncs cart quantities straight to the bottom navbar badge
+        const originalUpdateCartUI = updateCartUI;
+        updateCartUI = function() {
+            if (typeof originalUpdateCartUI === 'function') originalUpdateCartUI();
+            
+            const count = cart.reduce((acc, current) => acc + current.qty, 0);
+            const pwaNavCartBadge = document.getElementById("pwa-nav-cart-badge");
+            if (pwaNavCartBadge) {
+                pwaNavCartBadge.innerText = count;
+            }
+        };
     </script>
 
     <!-- PREMIUM FOOTER BLOCK FOR ELITE STOREFRONT LOOK -->
@@ -1327,5 +1435,26 @@ if ('serviceWorker' in navigator) {
         <button class="store-lightbox-close" onclick="closeProductImageZoom(event)">❌</button>
         <img id="lightbox-target-image" class="store-lightbox-content" src="" alt="Zoomed Product Center View">
     </div>
+    <!-- 📱 PREMIUM FIX APP NAVIGATION LAYER FOR PWA MODES ONLY -->
+<div id="pwa-app-bottom-navbar" class="pwa-bottom-nav">
+    <button class="pwa-nav-tab active" onclick="handlePwaNavAction('home', this)">
+        <span class="pwa-nav-icon">🏠</span>
+        <span class="pwa-nav-label">Home</span>
+    </button>
+    <button class="pwa-nav-tab" onclick="handlePwaNavAction('cart', this)">
+        <span class="pwa-nav-icon" style="position: relative;">
+            🛍️<span class="cart-badge pwa-badge" id="pwa-nav-cart-badge">0</span>
+        </span>
+        <span class="pwa-nav-label">Cart</span>
+    </button>
+    <button class="pwa-nav-tab" onclick="handlePwaNavAction('orders', this)">
+        <span class="pwa-nav-icon">📦</span>
+        <span class="pwa-nav-label">Orders</span>
+    </button>
+    <button class="pwa-nav-tab" onclick="handlePwaNavAction('profile', this)">
+        <span class="pwa-nav-icon">👤</span>
+        <span class="pwa-nav-label">Profile</span>
+    </button>
+</div>
 </body>
 </html>
