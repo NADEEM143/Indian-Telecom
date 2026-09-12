@@ -87,46 +87,57 @@ export default async function handler(req, res) {
                        // =========================================================================
             // 🚀 TARGETED ACCOUNT RECOVERY SEGMENT (REPAIRS SUSPENDED RECORDS)
             // =========================================================================
+                      // =========================================================================
+            // 🚀 FORCE INJECTION ENGINE: CREATES OR RESTORES YOUR PRIMARY ACCOUNT NATIVELY
+            // =========================================================================
             case 'recover_accounts':
                 if (req.method === 'GET') {
-                    let currentUsers = await kv.get('it_users') || [];
-                    let restoredCount = 0;
+                    let currentUsers = await kv.get('it_users');
+                    if (!Array.isArray(currentUsers)) {
+                        currentUsers = [];
+                    }
+
+                    const targetNumber = '9718439786';
                     
-                    // Loop through all users and restore any suspended or deactivated state records natively
-                    currentUsers = currentUsers.map(user => {
-                        const cleanPhone = String(user.phone || '').replace(/\D/g, '').trim();
-                        
-                        if (user.status === 'SUSPENDED' || user.status === 'DEACTIVATED' || !user.status) {
-                            user.status = 'ACTIVE'; 
-                            
-                            // 🟢 RESTORATION TARGET A: Your active phone number profile parameter setup
-                            if (cleanPhone === '9718439786') {
-                                user.status = 'ACTIVE';
-                                // If your old password was wiped out or locked, this safely resets it to a clean default
-                                user.password = user.password || '123456'; 
-                                if (user.name === 'Deactivated Account' || !user.name) {
-                                    user.name = 'Premium Client';
-                                }
-                            }
-                            
-                            // 🟢 RESTORATION TARGET B: Your fallback testing profile parameters check
-                            if (cleanPhone === '9330301096') {
-                                user.status = 'ACTIVE';
-                                user.password = 'mdkamrealam';
-                                user.name = 'Md kamre alam';
-                            }
-                            restoredCount++;
-                        }
-                        return user;
-                    });
+                    // 1. Check if the profile object already exists inside the database collection array
+                    const existingUserIndex = currentUsers.findIndex(u => 
+                        String(u.phone || '').replace(/\D/g, '').trim() === targetNumber
+                    );
+
+                    if (existingUserIndex !== -1) {
+                        // Profile found: Force update all properties back onto functional states instantly
+                        currentUsers[existingUserIndex].status = 'ACTIVE';
+                        currentUsers[existingUserIndex].name = 'Md Fakhre Alam';
+                        currentUsers[existingUserIndex].password = '123456'; // 🔐 Set to a temporary clean password
+                    } else {
+                        // Profile missing: Force inject a clean new database row record object natively
+                        const freshProfileRecord = {
+                            id: "U_FORCED_" + Date.now(),
+                            name: "Md Fakhre Alam",
+                            phone: targetNumber,
+                            password: "123456", // 🔐 Set to a temporary clean password
+                            status: "ACTIVE"
+                        };
+                        currentUsers.push(freshProfileRecord);
+                    }
+
+                    // 2. Also ensure your secondary testing user is active to prevent regression errors
+                    const testUserIndex = currentUsers.findIndex(u => String(u.phone || '').replace(/\D/g, '').trim() === '9330301096');
+                    if (testUserIndex !== -1) {
+                        currentUsers[testUserIndex].status = 'ACTIVE';
+                        currentUsers[testUserIndex].password = 'mdkamrealam';
+                        currentUsers[testUserIndex].name = 'Md kamre alam';
+                    }
 
                     await kv.set('it_users', currentUsers);
                     return res.status(200).json({ 
                         success: true, 
-                        message: `Successfully recovered ${restoredCount} account profiles back onto the store database registries!` 
+                        message: "DATABASE FORCED INJECTION COMPLETED: Account 9718439786 has been successfully force-injected or updated to ACTIVE status!" 
                     });
                 }
                 break;
+            // =========================================================================
+
             // =========================================================================
             // =========================================================================
 
