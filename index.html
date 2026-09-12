@@ -1040,14 +1040,32 @@ function switchOnlineSubMethod(targetMethod) {
         // =========================================================================
         // 🚀 STANDALONE CHECKOUT ORDER PLACEMENT DISPATCH ENGINE
         // =========================================================================
-                async function submitOrder(e) {
+                        async function submitOrder(e) {
             e.preventDefault();
+            
+            // 🟢 LOCK STATE GUARD: Find the form and its submit button layout element target
+            const orderFormElement = document.getElementById("order-form");
+            const checkoutSubmitButton = orderFormElement ? orderFormElement.querySelector('button[type="submit"]') : null;
+            
+            // If the button state is already set to disabled, cancel secondary double-clicks immediately
+            if (checkoutSubmitButton && checkoutSubmitButton.disabled) {
+                return;
+            }
+
             const mode = document.querySelector('input[name="mop"]:checked').value;
             const utrNum = document.getElementById("pay-utr").value.trim();
             
             if(mode === 'ONLINE' && utrNum.length < 6) {
                 showStoreNotification("Please enter a valid banking UTR reference number.", "⚠️");
                 return;
+            }
+
+            // 🟢 LOCK BUTTON STATE: Freeze interaction flags immediately to stop duplicate request processing loops
+            if (checkoutSubmitButton) {
+                checkoutSubmitButton.disabled = true;
+                checkoutSubmitButton.innerText = "⏳ Registering Order...";
+                checkoutSubmitButton.style.opacity = "0.6";
+                checkoutSubmitButton.style.cursor = "not-allowed";
             }
 
             // 1. Calculate live basket total sum dynamically
@@ -1090,12 +1108,19 @@ function switchOnlineSubMethod(targetMethod) {
                 closeCheckout();
                 toggleCart(false);
                 
-                const orderFormElement = document.getElementById("order-form");
                 if (orderFormElement) orderFormElement.reset();
                 togglePaymentMode('COD');
             } catch (networkError) {
                 console.error("Checkout Processing Error Trace:", networkError);
                 showStoreNotification("Checkout connection failed. Try resubmitting parameters.", "⚠️");
+            } finally {
+                // 🟢 UNLOCK BUTTON STATE: Cleanly unfreezes interaction keys if network requests drop or fail
+                if (checkoutSubmitButton) {
+                    checkoutSubmitButton.disabled = false;
+                    checkoutSubmitButton.innerText = "Confirm & Place Order";
+                    checkoutSubmitButton.style.opacity = "1";
+                    checkoutSubmitButton.style.cursor = "pointer";
+                }
             }
         }
         // =========================================================================
