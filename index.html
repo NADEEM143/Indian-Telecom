@@ -445,6 +445,46 @@
                     </table>
                 </div>
             </div>
+
+            <!-- 👤 NEW: CUSTOMER ACCOUNT PROFILE SECURITY & SETTINGS CARD GRID PANEL -->
+            <div style="background: rgba(255,255,255,0.02); padding: 24px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                <h4 style="font-size: 15px; font-weight: 700; color: #3b82f6; display: flex; align-items: center; gap: 8px; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 10px;">👤 Account Settings & Security Management</h4>
+                
+                <form id="dash-profile-settings-form" onsubmit="saveCustomerProfileMutations(event)" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                    <div style="grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label style="color: #94a3b8; font-size: 12px; font-weight: 700; text-transform: uppercase;">Full Name</label>
+                            <input type="text" id="dash-prof-name" style="width:100%; padding:12px 16px; background: rgba(255,255,255,0.03); border: 1px solid #1e293b; border-radius:12px; font-size:14px; outline:none; color: white;" required>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label style="color: #64748b; font-size: 12px; font-weight: 700; text-transform: uppercase;">Registered Mobile Number (Locked 🔒)</label>
+                            <input type="tel" id="dash-prof-phone" style="width:100%; padding:12px 16px; background: rgba(255,255,255,0.01); border: 1px solid #1e293b; border-radius:12px; font-size:14px; outline:none; color: #64748b; cursor: not-allowed;" readonly>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label style="color: #94a3b8; font-size: 12px; font-weight: 700; text-transform: uppercase;">Verify Current Password</label>
+                        <input type="password" id="dash-prof-curr-pass" placeholder="Required to authorize changes" style="width:100%; padding:12px 16px; background: rgba(255,255,255,0.03); border: 1px solid #1e293b; border-radius:12px; font-size:14px; outline:none; color: white;" required>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label style="color: #94a3b8; font-size: 12px; font-weight: 700; text-transform: uppercase;">New Secret Password (Optional)</label>
+                        <input type="password" id="dash-prof-new-pass" placeholder="Leave empty to keep unchanged" style="width:100%; padding:12px 16px; background: rgba(255,255,255,0.03); border: 1px solid #1e293b; border-radius:12px; font-size:14px; outline:none; color: white;">
+                    </div>
+                    
+                    <div class="form-group" style="grid-column: 1 / -1; margin-bottom: 0;">
+                        <label style="color: #94a3b8; font-size: 12px; font-weight: 700; text-transform: uppercase;">Default Delivery / Shipping Address</label>
+                        <textarea id="dash-prof-address" rows="3" placeholder="Save your primary address to fill out checkout drawers automatically" style="width:100%; padding:12px 16px; background: rgba(255,255,255,0.03); border:1px solid #1e293b; border-radius:12px; font-size:14px; outline:none; color:white; resize:none; font-family: inherit;"></textarea>
+                    </div>
+
+                    <div style="grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 16px; margin-top: 10px; flex-wrap: wrap; gap: 14px;">
+                        <div style="display: flex; gap: 12px; align-items: center;">
+                            <a href="https://wa.me" target="_blank" style="background: rgba(37,211,102,0.1); border: 1px solid rgba(37,211,102,0.2); color: #25D366; padding: 10px 16px; border-radius: 10px; font-weight: 700; font-size: 13px; text-decoration: none; display: flex; align-items: center; gap: 6px;">💬 Report Account Issue</a>
+                            <button type="button" onclick="triggerCustomerAccountDeletionPipeline()" style="background: transparent; border: 1px solid #dc2626; color: #ef4444; padding: 10px 16px; border-radius: 10px; font-weight: 700; font-size: 13px; cursor: pointer; transition: 0.2s;" onmouseover="this.style.background='rgba(239,68,68,0.05)'" onmouseout="this.style.background='transparent'">🔴 Delete Account</button>
+                        </div>
+                        <button type="submit" class="checkout-trigger" style="width: auto; padding: 12px 28px; background: #2563eb; font-size: 14px; font-weight: 700; border-radius: 10px; box-shadow: 0 4px 12px rgba(37,99,235,0.15); color: white; border: none; cursor: pointer;">💾 Save Profile Info</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </section>
 
@@ -1393,6 +1433,105 @@ if ('serviceWorker' in navigator) {
                 pwaNavCartBadge.innerText = count;
             }
         };
+                // =========================================================================
+        // 👥 ADVANCED PROFILE SETTINGS & ACCOUNT MANAGEMENT CONTROL PROCESSORS
+        // =========================================================================
+        
+        // Auto-fill configuration fields during dashboard generation loops
+        const originalEnterDashboardView = enterDashboardView;
+        enterDashboardView = function() {
+            if (typeof originalEnterDashboardView === 'function') originalEnterDashboardView();
+            
+            if (activeSessionUser) {
+                document.getElementById("dash-prof-name").value = activeSessionUser.name || "";
+                document.getElementById("dash-prof-phone").value = activeSessionUser.phone || "";
+                document.getElementById("dash-prof-address").value = activeSessionUser.defaultAddress || "";
+                document.getElementById("dash-prof-curr-pass").value = "";
+                document.getElementById("dash-prof-new-pass").value = "";
+            }
+        };
+
+        // Auto-fill shipping checkout details form arrays with saved account profile variables
+        const originalOpenCheckout = openCheckout;
+        openCheckout = function() {
+            if (typeof originalOpenCheckout === 'function') originalOpenCheckout();
+            
+            if (activeSessionUser && activeSessionUser.defaultAddress) {
+                const checkoutAddressField = document.getElementById("cust-address");
+                if (checkoutAddressField && !checkoutAddressField.value) {
+                    checkoutAddressField.value = activeSessionUser.defaultAddress;
+                }
+            }
+        };
+
+        async function saveCustomerProfileMutations(e) {
+            e.preventDefault();
+            if (!activeSessionUser) return;
+
+            const currVerifyPass = document.getElementById("dash-prof-curr-pass").value;
+            const newPassField = document.getElementById("dash-prof-new-pass").value.trim();
+            const mutatedName = document.getElementById("dash-prof-name").value.trim();
+            const savedAddress = document.getElementById("dash-prof-address").value.trim();
+
+            if (currVerifyPass !== activeSessionUser.password) {
+                showStoreNotification("Verification Failed: Current password string is incorrect.", "⚠️");
+                return;
+            }
+
+            const profileUpdatePayload = {
+                phone: activeSessionUser.phone,
+                name: mutatedName,
+                address: savedAddress,
+                password: newPassField !== "" ? newPassField : activeSessionUser.password
+            };
+
+            try {
+                const response = await fetch(`${API_BASE_ENDPOINT}/admin?type=update_profile`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(profileUpdatePayload)
+                });
+
+                if (response.ok) {
+                    const parsedResult = await response.json();
+                    activeSessionUser = parsedResult.updatedUser;
+                    localStorage.setItem('IT_ACTIVE_USER', JSON.stringify(activeSessionUser));
+                    
+                    document.getElementById("dash-user-title").innerText = activeSessionUser.name || "Customer";
+                    document.getElementById("dash-prof-curr-pass").value = "";
+                    document.getElementById("dash-prof-new-pass").value = "";
+                    
+                    showStoreNotification("Profile Security Parameters Saved Successfully!", "🎉");
+                } else {
+                    throw new Error("API transmission failure.");
+                }
+            } catch (err) {
+                console.error("Profile synchronization fault trace:", err);
+                showStoreNotification("Server rejected change requests. Check network endpoints.", "⚠️");
+            }
+        }
+
+        async function triggerCustomerAccountDeletionPipeline() {
+            if (!activeSessionUser) return;
+            
+            const confirmedChoice = confirm("CRITICAL ACCESSIBILITY ALERT:\n\nAre you sure you want to deactivate your profile? You will be immediately logged out, and access parameters will be blocked under NPCI/Indian Telecom terms.");
+            if (!confirmedChoice) return;
+
+            try {
+                const response = await fetch(`${API_BASE_ENDPOINT}/admin?type=update_profile`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ phone: activeSessionUser.phone, action: 'DELETE_ACCOUNT' })
+                });
+
+                if (response.ok) {
+                    alert("Account Suspended Successfully. Wiping localized session tokens... Goodbye!");
+                    if (typeof confirmLogoutAction === 'function') confirmLogoutAction();
+                }
+            } catch (err) {
+                showStoreNotification("Failed to finalize profile data deactivation rules.", "⚠️");
+            }
+        }
     </script>
 
     <!-- PREMIUM FOOTER BLOCK FOR ELITE STOREFRONT LOOK -->
