@@ -840,14 +840,24 @@
         }
 
         // 🟢 FIXED: Injects interactive plus and minus controls to update item counts instantly
-                        function updateCartUI() {
+                               function updateCartUI() {
             const badge = document.getElementById("cart-badge");
             const totalStr = document.getElementById("cart-total");
             const count = cart.reduce((acc, current) => acc + current.qty, 0);
-            const total = cart.reduce((acc, current) => acc + (current.discountPrice * current.qty), 0);
+            
+            // 🟢 FIXED CALCULATION ENGINE: Tracks both the active sales total and the original retail total sum
+            const total = cart.reduce((acc, current) => acc + (Number(current.discountPrice || 0) * current.qty), 0);
+            const origTotal = cart.reduce((acc, current) => acc + (Math.max(Number(current.price || 0), Number(current.discountPrice || 0)) * current.qty), 0);
             
             if (badge) badge.innerText = count;
-            if (totalStr) totalStr.innerText = `₹${total}`;
+            
+            // 🟢 FIXED FOOTER RENDERING: Injects the strikethrough original total next to the discounted payable sum inside the red box container area!
+            if (totalStr) {
+                totalStr.innerHTML = `
+                    <span style="text-decoration: line-through; color: #94a3b8; font-size: 14px; font-weight: 500; margin-right: 8px;">₹${origTotal}</span>
+                    <span>₹${total}</span>
+                `;
+            }
             
             const container = document.getElementById("cart-items-container");
             if (!container) return;
@@ -858,7 +868,6 @@
             }
             
             container.innerHTML = cart.map(i => {
-                // 🟢 FIXED SAFETY CHECK: Ensure we always print the higher value as the crossed-out original price
                 const realOriginalPrice = Math.max(Number(i.price || 0), Number(i.discountPrice || 0));
                 const realDiscountPrice = Math.min(Number(i.price || 0), Number(i.discountPrice || 0));
 
@@ -873,8 +882,6 @@
                                 <button onclick="changeBasketItemQty('${i.id}', -1)" style="width: 24px; height: 24px; border-radius: 6px; border: 1px solid #cbd5e1; background: #ffffff; color: #0f172a; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; transition: 0.2s;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='#ffffff'">−</button>
                                 <span style="font-size: 13px; font-weight: 700; color: #0f172a; min-width: 16px; text-align: center;">${i.qty}</span>
                                 <button onclick="changeBasketItemQty('${i.id}', 1)" style="width: 24px; height: 24px; border-radius: 6px; border: 1px solid #cbd5e1; background: #ffffff; color: #0f172a; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; transition: 0.2s;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='#ffffff'">+</button>
-                                
-                                <!-- 🟢 FIXED MATRIX: Places the lower sales price first and forces the higher value to cross out second -->
                                 <span style="font-size:12px;color:#64748b;margin-left:6px;">
                                     × ₹${realDiscountPrice} <span style="text-decoration: line-through; color: #94a3b8; font-size: 11px; margin-left: 4px;">₹${realOriginalPrice}</span>
                                 </span>
@@ -885,6 +892,7 @@
                 `;
             }).join('');
         }
+
 
         // 🟢 NEW: Handles inline calculation logic updating or splicing cart arrays cleanly
         function changeBasketItemQty(id, delta) {
