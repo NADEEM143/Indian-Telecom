@@ -84,6 +84,9 @@ export default async function handler(req, res) {
             // =========================================================================
             // 🚀 PASTE THE SAFE PROFILE RECOVERY TOOL ROUTER CASE SEGMENT RIGHT HERE
             // =========================================================================
+                       // =========================================================================
+            // 🚀 TARGETED ACCOUNT RECOVERY SEGMENT (REPAIRS SUSPENDED RECORDS)
+            // =========================================================================
             case 'recover_accounts':
                 if (req.method === 'GET') {
                     let currentUsers = await kv.get('it_users') || [];
@@ -91,11 +94,24 @@ export default async function handler(req, res) {
                     
                     // Loop through all users and restore any suspended or deactivated state records natively
                     currentUsers = currentUsers.map(user => {
+                        const cleanPhone = String(user.phone || '').replace(/\D/g, '').trim();
+                        
                         if (user.status === 'SUSPENDED' || user.status === 'DEACTIVATED' || !user.status) {
                             user.status = 'ACTIVE'; 
                             
-                            // Re-apply original active credential strings for your testing profile
-                            if (String(user.phone).trim() === '9330301096') {
+                            // 🟢 RESTORATION TARGET A: Your active phone number profile parameter setup
+                            if (cleanPhone === '9718439786') {
+                                user.status = 'ACTIVE';
+                                // If your old password was wiped out or locked, this safely resets it to a clean default
+                                user.password = user.password || '123456'; 
+                                if (user.name === 'Deactivated Account' || !user.name) {
+                                    user.name = 'Premium Client';
+                                }
+                            }
+                            
+                            // 🟢 RESTORATION TARGET B: Your fallback testing profile parameters check
+                            if (cleanPhone === '9330301096') {
+                                user.status = 'ACTIVE';
                                 user.password = 'mdkamrealam';
                                 user.name = 'Md kamre alam';
                             }
@@ -111,6 +127,7 @@ export default async function handler(req, res) {
                     });
                 }
                 break;
+            // =========================================================================
             // =========================================================================
 
             case 'history':
