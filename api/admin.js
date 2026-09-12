@@ -160,7 +160,7 @@ export default async function handler(req, res) {
                     }
 
                     // Action Parameter Rule B: Standard text updates mapping name, password mutations, and saved locations
-                    if (name) currentUsers[userIndex].name = name;
+                                       if (name) currentUsers[userIndex].name = name;
                     if (password) currentUsers[userIndex].password = password;
                     if (address !== undefined) currentUsers[userIndex].defaultAddress = address;
 
@@ -168,6 +168,41 @@ export default async function handler(req, res) {
                     return res.status(200).json({ success: true, updatedUser: currentUsers[userIndex] });
                 }
                 break;
+
+            // =========================================================================
+            // 🚀 INTEGRATED DATABASE RECOVERY SEGMENT (REPAIRS SUSPENDED RECORDS)
+            // =========================================================================
+            case 'restore_users':
+                if (req.method === 'GET') {
+                    let currentUsers = await kv.get('it_users');
+                    if (!Array.isArray(currentUsers)) {
+                        currentUsers = [];
+                    }
+                    let modifiedCount = 0;
+
+                    // Force convert any 'SUSPENDED' or hidden status flags back to active parameters
+                    currentUsers = currentUsers.map(user => {
+                        if (user.status === 'SUSPENDED' || user.status === 'DEACTIVATED' || !user.status) {
+                            user.status = 'ACTIVE';
+                            
+                            // Explicit recovery rule targets for your custom profile records choice checks
+                            if (String(user.phone).trim() === '9330301096') {
+                                user.password = 'mdkamrealam';
+                                user.name = 'Md kamre alam';
+                            }
+                            modifiedCount++;
+                        }
+                        return user;
+                    });
+
+                    await kv.set('it_users', currentUsers);
+                    return res.status(200).json({ 
+                        success: true, 
+                        message: `Fixed ${modifiedCount} database account rows! Your records are now fully active and visible in the Admin Panel.` 
+                    });
+                }
+                break;
+            // =========================================================================
 
             default:
                 return res.status(400).json({ error: `Invalid datatype target mapping '${dataType}' specified.` });
