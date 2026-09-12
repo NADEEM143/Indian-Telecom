@@ -59,13 +59,12 @@ export default async function handler(req, res) {
                 }
                 break;
 
-            case 'users':
+                        case 'users':
                 if (req.method === 'GET') {
                     const users = await kv.get('it_users') || [];
                     return res.status(200).json(users);
                 }
                 if (req.method === 'POST') {
-                    // 🟢 FIXED: Server-side check appends single user records without erasing old registers
                     let currentUsers = await kv.get('it_users');
                     if (!Array.isArray(currentUsers)) {
                         currentUsers = [];
@@ -80,7 +79,39 @@ export default async function handler(req, res) {
                     await kv.set('it_users', currentUsers);
                     return res.status(200).json({ success: true });
                 }
+                break; // 👈 FIND THIS CLOSING BREAK STATEMENT INSIDE YOUR ADMIN.JS FILE
+
+            // =========================================================================
+            // 🚀 PASTE THE SAFE PROFILE RECOVERY TOOL ROUTER CASE SEGMENT RIGHT HERE
+            // =========================================================================
+            case 'recover_accounts':
+                if (req.method === 'GET') {
+                    let currentUsers = await kv.get('it_users') || [];
+                    let restoredCount = 0;
+                    
+                    // Loop through all users and restore any suspended or deactivated state records natively
+                    currentUsers = currentUsers.map(user => {
+                        if (user.status === 'SUSPENDED' || user.status === 'DEACTIVATED' || !user.status) {
+                            user.status = 'ACTIVE'; 
+                            
+                            // Re-apply original active credential strings for your testing profile
+                            if (String(user.phone).trim() === '9330301096') {
+                                user.password = 'mdkamrealam';
+                                user.name = 'Md kamre alam';
+                            }
+                            restoredCount++;
+                        }
+                        return user;
+                    });
+
+                    await kv.set('it_users', currentUsers);
+                    return res.status(200).json({ 
+                        success: true, 
+                        message: `Successfully recovered ${restoredCount} account profiles back onto the store database registries!` 
+                    });
+                }
                 break;
+            // =========================================================================
 
             case 'history':
                 if (req.method === 'GET') {
