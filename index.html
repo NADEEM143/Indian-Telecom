@@ -1040,7 +1040,7 @@ function switchOnlineSubMethod(targetMethod) {
         // =========================================================================
         // 🚀 STANDALONE CHECKOUT ORDER PLACEMENT DISPATCH ENGINE
         // =========================================================================
-        async function submitOrder(e) {
+                async function submitOrder(e) {
             e.preventDefault();
             const mode = document.querySelector('input[name="mop"]:checked').value;
             const utrNum = document.getElementById("pay-utr").value.trim();
@@ -1050,7 +1050,14 @@ function switchOnlineSubMethod(targetMethod) {
                 return;
             }
 
-            // 🟢 FIXED: Kept your exact parameters intact while appending your active shopping cart contents
+            // 1. Calculate live basket total sum dynamically
+            const rawTotal = cart.reduce((acc, current) => acc + (current.discountPrice * current.qty), 0);
+
+            // 2. Format a comprehensive breakdown string so it saves into your dashboard entry cleanly
+            // Example output formatting: "Premium Cases (x5) [Total: ₹1199]"
+            const consolidatedItemsDescription = cart.map(item => `${item.name} (x${item.qty})`).join(', ');
+
+            // 🟢 FIXED: Combines all item quantities under ONE unique Order ID payload structure natively
             const freshCheckoutOrder = {
                 id: "ORD-" + Math.floor(1000 + Math.random() * 9000),
                 name: document.getElementById("cust-name").value,
@@ -1058,7 +1065,8 @@ function switchOnlineSubMethod(targetMethod) {
                 address: document.getElementById("cust-address").value,
                 mop: mode,
                 utr: mode === 'ONLINE' ? utrNum : 'N/A',
-                items: cart // Ensures items in the shopping bag save globally to your admin logs panel database
+                items: cart, // Keeps structural array breakdown intact for your admin settings panel database
+                location: `${consolidatedItemsDescription} [Total: ₹${rawTotal}]` // Populates your tracking tables beautifully
             };
 
             try {
@@ -1082,7 +1090,7 @@ function switchOnlineSubMethod(targetMethod) {
                 closeCheckout();
                 toggleCart(false);
                 
-                               const orderFormElement = document.getElementById("order-form");
+                const orderFormElement = document.getElementById("order-form");
                 if (orderFormElement) orderFormElement.reset();
                 togglePaymentMode('COD');
             } catch (networkError) {
