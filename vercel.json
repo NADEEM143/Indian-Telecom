@@ -3,10 +3,13 @@
   "cleanUrls": true,
   "builds": [
     { "src": "api/admin.js", "use": "@vercel/node" },
-    { "src": "*.html", "use": "@vercel/static" },
-    { "src": "*.json", "use": "@vercel/static" },
-    { "src": "*.js", "use": "@vercel/static" },
-    { "src": "*.png", "use": "@vercel/static" }
+    { "src": "index.html", "use": "@vercel/static" },
+    { "src": "admin.html", "use": "@vercel/static" },
+    { "src": "manifest.json", "use": "@vercel/static" },
+    { "src": "sw.js", "use": "@vercel/static" },
+    { "src": "dashboard.js", "use": "@vercel/static" },
+    { "src": "icon-192.png", "use": "@vercel/static" },
+    { "src": "icon-512.png", "use": "@vercel/static" }
   ],
   "rewrites": [
     { 
@@ -16,6 +19,10 @@
     { 
       "source": "/master-admin-console", 
       "destination": "/admin.html" 
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ],
   "headers": [
