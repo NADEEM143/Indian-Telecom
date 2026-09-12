@@ -128,6 +128,42 @@ export default async function handler(req, res) {
                     return res.status(200).json({ success: true });
                 }
                 break;
+                            // 🔒 SECURE CUSTOMER SIDE PROFILE AND ACCOUNT SECURITY MODIFIERS ENGINE
+            case 'update_profile':
+                if (req.method === 'POST') {
+                    const { phone, name, password, address, action } = req.body;
+                    
+                    if (!phone) {
+                        return res.status(400).json({ error: "Missing customer identification phone token." });
+                    }
+
+                    let currentUsers = await kv.get('it_users');
+                    if (!Array.isArray(currentUsers)) {
+                        currentUsers = [];
+                    }
+
+                    const userIndex = currentUsers.findIndex(u => String(u.phone).replace(/\D/g, '') === String(phone).replace(/\D/g, ''));
+                    if (userIndex === -1) {
+                        return res.status(404).json({ error: "Account profile record registry not found." });
+                    }
+
+                    // Action Parameter Rule A: Handle request to suspend/delete account data records
+                    if (action === 'DELETE_ACCOUNT') {
+                        // Flag user profile state parameters as SUSPENDED rather than erasing history links instantly
+                        currentUsers[userIndex].status = 'SUSPENDED';
+                        await kv.set('it_users', currentUsers);
+                        return res.status(200).json({ success: true, message: "Account profile deactivated safely." });
+                    }
+
+                    // Action Parameter Rule B: Standard text updates mapping name, password mutations, and saved locations
+                    if (name) currentUsers[userIndex].name = name;
+                    if (password) currentUsers[userIndex].password = password;
+                    if (address !== undefined) currentUsers[userIndex].defaultAddress = address;
+
+                    await kv.set('it_users', currentUsers);
+                    return res.status(200).json({ success: true, updatedUser: currentUsers[userIndex] });
+                }
+                break;
 
             default:
                 return res.status(400).json({ error: `Invalid datatype target mapping '${dataType}' specified.` });
