@@ -1,5 +1,5 @@
 // 🟢 CHANGED CACHE VALUE: Forces your phone to purge old memory registries instantly
-const CACHE_NAME = 'it-storefront-cache-v17'; // Incremented version to completely dump past bad cache registries
+const CACHE_NAME = 'it-storefront-cache-v18'; // Incremented version to completely dump past bad cache registries
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
@@ -32,41 +32,53 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Cache-First with Network-Fallback execution pipeline strategy
+// Hybrid Network-First (for HTML routing keys) + Cache-First (static files) Architecture Pipeline
 self.addEventListener('fetch', (event) => {
   const requestUrl = new URL(event.request.url);
 
-  // 🛑 BYPASS GATEWAY: If the route is an API request, send it straight to the network and exit!
+  // 🛑 BYPASS GATEWAY: If the route is an API request or cross-origin link, send it straight to the network!
   if (requestUrl.pathname.startsWith('/api') || !event.request.url.startsWith(self.location.origin)) {
     return event.respondWith(fetch(event.request));
   }
 
-  // 🛡️ SAFE METADATA MAPS: Map naked directory structures back onto physical request signatures cleanly
-  const isRootPath = requestUrl.pathname === '/' || requestUrl.pathname === '/index.html';
-  const cacheQueryKey = isRootPath ? '/index.html' : event.request;
+  // Identify HTML framework entry points cleanly
+  const isHtmlNavigationRoute = requestUrl.pathname === '/' || requestUrl.pathname === '/index.html' || requestUrl.pathname.endsWith('.html');
 
-  event.respondWith(
-    caches.match(cacheQueryKey).then((cachedResponse) => {
-      if (cachedResponse) {
-        // Fetch a fresh version in the background to update the cache safely
-        fetch(event.request.url).then((networkResponse) => {
-          if (networkResponse.status === 200) {
-            
-            // 🛑 CRITICAL FIXED LAYER FOR VERCEL: If the background update was redirected, 
-            // drop it immediately to prevent cache corruption and stop the refresh crash!
-            if (networkResponse.redirected) {
-              return;
-            }
-            
+  if (isHtmlNavigationRoute) {
+    // 🚀 STRATEGY: Network-First for main routing paths to completely prevent Vercel blank refresh crashes
+    event.respondWith(
+      fetch(event.request)
+        .then((networkResponse) => {
+          if (networkResponse.status === 200 && !networkResponse.redirected) {
+            const responseClone = networkResponse.clone();
             caches.open(CACHE_NAME).then((cache) => {
-              cache.put(cacheQueryKey, networkResponse.clone());
+              cache.put('/index.html', responseClone); // Save fresh version into index placeholder entry
             });
           }
-        }).catch(() => {});
-        
-        return cachedResponse;
-      }
-      return fetch(event.request);
-    })
-  );
+          return networkResponse;
+        })
+        .catch(() => {
+          // Offline fallback path: if network drops, pull from your offline local cache structure safely
+          return caches.match('/index.html');
+        })
+    );
+  } else {
+    // 🛡️ STRATEGY: Cache-First for assets (manifests, png icons, background scripts)
+    event.respondWith(
+      caches.match(event.request).then((cachedResponse) => {
+        if (cachedResponse) {
+          return cachedResponse;
+        }
+        return fetch(event.request).then((networkResponse) => {
+          if (networkResponse.status === 200 && !networkResponse.redirected) {
+            const responseClone = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => {
+              cache.put(event.request, responseClone);
+            });
+          }
+          return networkResponse;
+        });
+      })
+    );
+  }
 });
