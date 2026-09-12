@@ -1335,23 +1335,24 @@ function enterDashboardView() {
                 pullMasterDatabaseArrays();
             }
 
-            const formElement = document.getElementById("order-form");
+                        const formElement = document.getElementById("order-form");
             if (formElement) formElement.addEventListener("submit", submitOrder);
 
             // 3. 📱 PROGRESSIVE APP ENGINE ACTIVATION ROUTINE
             // 📱 FORCE UPDATE LOGIC: Append a live version token to completely destroy Android ghost memory loops
-if ('serviceWorker' in navigator) {
-    // Appends a unique build version marker (?v=2) to force Chrome to download the clean file
-    navigator.serviceWorker.register('/sw.js?v=2')
-        .then((registration) => {
-            console.log("PWA Engine Booted Successfully!");
-            
-            // Instantly checks for code changes on Vercel without waiting for standard browser timeouts
-            registration.update(); 
-        })
-        .catch((err) => console.error("PWA Initialization Error:", err));
-}
+            if ('serviceWorker' in navigator) {
+                // 🟢 FIXED: Bumped the build version token to (?v=3) to forcefully clear out old PWA memory loops
+                navigator.serviceWorker.register('/sw.js?v=3')
+                    .then((registration) => {
+                        console.log("PWA Engine Booted Successfully!");
+                        
+                        // Instantly checks for code changes on Vercel without waiting for standard browser timeouts
+                        registration.update(); 
+                    })
+                    .catch((err) => console.error("PWA Initialization Error:", err));
+            }
         });
+
 
         // 🟢 NEW: Native system interceptor catches phone installation readiness tokens cleanly
         window.addEventListener('beforeinstallprompt', (event) => {
