@@ -1264,7 +1264,7 @@ function enterDashboardView() {
             document.getElementById("product-grid").style.display = "grid";
             document.getElementById("customer-profile-dashboard").style.display = "none";
         }
-                       async function fetchAndRenderCustomerOrderTracks() {
+                             async function fetchAndRenderCustomerOrderTracks() {
             const activeTargetRows = document.getElementById("client-active-orders-rows");
             const historyTargetRows = document.getElementById("client-past-history-rows");
             const cacheBusterTimeToken = Date.now();
@@ -1300,11 +1300,10 @@ function enterDashboardView() {
                         `<tr><td colspan="5" style="text-align:center;color:#64748b;padding:20px;">No processing packages captured in queue right now.</td></tr>` :
                         matchingActiveTracks.map(o => `
                             <tr style="border-bottom: 1px solid #1e293b; color: #cbd5e1;">
-                                <td style="padding:12px 8px;font-weight:700;color:#3b82f6;">#${o.id || 'ORD'}</td>
+                                <!-- 🟢 FIXED: Made the Order ID clickable to trigger your premium details popup -->
+                                <td style="padding:12px 8px;font-weight:700;color:#3b82f6;cursor:pointer;text-decoration:underline;" onclick="openOrderDetailsPipeline('${o.id}', 'PROCESSING')">#${o.id || 'ORD'}</td>
                                 
-                                <!-- 🟢 FIXED: Swapped parameters to check o.location first so quantities and totals render instantly -->
                                 <td style="padding:12px 8px;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${o.location || o.address || 'N/A'}">${o.location || o.address || 'N/A'}</td>
-                                
                                 <td style="padding:12px 8px;"><span style="background:rgba(245,158,11,0.1);color:#f59e0b;padding:2px 6px;border-radius:4px;font-size:11px;">${o.mop || 'N/A'}</span></td>
                                 <td style="padding:12px 8px;font-family:monospace;color:#64748b;">${o.utr || 'N/A'}</td>
                                 <td style="padding:12px 8px;text-align:right;"><span style="color:#f59e0b;font-weight:bold;font-size:11px;background:rgba(245,158,11,0.1);padding:4px 8px;border-radius:20px;border:1px solid rgba(245,158,11,0.2);">⏳ PROCESSING</span></td>
@@ -1327,11 +1326,10 @@ function enterDashboardView() {
                         `<tr><td colspan="5" style="text-align:center;color:#64748b;padding:20px;">No past shipped orders historical entries saved.</td></tr>` :
                         matchingHistoryTracks.map(o => `
                             <tr style="border-bottom: 1px solid #1e293b; color: #cbd5e1;">
-                                <td style="padding:12px 8px;font-weight:700;color:#94a3b8;">#${o.id || 'ORD'}</td>
+                                <!-- 🟢 FIXED: Made the completed Order ID rows clickable too -->
+                                <td style="padding:12px 8px;font-weight:700;color:#94a3b8;cursor:pointer;text-decoration:underline;" onclick="openOrderDetailsPipeline('${o.id}', 'SHIPPED')">#${o.id || 'ORD'}</td>
                                 
-                                <!-- 🟢 FIXED: Swapped parameters to check o.location first for completed histories too -->
                                 <td style="padding:12px 8px;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${o.location || o.address || 'N/A'}">${o.location || o.address || 'N/A'}</td>
-                                
                                 <td style="padding:12px 8px;"><span style="background:rgba(100,116,139,0.1);color:#94a3b8;padding:2px 6px;border-radius:4px;font-size:11px;">${o.mop || 'N/A'}</span></td>
                                 <td style="padding:12px 8px;font-family:monospace;color:#64748b;">${o.utr || 'N/A'}</td>
                                 <td style="padding:12px 8px;text-align:right;"><span style="color:#10b981;font-weight:bold;font-size:11px;background:rgba(16,185,129,0.1);padding:4px 8px;border-radius:20px;border:1px solid rgba(16,185,129,0.2);">📦 SHIPPED</span></td>
@@ -1585,6 +1583,116 @@ function enterDashboardView() {
                 showStoreNotification("Failed to finalize profile data deactivation rules.", "⚠️");
             }
         }
+                // =========================================================================
+        // 📦 DYNAMIC RECEIPT & SPECIFIC ORDER DETAILS VIEW GENERATOR PIPELINES
+        // =========================================================================
+        async function openOrderDetailsPipeline(orderId, currentStatus) {
+            const modal = document.getElementById("order-details-modal");
+            const modalBody = document.getElementById("order-details-modal-body");
+            const modalIdText = document.getElementById("detail-modal-id");
+            
+            if (!modal || !modalBody || !modalIdText) return;
+            
+            modalIdText.innerText = `#${orderId}`;
+            modalBody.innerHTML = `<div style="text-align:center; padding:30px; color:#94a3b8;">Processing secure tracking metrics...</div>`;
+            modal.style.display = "flex";
+
+            try {
+                // Fetch context log from backend endpoint maps
+                const fetchTargetType = currentStatus === 'PROCESSING' ? 'orders' : 'history';
+                const response = await fetch(`${API_BASE_ENDPOINT}/admin?type=${fetchTargetType}&_t=${Date.now()}`);
+                
+                if (!response.ok) throw new Error("Network fetch exception.");
+                const dataList = await response.json();
+                const activeRecord = dataList.find(o => String(o.id) === String(orderId));
+                
+                if (!activeRecord) {
+                    modalBody.innerHTML = `<div style="text-align:center; padding:20px; color:#ef4444;">Tracking sheet records details missing on server registry.</div>`;
+                    return;
+                }
+
+                // Parse and map full products listing lines
+                let itemsGridHTML = "";
+                let billCalculatedTotal = 0;
+                
+                if (Array.isArray(activeRecord.items) && activeRecord.items.length > 0) {
+                    itemsGridHTML = activeRecord.items.map(item => {
+                        const calculatedRowSum = Number(item.discountPrice) * Number(item.qty);
+                        billCalculatedTotal += calculatedRowSum;
+                        return `
+                            <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.02); padding:10px 14px; border-radius:10px; border:1px solid rgba(255,255,255,0.03); margin-bottom: 8px;">
+                                <div>
+                                    <h5 style="font-size:13px; font-weight:700; color:white; margin:0;">${item.name}</h5>
+                                    <p style="font-size:11px; color:#64748b; margin:2px 0 0 0;">₹${item.discountPrice} × ${item.qty}</p>
+                                </div>
+                                <span style="font-size:13px; font-weight:700; color:#cbd5e1;">₹${calculatedRowSum}</span>
+                            </div>
+                        `;
+                    }).join('');
+                } else {
+                    // Fallback layout if specific item sub-arrays aren't captured
+                    itemsGridHTML = `<div style="font-size:13px; color:#94a3b8; background:rgba(255,255,255,0.01); padding:12px; border-radius:10px;">${activeRecord.location || activeRecord.address || 'Standard Accessories Bundle Package'}</div>`;
+                }
+
+                // Dynamically compile the premium delivery receipt summary layout metrics fields
+                modalBody.innerHTML = `
+                    <!-- 1. Lifecycle Step Tracker Timeline -->
+                    <div style="background:rgba(255,255,255,0.01); padding:16px; border-radius:12px; border:1px solid rgba(255,255,255,0.03);">
+                        <h4 style="font-size:12px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:14px; margin-top:0;">📦 Fulfillment Path Status Timeline</h4>
+                        <div style="display:flex; flex-direction:column; gap:12px; position:relative; padding-left:20px; border-left:2px solid #1e293b; text-align: left;">
+                            <div style="position:relative;">
+                                <span style="position:absolute; left:-26px; top:4px; background:#10b981; width:10px; height:10px; border-radius:50%; box-shadow:0 0 8px #10b981;"></span>
+                                <h5 style="font-size:13px; font-weight:700; color:white; margin:0;">Order Registered Successfully</h5>
+                                <p style="font-size:11px; color:#64748b; margin:2px 0 0 0;">Package logged inside Indian Telecom cloud logs registry.</p>
+                            </div>
+                            <div style="position:relative; margin-top:4px;">
+                                <span style="position:absolute; left:-26px; top:4px; background:${activeRecord.mop === 'ONLINE' ? '#10b981' : '#f59e0b'}; width:10px; height:10px; border-radius:50%;"></span>
+                                <h5 style="font-size:13px; font-weight:700; color:white; margin:0;">MOP Security Verification</h5>
+                                <p style="font-size:11px; color:#64748b; margin:2px 0 0 0;">Payment type verified via ${activeRecord.mop || 'COD'} clearance protocols.</p>
+                            </div>
+                            <div style="position:relative; margin-top:4px;">
+                                <span style="position:absolute; left:-26px; top:4px; background:${currentStatus === 'SHIPPED' ? '#10b981' : '#64748b'}; width:10px; height:10px; border-radius:50%; ${currentStatus === 'SHIPPED' ? 'box-shadow:0 0 8px #10b981;' : ''}"></span>
+                                <h5 style="font-size:13px; font-weight:700; color:white; margin:0;">Dispatched & Out for Delivery</h5>
+                                <p style="font-size:11px; color:#64748b; margin:2px 0 0 0;">${currentStatus === 'SHIPPED' ? 'Handed over cleanly to logistics courier pipelines.' : 'Awaiting physical warehouse checks by Md Kamre Alam.'}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. Ordered Items List Container -->
+                    <div style="display:flex; flex-direction:column; gap:4px; text-align: left;">
+                        <h4 style="font-size:12px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px; margin-top:0;">📋 Purchased Inventory Breakdown</h4>
+                        ${itemsGridHTML}
+                    </div>
+
+                    <!-- 3. Customer Shipping and Payment Metadata details grid info summary list fields -->
+                    <div style="background:rgba(255,255,255,0.01); padding:16px; border-radius:12px; border:1px solid rgba(255,255,255,0.03); display:grid; grid-template-columns:1fr; gap:12px; font-size:13px; text-align: left;">
+                        <div>
+                            <span style="color:#64748b; font-size:11px; text-transform:uppercase; font-weight:700; display:block; margin-bottom:2px;">Delivery Destination Details</span>
+                            <strong style="color:#cbd5e1; font-weight:600; display:block; margin-bottom:2px;">${activeRecord.name || 'Premium Shopper'} (${activeRecord.phone || 'VPA'})</strong>
+                            <p style="color:#94a3b8; line-height:1.4; font-size:12px; margin:0;">${activeRecord.address || 'Indian Telecom Hub Center, Madhubani Bihar'}</p>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid rgba(255,255,255,0.04); padding-top:10px;">
+                            <div>
+                                <span style="color:#64748b; font-size:11px; text-transform:uppercase; font-weight:700; display:block;">Reference Bank UTR</span>
+                                <strong style="font-family:monospace; color:#cbd5e1; font-size:12px;">${activeRecord.utr || 'N/A'}</strong>
+                            </div>
+                            <div style="text-align:right;">
+                                <span style="color:#64748b; font-size:11px; text-transform:uppercase; font-weight:700; display:block;">MOP Method</span>
+                                <strong style="color:#f59e0b; font-size:12px;">${activeRecord.mop || 'COD'}</strong>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } catch (err) {
+                console.error("Details screen generation pipeline crash:", err);
+                modalBody.innerHTML = `<div style="text-align:center; padding:20px; color:#ef4444;">Network connection fault. Failed to compile real-time tracking lines.</div>`;
+            }
+        }
+
+        function closeOrderDetailsModal() {
+            const modal = document.getElementById("order-details-modal");
+            if (modal) modal.style.display = "none";
+        }
     </script>
 
     <!-- PREMIUM FOOTER BLOCK FOR ELITE STOREFRONT LOOK -->
@@ -1626,6 +1734,27 @@ function enterDashboardView() {
     <div id="product-zoom-lightbox" class="store-lightbox-overlay" onclick="closeProductImageZoom(event)">
         <button class="store-lightbox-close" onclick="closeProductImageZoom(event)">❌</button>
         <img id="lightbox-target-image" class="store-lightbox-content" src="" alt="Zoomed Product Center View">
+    </div>
+        <!-- 📦 PREMIUM DYNAMIC FULL-SCREEN ORDER DETAILS LOOK MODAL -->
+    <div class="modal" id="order-details-modal" style="display: none; position: fixed; inset: 0; background: rgba(15,23,42,0.7); backdrop-filter: blur(6px); z-index: 999999; align-items: center; justify-content: center; padding: 20px;">
+        <div class="modal-content" style="background: #1e1e24; color: #ffffff; width: 100%; max-width: 550px; border-radius: 20px; padding: 24px; max-height: 90vh; overflow-y: auto; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.05);">
+            
+            <!-- Header section -->
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 16px; margin-bottom: 20px;">
+                <div>
+                    <h3 style="font-size: 18px; font-weight: 800; color: #ffffff;">Order Summary Details</h3>
+                    <p id="detail-modal-id" style="font-size: 13px; color: #3b82f6; font-weight: 700; margin-top: 2px;">#ORD-0000</p>
+                </div>
+                <button class="close-btn" onclick="closeOrderDetailsModal()" style="background: none; border: none; font-size: 20px; color: #94a3b8; cursor: pointer;">❌</button>
+            </div>
+
+            <!-- Content Container Injection Point -->
+            <div id="order-details-modal-body" style="display: flex; flex-direction: column; gap: 20px;">
+                <!-- JavaScript loads elements dynamically here -->
+            </div>
+            
+            <button onclick="closeOrderDetailsModal()" style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 12px; border-radius: 12px; font-weight: 700; margin-top: 20px; cursor: pointer; transition: 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='rgba(255,255,255,0.05)'">Close Details</button>
+        </div>
     </div>
     <!-- 📱 PREMIUM FIX APP NAVIGATION LAYER FOR PWA MODES ONLY -->
 <div id="pwa-app-bottom-navbar" class="pwa-bottom-nav">
