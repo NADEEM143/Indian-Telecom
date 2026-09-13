@@ -29,9 +29,29 @@ async function pushInventoryStateToCloud() {
         console.error("Cloud write failed:", err);
     }
 }
+
 function generateImagePreview(inputElement) {
     const preview = document.getElementById("upload-preview");
     if (inputElement.files && inputElement.files[0]) {
+        const selectedFile = inputElement.files[0];
+        const fileSizeInKB = selectedFile.size / 1024;
+
+        // 🛑 PREVIEW TIME GUARD: Immediately reject images over 65 KB upon selecting them
+        if (fileSizeInKB > 65) {
+            alert(
+                "❌ UPLOAD BLOCKED [FILE TOO LARGE]\n\n" +
+                `The image you selected is ${fileSizeInKB.toFixed(1)} KB, which exceeds the 65 KB safety limit.\n\n` +
+                "Please choose a compressed or lighter file."
+            );
+            inputElement.value = ""; // Reset file selection input container parameters
+            if (preview) {
+                preview.src = "";
+                preview.style.display = "none";
+            }
+            temporaryImageBase64 = "";
+            return;
+        }
+
         const fileReaderEngine = new FileReader();
         fileReaderEngine.onload = function (e) {
             temporaryImageBase64 = e.target.result;
@@ -40,7 +60,7 @@ function generateImagePreview(inputElement) {
                 preview.style.display = "block";
             }
         };
-        fileReaderEngine.readAsDataURL(inputElement.files[0]);
+        fileReaderEngine.readAsDataURL(selectedFile);
     }
 }
 
@@ -101,6 +121,25 @@ function renderAdminOrders() {
 
 async function processNewProduct(event) {
     event.preventDefault();
+
+    // 🛑 SUBMIT TIME HARD FIREWALL: Airtight secondary check validating the base64 footprint size metrics
+    if (temporaryImageBase64) {
+        const base64BytesFootprint = temporaryImageBase64.length * (3 / 4);
+        const base64SizeInKB = base64BytesFootprint / 1024;
+
+        if (base64SizeInKB > 65) {
+            alert(
+                "❌ UPLOAD BLOCKED [PAYLOAD CONSTRAINT]\n\n" +
+                `Even after baseline processing, the image string payload is ${base64SizeInKB.toFixed(1)} KB, which violates constraints.\n\n` +
+                "Please choose a lower resolution photo asset."
+            );
+            return; // ⛔ TERMINATES PIPELINE: Absolutely blocks the server save call
+        }
+    } else {
+        alert("⚠️ ATTENTION: Please upload a product image asset under 65 KB before publishing.");
+        return;
+    }
+
     const name = document.getElementById("prod-name").value;
     const cat = document.getElementById("prod-cat").value;
     const price = parseInt(document.getElementById("prod-price").value);
@@ -113,16 +152,19 @@ async function processNewProduct(event) {
         price: price,
         discountPrice: discount,
         isLive: true,
-        asset: temporaryImageBase64 || null
+        asset: temporaryImageBase64
     };
 
     liveInventoryState.push(newProductItem);
     await pushInventoryStateToCloud();
     renderAdminInventory();
     
-    alert(`Success: "${name}" added to live inventory list!`);
+    // 🎉 DISTINCT SUCCESS ALERT LAYER
+    alert(`🚀 ITEM PUBLISHED: "${name}" uploaded with high-res media storage locked successfully!`);
+    
     document.getElementById("product-upload-form").reset();
-    document.getElementById("upload-preview").style.display = "none";
+    const previewBox = document.getElementById("upload-preview");
+    if (previewBox) previewBox.style.display = "none";
     temporaryImageBase64 = "";
 }
 
