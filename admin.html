@@ -330,75 +330,108 @@
                 });
             } catch (e) { return null; }
         }
-                      async function pullMasterDatabaseArrays() {
+                   async function pullMasterDatabaseArrays() {
             try {
                 // 🟢 FIXED: Unique millisecond stamp completely bypasses browser/Vercel cache limits
                 const cacheBusterToken = Date.now();
 
-                // 📢 NEW: Fetch the active storefront marquee offer message text string on dashboard load
-                const bannerMsgResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=banner_msg&_t=${cacheBusterToken}`);
-                if (bannerMsgResponse.ok) {
-                    const parsedBannerPayload = await bannerMsgResponse.json();
-                    liveMarqueeOfferMessageStr = parsedBannerPayload.message || "🔥 MEGA OFFER: FLAT 30% OFF ON PREMIUM CHARGERS & COVERS! LIMITED STOCK!";
-                    const msgInputFieldElement = document.getElementById("live-banner-message-field");
-                    if (msgInputFieldElement) msgInputFieldElement.value = liveMarqueeOfferMessageStr;
+                // 📢 NEW: Fetch the active storefront marquee offer message text string safely
+                try {
+                    const bannerMsgResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=banner_msg&_t=${cacheBusterToken}`);
+                    if (bannerMsgResponse.ok) {
+                        const parsedBannerPayload = await bannerMsgResponse.json();
+                        liveMarqueeOfferMessageStr = parsedBannerPayload.message || "🔥 MEGA OFFER: FLAT 30% OFF ON PREMIUM CHARGERS & COVERS! LIMITED STOCK!";
+                        const msgInputFieldElement = document.getElementById("live-banner-message-field");
+                        if (msgInputFieldElement) msgInputFieldElement.value = liveMarqueeOfferMessageStr;
+                    }
+                } catch (err) { console.error("Banner fetch failed, continuing...", err); }
+
+                // 1. Fetch live product catalog structures safely
+                try {
+                    const productResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=products&_t=${cacheBusterToken}`);
+                    if (productResponse.ok) { 
+                        liveInventoryState = await productResponse.json(); 
+                    } else {
+                        liveInventoryState = [];
+                    }
+                } catch (err) { 
+                    console.error("Products catalog fetch failed, bypassing error...", err); 
+                    liveInventoryState = [];
                 }
 
-                // 1. Fetch live product catalog structures
-                const productResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=products&_t=${cacheBusterToken}`);
-                if (productResponse.ok) { liveInventoryState = await productResponse.json(); }
-
-                // 2. Fetch active checkout order records queue
-                const orderResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=orders&_t=${cacheBusterToken}`);
-                if (orderResponse.ok) { liveOrdersState = await orderResponse.json(); }
+                // 2. Fetch active checkout order records queue safely
+                try {
+                    const orderResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=orders&_t=${cacheBusterToken}`);
+                    if (orderResponse.ok) { 
+                        liveOrdersState = await orderResponse.json(); 
+                    } else {
+                        liveOrdersState = [];
+                    }
+                } catch (err) {
+                    console.error("Active orders queue fetch failed...", err);
+                    liveOrdersState = [];
+                }
 
                 // 3. Fetch completed shipped logs safely from history database cluster
-                const historyResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=history&_t=${cacheBusterToken}`);
-                if (historyResponse.ok) { completedHistoryState = await historyResponse.json(); }
+                try {
+                    const historyResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=history&_t=${cacheBusterToken}`);
+                    if (historyResponse.ok) { 
+                        completedHistoryState = await historyResponse.json(); 
+                    } else {
+                        completedHistoryState = [];
+                    }
+                } catch (err) {
+                    console.error("Order history cluster fetch failed...", err);
+                    completedHistoryState = [];
+                }
 
                 // 4. FETCH REGISTERED ACCOUNTS SAFELY FROM CLOUD DATA STORE
-                const usersResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=users&_t=${cacheBusterToken}`);
-                const userTableBody = document.getElementById("users-list-target");
-                
-                               if (usersResponse.ok && userTableBody) {
-                    const databaseUsersList = await usersResponse.json();
+                try {
+                    const usersResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=users&_t=${cacheBusterToken}`);
+                    const userTableBody = document.getElementById("users-list-target");
                     
-                    // Clear previous blank items or hidden placeholders safely
-                    userTableBody.innerHTML = ""; 
-                    
-                    if (!databaseUsersList || databaseUsersList.length === 0) {
-                        userTableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#94a3b8; padding:30px; font-weight:700;">No data records found inside cloud store.</td></tr>`;
-                    } else {
-                        // 🟢 FIXED: Renders live interactive editing and suspension triggers for each customer account row
-                        userTableBody.innerHTML = databaseUsersList.map((u, idx) => `
-                            <tr>
-                                <td style="font-weight:700; color:#3b82f6; padding:12px 8px;">#${u.id || 'U'}</td>
-                                <td style="color:#ffffff; font-weight:bold; padding:12px 8px;">${u.name || 'N/A'}</td>
-                                <td style="color:#cbd5e1; padding:12px 8px;">${u.phone || u.contact || 'N/A'}</td>
-                                <td style="font-family:monospace; color:#a1a1aa; padding:12px 8px;">${u.password || 'N/A'}</td>
-                                <td style="text-align: right; padding:12px 8px; white-space: nowrap;">
-                                    <button class="action-icon-btn" style="color: #f59e0b; background: rgba(245,158,11,0.1); margin-right: 5px; font-weight: bold;" onclick="triggerInlineUserEdit(${idx})">📝 Edit</button>
-                                    <button class="action-icon-btn" style="color: #ef4444; background: rgba(239,68,68,0.1); font-weight: bold;" onclick="suspendCustomerAccount(${idx})">🚫 Delete</button>
-                                </td>
-                            </tr>
-                        `).join('');
+                    if (usersResponse.ok && userTableBody) {
+                        const databaseUsersList = await usersResponse.json();
+                        
+                        // Clear previous blank items or hidden placeholders safely
+                        userTableBody.innerHTML = ""; 
+                        
+                        if (!databaseUsersList || databaseUsersList.length === 0) {
+                            userTableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#94a3b8; padding:30px; font-weight:700;">No data records found inside cloud store.</td></tr>`;
+                        } else {
+                            // 🟢 FIXED: Text color changed to #0f172a for high-contrast visibility on white cards
+                            userTableBody.innerHTML = databaseUsersList.map((u, idx) => `
+                                <tr>
+                                    <td style="font-weight:700; color:#3b82f6; padding:12px 8px;">#${u.id || 'U'}</td>
+                                    <td style="color:#0f172a; font-weight:bold; padding:12px 8px;">${u.name || 'N/A'}</td>
+                                    <td style="color:#cbd5e1; padding:12px 8px;">${u.phone || u.contact || 'N/A'}</td>
+                                    <td style="font-family:monospace; color:#a1a1aa; padding:12px 8px;">${u.password || 'N/A'}</td>
+                                    <td style="text-align: right; padding:12px 8px; white-space: nowrap;">
+                                        <button class="action-icon-btn" style="color: #f59e0b; background: rgba(245,158,11,0.1); margin-right: 5px; font-weight: bold;" onclick="triggerInlineUserEdit(${idx})">📝 Edit</button>
+                                        <button class="action-icon-btn" style="color: #ef4444; background: rgba(239,68,68,0.1); font-weight: bold;" onclick="suspendCustomerAccount(${idx})">🚫 Delete</button>
+                                    </td>
+                                </tr>
+                            `).join('');
+                        }
                     }
-                }
+                } catch (err) { console.error("Registered accounts fetch failed...", err); }
 
                 // =========================================================================
-                // 📢 DOWNLOAD LIVE ACTIVE SHOPPING BASKETS FROM BACKEND
+                // 📢 DOWNLOAD LIVE ACTIVE SHOPPING BASKETS FROM BACKEND SAFELY
                 // =========================================================================
-                const cartsResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=abandoned_carts&_t=${cacheBusterToken}`);
-                if (cartsResponse.ok) {
-                    const serverCartsPayload = await cartsResponse.json();
-                    renderLiveCustomerCarts(serverCartsPayload);
-                }
+                try {
+                    const cartsResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=abandoned_carts&_t=${cacheBusterToken}`);
+                    if (cartsResponse.ok) {
+                        const serverCartsPayload = await cartsResponse.json();
+                        renderLiveCustomerCarts(serverCartsPayload);
+                    }
+                } catch (err) { console.error("Active client baskets fetch failed...", err); }
 
-                // Render dynamic inventory arrays onto their target tables
-                                // Render dynamic inventory arrays onto their target tables
-                await renderAdminInventory();
-                renderAdminOrders();
-                renderAdminHistoryLog(); // Load permanent tracker rows onto the UI
+                // ⚡️ ALWAYS FORCE RENDERING: Keeps layout active and elements clickable even if a server fetch fails
+                if (typeof renderAdminInventory === 'function') await renderAdminInventory();
+                if (typeof renderAdminOrders === 'function') renderAdminOrders();
+                if (typeof renderAdminHistoryLog === 'function') renderAdminHistoryLog(); // Load permanent tracker rows onto the UI
+                
             } catch (err) {
                 console.error("Cloud Master State Sync Error:", err.message);
             }
@@ -698,102 +731,127 @@ async function renderAdminInventory() {
         }
 
                 // 🟢 ARCHIVAL LOGGER MAPPING ENGINE DRAWING CELLS UNTO SCREEN VIEWS
-                async function pullMasterDatabaseArrays() {
+               async function pullMasterDatabaseArrays() {
             try {
                 // 🟢 CACHE BUSTER: Destroys browser and network cache blocks completely for real-time streaming
                 const cacheBusterToken = Date.now();
 
-                // 1. Fetch live product catalog structures
-                const productResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=products&_t=${cacheBusterToken}`);
-                if (productResponse.ok) { liveInventoryState = await productResponse.json(); }
+                // 1. Fetch live product catalog structures safely
+                try {
+                    const productResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=products&_t=${cacheBusterToken}`);
+                    if (productResponse.ok) { 
+                        liveInventoryState = await productResponse.json(); 
+                    } else {
+                        liveInventoryState = [];
+                    }
+                } catch (err) { 
+                    console.error("Products streaming failure, fallback enabled:", err); 
+                    liveInventoryState = [];
+                }
 
-                // 2. Fetch active checkout order records queue
-                const orderResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=orders&_t=${cacheBusterToken}`);
-                if (orderResponse.ok) { liveOrdersState = await orderResponse.json(); }
+                // 2. Fetch active checkout order records queue safely
+                try {
+                    const orderResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=orders&_t=${cacheBusterToken}`);
+                    if (orderResponse.ok) { 
+                        liveOrdersState = await orderResponse.json(); 
+                    } else {
+                        liveOrdersState = [];
+                    }
+                } catch (err) {
+                    console.error("Orders streaming failure:", err);
+                    liveOrdersState = [];
+                }
 
-                // 3. 🟢 FIXED: Downloads history logs array and explicitly links it to the active memory tracker
-                const historyResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=history&_t=${cacheBusterToken}`);
-                if (historyResponse.ok) { 
-                    const historicalServerPayload = await historyResponse.json();
-                    // Forces conversion to a valid array structure under all conditions
-                    completedHistoryState = Array.isArray(historicalServerPayload) ? historicalServerPayload : [];
-                } else {
+                // 3. 🟢 FIXED: Downloads history logs array safely from history database cluster
+                try {
+                    const historyResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=history&_t=${cacheBusterToken}`);
+                    if (historyResponse.ok) { 
+                        const historicalServerPayload = await historyResponse.json();
+                        completedHistoryState = Array.isArray(historicalServerPayload) ? historicalServerPayload : [];
+                    } else {
+                        completedHistoryState = [];
+                    }
+                } catch (err) {
+                    console.error("History loading failed:", err);
                     completedHistoryState = [];
                 }
 
                 // 4. Fetch registered client credentials accounts safely
-                const usersResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=users&_t=${cacheBusterToken}`);
-                const userTableBody = document.getElementById("users-list-target");
-                
-                if (usersResponse.ok && userTableBody) {
-                    const databaseUsersList = await usersResponse.json();
-                    userTableBody.innerHTML = ""; 
+                try {
+                    const usersResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=users&_t=${cacheBusterToken}`);
+                    const userTableBody = document.getElementById("users-list-target");
                     
-                    if (!databaseUsersList || databaseUsersList.length === 0) {
-                        userTableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#94a3b8; padding:30px; font-weight:700;">No data records found inside cloud store.</td></tr>`;
-                    } else {
-                        const activeClients = databaseUsersList.filter(u => !u.status || u.status !== 'SUSPENDED');
-                        const suspendedClients = databaseUsersList.filter(u => u.status === 'SUSPENDED');
+                    if (usersResponse.ok && userTableBody) {
+                        const databaseUsersList = await usersResponse.json();
+                        userTableBody.innerHTML = ""; 
+                        
+                        if (!databaseUsersList || databaseUsersList.length === 0) {
+                            userTableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#94a3b8; padding:30px; font-weight:700;">No data records found inside cloud store.</td></tr>`;
+                        } else {
+                            const activeClients = databaseUsersList.filter(u => !u.status || u.status !== 'SUSPENDED');
+                            const suspendedClients = databaseUsersList.filter(u => u.status === 'SUSPENDED');
 
-                                                // 🟢 FIXED: High-contrast light theme text styles ensure customer parameters read beautifully
-                        userTableBody.innerHTML = activeClients.length === 0 ? 
-                            `<tr><td colspan="5" style="text-align:center; color:#475569; padding:30px;">No active customer profiles found.</td></tr>` :
-                            activeClients.map((u) => {
-                                const masterIdx = databaseUsersList.findIndex(masterUser => masterUser.id === u.id);
-                                return `
-                                    <tr>
-                                        <td style="font-weight:700; color:#2563eb; padding:12px 8px;">#${u.id || 'U'}</td>
-                                        <td style="color:#0f172a; font-weight:bold; padding:12px 8px;">${u.name || 'N/A'}</td>
-                                        <td style="color:#334155; padding:12px 8px; font-weight: 500;">${u.phone || u.contact || 'N/A'}</td>
-                                        <td style="font-family:monospace; color:#475569; padding:12px 8px; font-weight: 600;">${u.password || 'N/A'}</td>
-                                        <td style="text-align: right; padding:12px 8px; white-space: nowrap;">
-                                            <button class="action-icon-btn" style="color: #b45309; background: rgba(245,158,11,0.08); margin-right: 5px; font-weight: bold;" onclick="triggerInlineUserEdit(${masterIdx})">📝 Edit</button>
-                                            <button class="action-icon-btn" style="color: #ef4444; background: rgba(239,68,68,0.08); font-weight: bold;" onclick="suspendCustomerAccount(${masterIdx})">🚫 Delete</button>
-                                        </td>
-                                    </tr>
-                                `;
-                            }).join('');
-
-
-                                                const suspendedTableBody = document.getElementById("suspended-users-list-target");
-                        if (suspendedTableBody) {
-                            suspendedTableBody.innerHTML = suspendedClients.length === 0 ?
-                                `<tr><td colspan="5" style="text-align:center; color:#64748b; padding:20px;">No permanently suspended account histories logged.</td></tr>` :
-                                suspendedClients.map((u) => {
+                            // 🟢 FIXED: High-contrast light theme text styles ensure customer parameters read beautifully
+                            userTableBody.innerHTML = activeClients.length === 0 ? 
+                                `<tr><td colspan="5" style="text-align:center; color:#475569; padding:30px;">No active customer profiles found.</td></tr>` :
+                                activeClients.map((u) => {
                                     const masterIdx = databaseUsersList.findIndex(masterUser => masterUser.id === u.id);
                                     return `
-                                        <tr style="background: rgba(239,68,68,0.02);">
-                                            <td style="font-weight:700; color:#64748b; padding:12px 8px;">#${u.id || 'U'}</td>
-                                            <td style="color:#94a3b8; text-decoration: line-through; padding:12px 8px;">${u.name || 'N/A'}</td>
-                                            <td style="color:#64748b; padding:12px 8px;">${u.phone || u.contact || 'N/A'}</td>
-                                            <td style="font-family:monospace; color:#4b5563; padding:12px 8px;">${u.password || 'N/A'}</td>
+                                        <tr>
+                                            <td style="font-weight:700; color:#2563eb; padding:12px 8px;">#${u.id || 'U'}</td>
+                                            <td style="color:#0f172a; font-weight:bold; padding:12px 8px;">${u.name || 'N/A'}</td>
+                                            <td style="color:#334155; padding:12px 8px; font-weight: 500;">${u.phone || u.contact || 'N/A'}</td>
+                                            <td style="font-family:monospace; color:#475569; padding:12px 8px; font-weight: 600;">${u.password || 'N/A'}</td>
                                             <td style="text-align: right; padding:12px 8px; white-space: nowrap;">
-                                                <button class="action-icon-btn" style="color: #10b981; background: rgba(16,185,129,0.1); font-weight: bold;" onclick="reactivateCustomerAccount(${masterIdx})">🔄 Reactivate</button>
+                                                <button class="action-icon-btn" style="color: #b45309; background: rgba(245,158,11,0.08); margin-right: 5px; font-weight: bold;" onclick="triggerInlineUserEdit(${masterIdx})">📝 Edit</button>
+                                                <button class="action-icon-btn" style="color: #ef4444; background: rgba(239,68,68,0.08); font-weight: bold;" onclick="suspendCustomerAccount(${masterIdx})">🚫 Delete</button>
                                             </td>
                                         </tr>
                                     `;
                                 }).join('');
+
+                            const suspendedTableBody = document.getElementById("suspended-users-list-target");
+                            if (suspendedTableBody) {
+                                suspendedTableBody.innerHTML = suspendedClients.length === 0 ?
+                                    `<tr><td colspan="5" style="text-align:center; color:#64748b; padding:20px;">No permanently suspended account histories logged.</td></tr>` :
+                                    suspendedClients.map((u) => {
+                                        const masterIdx = databaseUsersList.findIndex(masterUser => masterUser.id === u.id);
+                                        return `
+                                            <tr style="background: rgba(239,68,68,0.02);">
+                                                <td style="font-weight:700; color:#64748b; padding:12px 8px;">#${u.id || 'U'}</td>
+                                                <td style="color:#94a3b8; text-decoration: line-through; padding:12px 8px;">${u.name || 'N/A'}</td>
+                                                <td style="color:#64748b; padding:12px 8px;">${u.phone || u.contact || 'N/A'}</td>
+                                                <td style="font-family:monospace; color:#4b5563; padding:12px 8px;">${u.password || 'N/A'}</td>
+                                                <td style="text-align: right; padding:12px 8px; white-space: nowrap;">
+                                                    <button class="action-icon-btn" style="color: #10b981; background: rgba(16,185,129,0.1); font-weight: bold;" onclick="reactivateCustomerAccount(${masterIdx})">🔄 Reactivate</button>
+                                                </td>
+                                            </tr>
+                                        `;
+                                    }).join('');
+                            }
                         }
                     }
-                }
+                } catch (err) { console.error("Customer accounts table interface painting skipped:", err); }
 
-                // 📢 DOWNLOAD LIVE ACTIVE SHOPPING BASKETS FROM BACKEND
-                const runtimeBusterToken = typeof cacheBusterToken !== 'undefined' ? cacheBusterToken : Date.now();
-                const cartsResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=abandoned_carts&_t=${runtimeBusterToken}`);
-                if (cartsResponse.ok) {
-                    const serverCartsPayload = await cartsResponse.json();
-                    renderLiveCustomerCarts(serverCartsPayload);
-                }
+                // 📢 DOWNLOAD LIVE ACTIVE SHOPPING BASKETS FROM BACKEND Safely
+                try {
+                    const runtimeBusterToken = typeof cacheBusterToken !== 'undefined' ? cacheBusterToken : Date.now();
+                    const cartsResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=abandoned_carts&_t=${runtimeBusterToken}`);
+                    if (cartsResponse.ok) {
+                        const serverCartsPayload = await cartsResponse.json();
+                        renderLiveCustomerCarts(serverCartsPayload);
+                    }
+                } catch (err) { console.error("Active customer cart tracking matrix update failed:", err); }
 
-                // Render dynamic pipelines onto their target layout table views
-                await renderAdminInventory();
-                renderAdminOrders();
-                renderAdminHistoryLog();
+                // ⚡️ ALWAYS FORCE RENDER RENDERING LIFECYCLE: Keep tables responsive and buttons clickable even if requests error out
+                if (typeof renderAdminInventory === 'function') await renderAdminInventory();
+                if (typeof renderAdminOrders === 'function') renderAdminOrders();
+                if (typeof renderAdminHistoryLog === 'function') renderAdminHistoryLog();
+                
             } catch (err) {
                 console.error("Cloud Master State Sync Error:", err.message);
             }
         }
-
 
                // 🟢 FINAL FIX: Safe-fallback mapping logic ensures text properties render flawlessly
                // 🟢 FIXED: High-contrast light theme text styles ensure archived history logs read beautifully
