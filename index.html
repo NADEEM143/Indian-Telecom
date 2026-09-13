@@ -315,6 +315,7 @@
         /* 🔥 CRITICAL MEDIA ENFORCEMENT ENGINE - AUTOMATICALLY SHOWS ONLY IN INSTALLED PWA APP */
                 /* 🔥 CRITICAL MEDIA ENFORCEMENT ENGINE - AUTOMATICALLY SHOWS ONLY IN INSTALLED PWA APP */
                 /* 🔥 CRITICAL MEDIA ENFORCEMENT ENGINE - AUTOMATICALLY SHOWS ONLY IN INSTALLED PWA APP */
+                /* 🔥 CRITICAL MEDIA ENFORCEMENT ENGINE - AUTOMATICALLY SHOWS ONLY IN INSTALLED PWA APP */
         @media (display-mode: standalone) {
             .pwa-bottom-nav {
                 display: grid !important;
@@ -348,9 +349,10 @@
                 background: transparent !important;
             }
 
-            /* 📱 PWA CLEAN TOP HEADER ENGINE: Completely hides duplicate logout buttons and top cart icons inside the App view */
+            /* 📱 PWA CLEAN TOP HEADER ENGINE: Completely hides duplicate logout, top cart, and My Account links inside the App view */
             header #logout-btn, 
-            header .cart-trigger {
+            header .cart-trigger,
+            header #user-portal-btn {
                 display: none !important;
             }
 
