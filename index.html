@@ -304,7 +304,7 @@
             color: #2563eb; /* Highlights active icon blue */
         }
         
-        .pwa-badge {
+                .pwa-badge {
             top: -6px !important;
             right: -10px !important;
             width: 16px !important;
@@ -319,6 +319,14 @@
             }
             body {
                 padding-bottom: 90px !important; /* Prevents contents from overlapping behind navigation bar */
+            }
+
+            /* 📱 PWA-ONLY ISOLATED VIEW LOGIC: Force-hides homepage grids strictly inside the App view when dashboard tabs are active */
+            body:has(#customer-profile-dashboard[style*="display: block"]) .hero-banner,
+            body:has(#customer-profile-dashboard[style*="display: block"]) .categories-nav,
+            body:has(#customer-profile-dashboard[style*="display: block"]) .categories-container,
+            body:has(#customer-profile-dashboard[style*="display: block"]) #product-grid {
+                display: none !important;
             }
         }
    </style>
@@ -1442,62 +1450,61 @@ function enterDashboardView() {
                         console.log('Customer accepted and completed mobile app installation!');
                     }
                     // Collapse banner layout since the installation registration step finalized
-                    const customInstallBannerCard = document.getElementById("pwa-custom-install-banner");
-                    if (customInstallBannerCard) customInstallBannerCard.style.display = "none";
-                    deferredPWAInstallationTrigger = null;
-                });
-            }
+                               // ... inside your targetTab choice result outcome block ...
+            if (customInstallBannerCard) customInstallBannerCard.style.display = "none";
+            deferredPWAInstallationTrigger = null;
         });
-                // 🚀 LINKAGE INTERFACE MECHANISM ENGINE FOR BOTTOM PWA APP NAV TABS
-                // 🚀 LINKAGE INTERFACE MECHANISM ENGINE FOR BOTTOM PWA APP NAV TABS
-        function handlePwaNavAction(targetTab, clickedBtn) {
-            // 1. Cycle Active UI Colors
-            document.querySelectorAll('.pwa-nav-tab').forEach(btn => btn.classList.remove('active'));
-            if (clickedBtn) clickedBtn.classList.add('active');
+    }
+});
 
-            const ordersView = document.getElementById("pwa-dash-orders-view");
-            const profileView = document.getElementById("pwa-dash-profile-view");
+// 🚀 LINKAGE INTERFACE MECHANISM ENGINE FOR BOTTOM PWA APP NAV TABS
+function handlePwaNavAction(targetTab, clickedBtn) {
+    // 1. Cycle Active UI Colors
+    document.querySelectorAll('.pwa-nav-tab').forEach(btn => btn.classList.remove('active'));
+    if (clickedBtn) clickedBtn.classList.add('active');
 
-            // 2. Route View State Logic Pipelines
-            if (targetTab === 'home') {
-                exitDashboardView();
-                toggleCart(false);
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-                filterCategory('All', document.querySelector('.cat-btn')); // Resets screen back onto 'All' items view
-            } 
-            else if (targetTab === 'cart') {
-                toggleCart(true); // Pops out item selection slider
-            } 
-            else if (targetTab === 'orders') {
-                toggleCart(false);
-                if (!activeSessionUser) {
-                    isLoginMode = true;
-                    toggleAuthMode();
-                    document.getElementById("auth-modal").style.display = "flex";
-                } else {
-                    enterDashboardView();
-                    // 🟢 SEGREGATED VIEW: Show ONLY order logs, hide profile controls
-                    if (ordersView) ordersView.style.display = "flex";
-                    if (profileView) profileView.style.display = "none";
-                }
-            } 
-            else if (targetTab === 'profile') {
-                toggleCart(false);
-                if (!activeSessionUser) {
-                    isLoginMode = true;
-                    toggleAuthMode();
-                    document.getElementById("auth-modal").style.display = "flex";
-                } else {
-                    enterDashboardView(); 
-                    // 🟢 SEGREGATED VIEW: Show ONLY profile controls, hide order logs
-                    if (ordersView) ordersView.style.display = "none";
-                    if (profileView) profileView.style.display = "block";
-                }
-            }
+    const ordersView = document.getElementById("pwa-dash-orders-view");
+    const profileView = document.getElementById("pwa-dash-profile-view");
+    const mainDashboardPanel = document.getElementById("customer-profile-dashboard");
+
+    // 2. Route View State Logic Pipelines
+    if (targetTab === 'home') {
+        toggleCart(false);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        filterCategory('All', document.querySelector('.cat-btn'));
+        if (mainDashboardPanel) mainDashboardPanel.style.display = "none";
+    } 
+    else if (targetTab === 'cart') {
+        toggleCart(true);
+    } 
+    else if (targetTab === 'orders') {
+        toggleCart(false);
+        if (!activeSessionUser) {
+            isLoginMode = true;
+            toggleAuthMode();
+            document.getElementById("auth-modal").style.display = "flex";
+        } else {
+            if (mainDashboardPanel) mainDashboardPanel.style.display = "block";
+            if (ordersView) ordersView.style.display = "flex";
+            if (profileView) profileView.style.display = "none";
         }
+    }
+    else if (targetTab === 'profile') {
+        toggleCart(false);
+        if (!activeSessionUser) {
+            isLoginMode = true;
+            toggleAuthMode();
+            document.getElementById("auth-modal").style.display = "flex";
+        } else {
+            if (mainDashboardPanel) mainDashboardPanel.style.display = "block";
+            if (ordersView) ordersView.style.display = "none";
+            if (profileView) profileView.style.display = "block";
+        }
+    }
+}
 
-        // 🟢 INTERACTION OVERRIDE: Syncs cart quantities straight to the bottom navbar badge
-        const originalUpdateCartUI = updateCartUI;
+// 🟢 INTERACTION OVERRIDE: Syncs cart quantities straight to the bottom navbar badge
+const originalUpdateCartUI = updateCartUI;
         updateCartUI = function() {
             if (typeof originalUpdateCartUI === 'function') originalUpdateCartUI();
             
