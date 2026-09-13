@@ -314,6 +314,7 @@
 
         /* 🔥 CRITICAL MEDIA ENFORCEMENT ENGINE - AUTOMATICALLY SHOWS ONLY IN INSTALLED PWA APP */
                 /* 🔥 CRITICAL MEDIA ENFORCEMENT ENGINE - AUTOMATICALLY SHOWS ONLY IN INSTALLED PWA APP */
+                /* 🔥 CRITICAL MEDIA ENFORCEMENT ENGINE - AUTOMATICALLY SHOWS ONLY IN INSTALLED PWA APP */
         @media (display-mode: standalone) {
             .pwa-bottom-nav {
                 display: grid !important;
@@ -345,6 +346,32 @@
             .drawer-overlay {
                 backdrop-filter: none !important;
                 background: transparent !important;
+            }
+
+            /* 📱 PWA CLEAN TOP HEADER ENGINE: Completely hides duplicate logout buttons and top cart icons inside the App view */
+            header #logout-btn, 
+            header .cart-trigger {
+                display: none !important;
+            }
+
+            /* 👥 PWA PROFILE INTEGRATION MODIFIER: Forces the hidden logout button layout to reappear perfectly inside your Profile Tab dashboard view block */
+            body:has(#pwa-dash-profile-view[style*="display: block"]) header #logout-btn {
+                display: block !important;
+                position: fixed;
+                bottom: 100px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: #ef4444 !important;
+                color: white !important;
+                padding: 12px 28px !important;
+                border-radius: 12px !important;
+                box-shadow: 0 10px 15px -3px rgba(239, 68, 68, 0.3) !important;
+                font-weight: 700 !important;
+                font-size: 14px !important;
+                z-index: 99999;
+                width: calc(100% - 72px);
+                max-width: 350px;
+                text-align: center;
             }
         }
    </style>
