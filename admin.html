@@ -525,10 +525,35 @@
         // =========================================================================
         // ⚡️ GLOBAL FIXED COMPRESSOR ENGINE: INTERCEPTS LARGE DEVICE FILES INSTANTLY
         // =========================================================================
+        // =========================================================================
+        // 🛡️ STRICT ADMINISTRATIVE SIZE GUARD INTERCEPTOR (MAX PAYLOAD SCALE: 65KB)
+        // =========================================================================
         function generateImagePreview(inputElement) {
             const preview = document.getElementById("upload-preview");
+            
             if (inputElement.files && inputElement.files[0]) {
-                showNotification("Compressing image parameters... ⏳", "📸");
+                const targetFileBytes = inputElement.files[0].size;
+                const fileWeightInKB = targetFileBytes / 1024;
+
+                // 🛑 CRITICAL SIZE THRESHOLD LOCK: Strict rejection rule triggers if file crosses 65KB threshold
+                if (fileWeightInKB > 65) {
+                    // 1. Fire your custom slide-up notification layout alert with personalized elite branding words
+                    showNotification("CRITICAL FILE ERROR: This image payload is too heavy! Kindly upload a lighter file under 65 KB to protect cloud bandwidth.", "⚠️");
+                    
+                    // 2. Clear out the un-optimized file selection from your system form parameters immediately
+                    inputElement.value = ""; 
+                    
+                    // 3. Keep your UI layout clean by hiding old ghost pictures previews maps 
+                    if (preview) {
+                        preview.src = "";
+                        preview.style.display = "none";
+                    }
+                    temporaryImageBase64 = ""; // Reset background global string
+                    return; // Block function chain execution instantly
+                }
+
+                // 🟢 SAFE TRACK: If the asset passes the check (is under 65KB), process and map it to your store natively
+                showNotification("Image parameters checked! Encapsulating asset... ⏳", "📸");
                 
                 const fileReaderEngine = new FileReader();
                 fileReaderEngine.readAsDataURL(inputElement.files[0]);
@@ -538,7 +563,7 @@
                     imageElementBuffer.src = e.target.result;
                     
                     imageElementBuffer.onload = function() {
-                        // 1. Establish strict canvas dimensions (Max 800px width/height standard)
+                        // Establish strict canvas bounding thresholds
                         const maximumPixelConstraint = 800;
                         let renderWidth = imageElementBuffer.width;
                         let renderHeight = imageElementBuffer.height;
@@ -555,7 +580,7 @@
                             }
                         }
 
-                        // 2. Build the off-screen canvas context workspace
+                        // Build off-screen canvas workspace
                         const offscreenCanvas = document.createElement('canvas');
                         offscreenCanvas.width = renderWidth;
                         offscreenCanvas.height = renderHeight;
@@ -563,16 +588,15 @@
                         const canvasRender2D = offscreenCanvas.getContext('2d');
                         canvasRender2D.drawImage(imageElementBuffer, 0, 0, renderWidth, renderHeight);
 
-                        // 3. Compress using e-commerce optimized web spec metrics (70% jpeg scale factor)
-                        // This shaves off raw device photo inflation bloat, flattening assets down to ~65KB natively!
+                        // Extract safe, validated Base64 matrix
                         temporaryImageBase64 = offscreenCanvas.toDataURL('image/jpeg', 0.7);
                         
-                        // 4. Update the layout preview container securely on your panel view
+                        // Update layout previews container securely on your panel view
                         if (preview) {
                             preview.src = temporaryImageBase64;
                             preview.style.display = "block";
                         }
-                        showNotification("Compression complete! Payload optimized. ✅", "✨");
+                        showNotification("Image asset verified and locked! Payload optimized. ✅", "✨");
                     };
                 };
             }
