@@ -24,12 +24,33 @@ export default async function handler(req, res) {
         // =========================================================================
         switch (dataType) {
             
-            case 'products':
+                        case 'products':
                 if (req.method === 'GET') {
                     const products = await kv.get('it_products') || [];
                     return res.status(200).json(products);
                 }
                 if (req.method === 'POST') {
+                    // 🛑 BACKEND SERVER FIREWALL: Block payload immediately if string weight exceeds total server allocation limits
+                    const rawPayloadString = JSON.stringify(req.body);
+                    if (rawPayloadString.length > 1572864) {
+                        return res.status(413).json({ error: "Payload Too Large: Bulk inventory transmission exceeds bandwidth limits." });
+                    }
+
+                    // Scan inside arrays to prevent bypassed raw post objects crossing the 65KB boundary
+                    if (Array.isArray(req.body)) {
+                        for (const product of req.body) {
+                            if (product.asset && typeof product.asset === 'string') {
+                                const approxAssetSizeKB = (product.asset.length * (3 / 4)) / 1024;
+                                if (approxAssetSizeKB > 65) {
+                                    return res.status(400).json({ 
+                                        error: `Server Rejection: The asset for "${product.name || 'Unknown'}" is ${approxAssetSizeKB.toFixed(1)} KB, which violates the strict 65 KB safety gate.` 
+                                    });
+                                }
+                            }
+                        }
+                    }
+
+                    // 🟢 SECURE TRACK: Save configuration states safely to cloud records pool
                     await kv.set('it_products', req.body);
                     return res.status(200).json({ success: true });
                 }
