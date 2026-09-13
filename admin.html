@@ -1095,7 +1095,7 @@ async function renderAdminInventory() {
                 const generatedId = "p_" + Date.now();
                 await saveImageLocally(generatedId, temporaryImageBase64);
 
-                const newProductItem = {
+                                const newProductItem = {
                     id: generatedId,
                     name: name,
                     category: cat,
@@ -1109,7 +1109,7 @@ async function renderAdminInventory() {
                 await pushInventoryStateToCloud();
                 
                 showNotification(`PUBLISHED: "${name}" is live!`, "✅");
-                alert(`🚀 ITEM PUBLISHED: "${name}" uploaded with high-res media storage locked successfully!`);
+                alert(`REJECTED: "${name}" uploaded image size is too heavy! Please select a lighter image less than 65kb`);
             }
 
             await renderAdminInventory();
@@ -1123,7 +1123,6 @@ async function renderAdminInventory() {
             liveInventoryState[index].isLive = !liveInventoryState[index].isLive;
             await pushInventoryStateToCloud();
         }
-
 
               async function deleteInventoryItem(index) {
             if (confirm("Remove this accessory from active storefront?")) {
