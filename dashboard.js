@@ -122,6 +122,28 @@ function renderAdminOrders() {
 async function processNewProduct(event) {
     event.preventDefault();
 
+    // 🛑 HARD SUBMIT GUARD: Absolute fallback verification check matching raw file sizes before creation pipelines run
+    const fileInput = document.getElementById("prod-file");
+    if (fileInput && fileInput.files && fileInput.files[0]) {
+        const rawFileBytes = fileInput.files[0].size;
+        const rawFileKB = rawFileBytes / 1024;
+        if (rawFileKB > 65) {
+            alert(
+                "❌ UPLOAD BLOCKED [FILE TOO LARGE]\n\n" +
+                `Operation Denied: The original image size (${rawFileKB.toFixed(1)} KB) is over the allowed 65 KB safety limit.\n\n` +
+                "Please choose a lighter or compressed file asset."
+            );
+            fileInput.value = "";
+            const preview = document.getElementById("upload-preview");
+            if (preview) {
+                preview.src = "";
+                preview.style.display = "none";
+            }
+            temporaryImageBase64 = "";
+            return;
+        }
+    }
+
     // 🛑 SUBMIT TIME HARD FIREWALL: Airtight secondary check validating the base64 footprint size metrics
     if (temporaryImageBase64) {
         const base64BytesFootprint = temporaryImageBase64.length * (3 / 4);
