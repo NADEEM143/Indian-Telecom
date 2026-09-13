@@ -1003,7 +1003,7 @@ async function renderAdminInventory() {
             } catch (err) { console.error("Local Image Cache Write Error", err); }
         }
 
-        async function processNewProduct(event) {
+                async function processNewProduct(event) {
             event.preventDefault();
 
             // 🛑 STRICT HARD FIREWALL: Validate raw selected file size first
@@ -1014,7 +1014,11 @@ async function renderAdminInventory() {
 
                 if (fileWeightInKB > 65) {
                     showNotification("CRITICAL FILE ERROR: Upload blocked! Image exceeds 65 KB threshold.", "🛑");
-                    alert(`Upload Denied: This raw image file is too large (${fileWeightInKB.toFixed(1)} KB). Please select a file under 65 KB.`);
+                    alert(
+                        "❌ UPLOAD BLOCKED [FILE TOO LARGE]\n\n" +
+                        `Operation Denied: The original image size (${fileWeightInKB.toFixed(1)} KB) is over the 65 KB safety limit.\n\n` +
+                        "Please choose a lighter image file."
+                    );
                     
                     // Flush bad inputs completely
                     fileInput.value = "";
@@ -1034,7 +1038,11 @@ async function renderAdminInventory() {
                 const base64PayloadSizeKB = (temporaryImageBase64.length * (3 / 4)) / 1024;
                 if (base64PayloadSizeKB > 65) {
                     showNotification("CRITICAL DATA ERROR: Processed asset payload is too heavy!", "🛑");
-                    alert(`Upload Denied: Even after internal scaling processing, the target image payload is ${base64PayloadSizeKB.toFixed(1)} KB. Please upload a lighter source photo.`);
+                    alert(
+                        "❌ UPLOAD BLOCKED [PAYLOAD CONSTRAINT]\n\n" +
+                        `Operation Denied: Even after canvas scaling processing, the target image payload is ${base64PayloadSizeKB.toFixed(1)} KB.\n\n` +
+                        "Please upload a smaller or lower-resolution photo source."
+                    );
                     
                     if (fileInput) fileInput.value = "";
                     const preview = document.getElementById("upload-preview");
@@ -1075,11 +1083,12 @@ async function renderAdminInventory() {
                     submitBtn.style.background = "#3b82f6";
                 }
                 
-                alert(`SUCCESS: "${name}" configurations updated live seamlessly!`);
+                showNotification(`SUCCESS: "${name}" configurations updated!`, "📝");
+                alert(`✨ CONFIGURATION SAVED: "${name}" variations updated live seamlessly!`);
             } else {
                 // Ensure a new product has an image before proceeding
                 if (!temporaryImageBase64) {
-                    alert("Operation Denied: Please upload a product image under 65 KB before publishing.");
+                    alert("⚠️ ATTENTION: Please upload a product thumbnail image under 65 KB before publishing.");
                     return;
                 }
 
@@ -1098,40 +1107,9 @@ async function renderAdminInventory() {
 
                 liveInventoryState.push(newProductItem);
                 await pushInventoryStateToCloud();
-                alert(`Success: "${name}" uploaded with high-res media storage locked successfully!`);
-            }
-
-            await renderAdminInventory();
-            document.getElementById("product-upload-form").reset();
-            const previewBox = document.getElementById("upload-preview");
-            if (previewBox) previewBox.style.display = "none";
-            temporaryImageBase64 = "";
-        }
                 
-                alert(`SUCCESS: "${name}" configurations updated live seamlessly!`);
-            } else {
-                // Ensure a new product has an image before proceeding
-                if (!temporaryImageBase64) {
-                    alert("Operation Denied: Please upload a product image under 65 KB before publishing.");
-                    return;
-                }
-
-                const generatedId = "p_" + Date.now();
-                await saveImageLocally(generatedId, temporaryImageBase64);
-
-                const newProductItem = {
-                    id: generatedId,
-                    name: name,
-                    category: cat,
-                    price: price,
-                    discountPrice: discount,
-                    isLive: true,
-                    asset: temporaryImageBase64 || null
-                };
-
-                liveInventoryState.push(newProductItem);
-                await pushInventoryStateToCloud();
-                alert(`Success: "${name}" uploaded with high-res media storage locked successfully!`);
+                showNotification(`PUBLISHED: "${name}" is live!`, "✅");
+                alert(`🚀 ITEM PUBLISHED: "${name}" uploaded with high-res media storage locked successfully!`);
             }
 
             await renderAdminInventory();
