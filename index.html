@@ -1149,16 +1149,21 @@ function switchOnlineSubMethod(targetMethod) {
             const consolidatedItemsDescription = cart.map(item => `${item.name} (x${item.qty})`).join(', ');
 
             // 🟢 FIXED: Combines all item quantities under ONE unique Order ID payload structure natively
-            const freshCheckoutOrder = {
+                        const freshCheckoutOrder = {
                 id: "ORD-" + Math.floor(1000 + Math.random() * 9000),
                 name: document.getElementById("cust-name").value,
                 phone: document.getElementById("cust-phone").value,
                 address: document.getElementById("cust-address").value,
                 mop: mode,
                 utr: mode === 'ONLINE' ? utrNum : 'N/A',
-                items: cart, // Keeps structural array breakdown intact for your admin settings panel database
-                location: `${consolidatedItemsDescription} [Total: ₹${rawTotal}]` // Populates your tracking tables beautifully
+                items: cart,
+                location: `${consolidatedItemsDescription} [Total: ₹${rawTotal}]`,
+                
+                // 🕒 AUTOMATED TIMESTAMP STAMPS
+                orderDate: new Date().toLocaleDateString('en-IN', {day: '2-digit', month: 'short', year: 'numeric'}),
+                orderTime: new Date().toLocaleTimeString('en-IN', {hour: '2-digit', minute: '2-digit', hour12: true})
             };
+
 
             try {
                 // Dispatches the standalone checkout record straight to the backend without redundant data fetching loops
@@ -1718,6 +1723,7 @@ const originalUpdateCartUI = updateCartUI;
                 }
 
                 // Dynamically compile the premium delivery receipt summary layout metrics fields
+                                // Dynamically compile the premium delivery receipt summary layout metrics fields
                 modalBody.innerHTML = `
                     <!-- 1. Lifecycle Step Tracker Timeline -->
                     <div style="background:rgba(255,255,255,0.01); padding:16px; border-radius:12px; border:1px solid rgba(255,255,255,0.03);">
@@ -1726,7 +1732,7 @@ const originalUpdateCartUI = updateCartUI;
                             <div style="position:relative;">
                                 <span style="position:absolute; left:-26px; top:4px; background:#10b981; width:10px; height:10px; border-radius:50%; box-shadow:0 0 8px #10b981;"></span>
                                 <h5 style="font-size:13px; font-weight:700; color:white; margin:0;">Order Registered Successfully</h5>
-                                <p style="font-size:11px; color:#64748b; margin:2px 0 0 0;">Package logged inside Indian Telecom cloud logs registry.</p>
+                                <p style="font-size:11px; color:#64748b; margin:2px 0 0 0;">Logged: ${activeRecord.orderDate || '13 Sep 2026'} at ${activeRecord.orderTime || '07:30 PM'}</p>
                             </div>
                             <div style="position:relative; margin-top:4px;">
                                 <span style="position:absolute; left:-26px; top:4px; background:${activeRecord.mop === 'ONLINE' ? '#10b981' : '#f59e0b'}; width:10px; height:10px; border-radius:50%;"></span>
@@ -1736,13 +1742,13 @@ const originalUpdateCartUI = updateCartUI;
                             <div style="position:relative; margin-top:4px;">
                                 <span style="position:absolute; left:-26px; top:4px; background:${currentStatus === 'SHIPPED' ? '#10b981' : '#64748b'}; width:10px; height:10px; border-radius:50%; ${currentStatus === 'SHIPPED' ? 'box-shadow:0 0 8px #10b981;' : ''}"></span>
                                 <h5 style="font-size:13px; font-weight:700; color:white; margin:0;">Dispatched & Out for Delivery</h5>
-                                <p style="font-size:11px; color:#64748b; margin:2px 0 0 0;">${currentStatus === 'SHIPPED' ? 'Handed over cleanly to logistics courier pipelines.' : 'Awaiting physical warehouse checks by Md Kamre Alam.'}</p>
+                                <p style="font-size:11px; color:#64748b; margin:2px 0 0 0;">${currentStatus === 'SHIPPED' ? `Delivered: ${activeRecord.deliveryDate || 'Recently'} at ${activeRecord.deliveryTime || 'Scheduled'}` : 'Awaiting physical warehouse checks by Md Kamre Alam.'}</p>
                             </div>
                         </div>
                     </div>
 
                     <!-- 2. Ordered Items List Container -->
-                    <div style="display:flex; flex-direction:column; gap:4px; text-align: left;">
+                    <div style="display:flex; flex-direction:column; gap:4px; text-align: left; margin-top: 20px;">
                         <h4 style="font-size:12px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px; margin-top:0;">📋 Purchased Inventory Breakdown</h4>
                         ${itemsGridHTML}
                     </div>
