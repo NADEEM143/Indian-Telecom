@@ -313,6 +313,7 @@
         }
 
         /* 🔥 CRITICAL MEDIA ENFORCEMENT ENGINE - AUTOMATICALLY SHOWS ONLY IN INSTALLED PWA APP */
+                /* 🔥 CRITICAL MEDIA ENFORCEMENT ENGINE - AUTOMATICALLY SHOWS ONLY IN INSTALLED PWA APP */
         @media (display-mode: standalone) {
             .pwa-bottom-nav {
                 display: grid !important;
@@ -327,6 +328,23 @@
             body:has(#customer-profile-dashboard[style*="display: block"]) .categories-container,
             body:has(#customer-profile-dashboard[style*="display: block"]) #product-grid {
                 display: none !important;
+            }
+
+            /* 🛒 PWA-ONLY FULL SCREEN CART ENGINE: Transforms the basket view into a native mobile page view */
+            .cart-drawer {
+                width: 100% !important;
+                max-width: 100% !important;
+                box-shadow: none !important;
+                border-radius: 0 !important;
+                height: calc(100vh - 64px) !important; /* Locks it precisely above your bottom navigation menu bar */
+                bottom: 64px !important;
+                top: 0 !important;
+            }
+            
+            /* Clean up background masks inside the mobile app view to prevent screen overlapping glitches */
+            .drawer-overlay {
+                backdrop-filter: none !important;
+                background: transparent !important;
             }
         }
    </style>
