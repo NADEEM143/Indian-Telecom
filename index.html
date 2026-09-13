@@ -1409,11 +1409,19 @@ function enterDashboardView() {
         // =========================================================================
         // 🚀 MASTER APPS PLATFORM INITIALIZATION DRIVERS WITH RECURSIVE ENGINES
         // =========================================================================
-        let deferredPWAInstallationTrigger = null;
+                let deferredPWAInstallationTrigger = null;
 
         window.addEventListener('load', () => {
-            // 1. Fire original user sessions and data inventory fetchers safely
+            // 1. Recover and evaluate security logs from local device hardware memory cache first
             if (typeof evaluateUserAccessSession === 'function') evaluateUserAccessSession();
+            
+            // 📱 PWA FIX: Instantly sync your order history paths if a user session is cached inside the app workspace
+            if (activeSessionUser) {
+                if (typeof fetchAndRenderCustomerOrderTracks === 'function') {
+                    fetchAndRenderCustomerOrderTracks();
+                }
+            }
+            
             if (typeof fetchLiveInventory === 'function') fetchLiveInventory();
             
             // 2. Compile dynamic catalog grids from cloud maps if backups exist
@@ -1422,9 +1430,6 @@ function enterDashboardView() {
             } else if (typeof pullMasterDatabaseArrays === 'function') {
                 pullMasterDatabaseArrays();
             }
-
-                        const formElement = document.getElementById("order-form");
-            if (formElement) formElement.addEventListener("submit", submitOrder);
 
             // 3. 📱 PROGRESSIVE APP ENGINE ACTIVATION ROUTINE
             // 📱 FORCE UPDATE LOGIC: Append a live version token to completely destroy Android ghost memory loops
