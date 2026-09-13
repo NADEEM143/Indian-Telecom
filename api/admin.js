@@ -270,7 +270,19 @@ export default async function handler(req, res) {
                     });
                 }
                 break;
-            // =========================================================================
+
+            case 'export_products':
+                if (req.method === 'GET') {
+                    // Downloads the raw data array bypassing Upstash layout restrictions
+                    const databaseProducts = await kv.get('it_products') || [];
+                    
+                    // Returns a clean, readable text structure to your browser window
+                    return res.status(200).json({
+                        totalItemsFound: databaseProducts.length,
+                        products: databaseProducts
+                    });
+                }
+                break;
 
             default:
                 return res.status(400).json({ error: `Invalid datatype target mapping '${dataType}' specified.` });
