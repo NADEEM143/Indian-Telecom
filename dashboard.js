@@ -181,7 +181,7 @@ async function processNewProduct(event) {
     await pushInventoryStateToCloud();
     renderAdminInventory();
     
-    // 🎉 DISTINCT SUCCESS ALERT LAYER
+    // 🎉 DISTINCT SUCCESS ALERT LAYER - This will only execute if all 65KB validation firewalls pass successfully!
     alert(`🚀 ITEM PUBLISHED: "${name}" uploaded with high-res media storage locked successfully!`);
     
     document.getElementById("product-upload-form").reset();
