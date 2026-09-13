@@ -17,11 +17,15 @@
       "destination": "/api/admin.js" 
     },
     { 
+      "source": "/admin", 
+      "destination": "/admin.html" 
+    },
+    { 
       "source": "/master-admin-console", 
       "destination": "/admin.html" 
     },
     {
-      "source": "/(.*)",
+      "source": "/((?!api|admin|master-admin-console).*)" ,
       "destination": "/index.html"
     }
   ],
@@ -38,6 +42,12 @@
       "headers": [
         { "key": "Content-Type", "value": "application/javascript" },
         { "key": "Cache-Control", "value": "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0" }
+      ]
+    },
+    {
+      "source": "/dashboard.js",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-store, no-cache, must-revalidate, max-age=0" }
       ]
     }
   ]
