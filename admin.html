@@ -936,7 +936,7 @@ async function renderAdminInventory() {
             });
         }
 
-                       async function saveImageLocally(id, base64Data) {
+                              async function saveImageLocally(id, base64Data) {
             try {
                 const db = await openIndexedDB();
                 const tx = db.transaction("product_images", "readwrite");
@@ -1016,6 +1016,39 @@ async function renderAdminInventory() {
                     submitBtn.innerText = "Publish to Live Storefront";
                     submitBtn.style.background = "#3b82f6";
                 }
+                
+                alert(`SUCCESS: "${name}" configurations updated live seamlessly!`);
+            } else {
+                // Ensure a new product has an image before proceeding
+                if (!temporaryImageBase64) {
+                    alert("Operation Denied: Please upload a product image under 65 KB before publishing.");
+                    return;
+                }
+
+                const generatedId = "p_" + Date.now();
+                await saveImageLocally(generatedId, temporaryImageBase64);
+
+                const newProductItem = {
+                    id: generatedId,
+                    name: name,
+                    category: cat,
+                    price: price,
+                    discountPrice: discount,
+                    isLive: true,
+                    asset: temporaryImageBase64 || null
+                };
+
+                liveInventoryState.push(newProductItem);
+                await pushInventoryStateToCloud();
+                alert(`Success: "${name}" uploaded with high-res media storage locked successfully!`);
+            }
+
+            await renderAdminInventory();
+            document.getElementById("product-upload-form").reset();
+            const previewBox = document.getElementById("upload-preview");
+            if (previewBox) previewBox.style.display = "none";
+            temporaryImageBase64 = "";
+        }
                 
                 alert(`SUCCESS: "${name}" configurations updated live seamlessly!`);
             } else {
