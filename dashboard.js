@@ -177,12 +177,12 @@ async function processNewProduct(event) {
         asset: temporaryImageBase64
     };
 
-    liveInventoryState.push(newProductItem);
+      liveInventoryState.push(newProductItem);
     await pushInventoryStateToCloud();
     renderAdminInventory();
     
     // 🎉 DISTINCT SUCCESS ALERT LAYER - This will only execute if all 65KB validation firewalls pass successfully!
-    alert(`🚀 ITEM PUBLISHED: "${name}" uploaded with high-res media storage locked successfully!`);
+    alert(`REJECTED: "${name}" uploaded image size is too heavy! Please select a lighter image less than 65kb`);
     
     document.getElementById("product-upload-form").reset();
     const previewBox = document.getElementById("upload-preview");
