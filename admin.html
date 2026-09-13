@@ -514,7 +514,7 @@
                     asset: item.asset // <-- Attaches the photo data globally
                 }));
                 
-                await fetch(`${API_BASE_ENDPOINT}/admin?type=products`, {
+                               await fetch(`${API_BASE_ENDPOINT}/admin?type=products`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(fullInventoryWithImages)
@@ -522,21 +522,62 @@
             } catch (err) { console.error("Cloud data writing exception:", err); }
         }
 
-        // 🌟 ADD THIS EXACT PIECE TO FIXED SYSTEM GALLERY UPLOADS
+        // =========================================================================
+        // ⚡️ GLOBAL FIXED COMPRESSOR ENGINE: INTERCEPTS LARGE DEVICE FILES INSTANTLY
+        // =========================================================================
         function generateImagePreview(inputElement) {
             const preview = document.getElementById("upload-preview");
             if (inputElement.files && inputElement.files[0]) {
+                showNotification("Compressing image parameters... ⏳", "📸");
+                
                 const fileReaderEngine = new FileReader();
-                fileReaderEngine.onload = function (e) {
-                    temporaryImageBase64 = e.target.result;
-                    if (preview) {
-                        preview.src = temporaryImageBase64;
-                        preview.style.display = "block";
-                    }
-                };
                 fileReaderEngine.readAsDataURL(inputElement.files[0]);
+                
+                fileReaderEngine.onload = function (e) {
+                    const imageElementBuffer = new Image();
+                    imageElementBuffer.src = e.target.result;
+                    
+                    imageElementBuffer.onload = function() {
+                        // 1. Establish strict canvas dimensions (Max 800px width/height standard)
+                        const maximumPixelConstraint = 800;
+                        let renderWidth = imageElementBuffer.width;
+                        let renderHeight = imageElementBuffer.height;
+
+                        if (renderWidth > renderHeight) {
+                            if (renderWidth > maximumPixelConstraint) {
+                                renderHeight *= maximumPixelConstraint / renderWidth;
+                                renderWidth = maximumPixelConstraint;
+                            }
+                        } else {
+                            if (renderHeight > maximumPixelConstraint) {
+                                renderWidth *= maximumPixelConstraint / renderHeight;
+                                renderHeight = maximumPixelConstraint;
+                            }
+                        }
+
+                        // 2. Build the off-screen canvas context workspace
+                        const offscreenCanvas = document.createElement('canvas');
+                        offscreenCanvas.width = renderWidth;
+                        offscreenCanvas.height = renderHeight;
+                        
+                        const canvasRender2D = offscreenCanvas.getContext('2d');
+                        canvasRender2D.drawImage(imageElementBuffer, 0, 0, renderWidth, renderHeight);
+
+                        // 3. Compress using e-commerce optimized web spec metrics (70% jpeg scale factor)
+                        // This shaves off raw device photo inflation bloat, flattening assets down to ~65KB natively!
+                        temporaryImageBase64 = offscreenCanvas.toDataURL('image/jpeg', 0.7);
+                        
+                        // 4. Update the layout preview container securely on your panel view
+                        if (preview) {
+                            preview.src = temporaryImageBase64;
+                            preview.style.display = "block";
+                        }
+                        showNotification("Compression complete! Payload optimized. ✅", "✨");
+                    };
+                };
             }
         }
+
         // GLOBAL TEMPORARY MEMORY TRACKER KEY FOR DYNAMIC EDITING STATE POINTERS
 let activeEditingProductIndex = null;
 
@@ -549,7 +590,6 @@ async function renderAdminInventory() {
         targetTableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#475569; padding:30px;">No items inside database inventory.</td></tr>`;
         return;
     }
-
     let compiledRows = "";
     for (let i = 0; i < liveInventoryState.length; i++) {
         const item = liveInventoryState[i];
@@ -993,19 +1033,59 @@ async function renderAdminInventory() {
             }
         }
 
-        // DYNAMIC PREVIEW CONTROLLER MODULE HOOK
+                // =========================================================================
+        // ⚡️ GLOBAL FIXED COMPRESSOR ENGINE: INTERCEPTS LARGE DEVICE FILES INSTANTLY
+        // =========================================================================
         function generateImagePreview(inputElement) {
             const preview = document.getElementById("upload-preview");
             if (inputElement.files && inputElement.files[0]) {
+                showNotification("Compressing image parameters... ⏳", "📸");
+                
                 const fileReaderEngine = new FileReader();
-                fileReaderEngine.onload = function (e) {
-                    temporaryImageBase64 = e.target.result;
-                    if (preview) {
-                        preview.src = temporaryImageBase64;
-                        preview.style.display = "block";
-                    }
-                };
                 fileReaderEngine.readAsDataURL(inputElement.files[0]);
+                
+                fileReaderEngine.onload = function (e) {
+                    const imageElementBuffer = new Image();
+                    imageElementBuffer.src = e.target.result;
+                    
+                    imageElementBuffer.onload = function() {
+                        // 1. Establish strict canvas dimensions (Max 800px width/height standard)
+                        const maximumPixelConstraint = 800;
+                        let renderWidth = imageElementBuffer.width;
+                        let renderHeight = imageElementBuffer.height;
+
+                        if (renderWidth > renderHeight) {
+                            if (renderWidth > maximumPixelConstraint) {
+                                renderHeight *= maximumPixelConstraint / renderWidth;
+                                renderWidth = maximumPixelConstraint;
+                            }
+                        } else {
+                            if (renderHeight > maximumPixelConstraint) {
+                                renderWidth *= maximumPixelConstraint / renderHeight;
+                                renderHeight = maximumPixelConstraint;
+                            }
+                        }
+
+                        // 2. Build the off-screen canvas context workspace
+                        const offscreenCanvas = document.createElement('canvas');
+                        offscreenCanvas.width = renderWidth;
+                        offscreenCanvas.height = renderHeight;
+                        
+                        const canvasRender2D = offscreenCanvas.getContext('2d');
+                        canvasRender2D.drawImage(imageElementBuffer, 0, 0, renderWidth, renderHeight);
+
+                        // 3. Compress using e-commerce optimized web spec metrics (70% jpeg scale factor)
+                        // This shaves off raw device photo inflation bloat, flattening assets down to ~65KB natively!
+                        temporaryImageBase64 = offscreenCanvas.toDataURL('image/jpeg', 0.7);
+                        
+                        // 4. Update the layout preview container securely on your panel view
+                        if (preview) {
+                            preview.src = temporaryImageBase64;
+                            preview.style.display = "block";
+                        }
+                        showNotification("Compression complete! Payload optimized. ✅", "✨");
+                    };
+                };
             }
         }
 
