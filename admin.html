@@ -374,6 +374,13 @@
                     } else {
                         completedHistoryState = [];
                     }
+                               try {
+                    const historyResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=history&_t=${cacheBusterToken}`);
+                    if (historyResponse.ok) { 
+                        completedHistoryState = await historyResponse.json(); 
+                    } else {
+                        completedHistoryState = [];
+                    }
                 } catch (err) {
                     console.error("Order history cluster fetch failed...", err);
                     completedHistoryState = [];
