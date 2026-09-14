@@ -1290,8 +1290,7 @@ async function renderAdminInventory() {
                         <td style="padding: 12px 8px;">
                             <div style="font-weight:700; color:#ffffff;">${cart.customerName || 'Store Buyer'}</div>
                             <div style="font-size:12px; color:#64748b;">${cart.phone || 'N/A'}</div>
-                        </td>
-                        <td style="padding: 12px 8px;"><span style="background:rgba(168,85,247,0.1); color:#a855f7; font-weight:bold; padding:2px 8px; border-radius:4px; font-size:12px;">${cart.items.length} Items Selected</span></td>
+                                                <td style="padding: 12px 8px;"><span style="background:rgba(168,85,247,0.1); color:#a855f7; font-weight:bold; padding:2px 8px; border-radius:4px; font-size:12px;">${cart.items.length} Items Selected</span></td>
                         <td style="padding: 12px 8px; color:#cbd5e1; max-width:300px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${summaryString}">${summaryString}</td>
                         <td style="padding: 12px 8px; text-align:right; font-family:monospace; color:#64748b;">${cart.updatedAt || 'Live'}</td>
                     </tr>
@@ -1299,40 +1298,106 @@ async function renderAdminInventory() {
             }).join('');
         }
 
-        // 🟢 FIXED: Non-destructive event-listener ensures fluid background framework boot loops
-               // 🟢 FIXED: Kept scripts and HTML markup layers cleanly separated to prevent syntax failures
+        // =========================================================================
+        // 🔍 ADDED LINK CONTROLS: RUNS DRAWER SEARCH LOGIC ON CLICK
+        // =========================================================================
+        function closeUserDetailsDrawer() {
+            document.getElementById("admin-user-details-drawer").style.display = "none";
+        }
+
+        async function inspectUserDashboardDetails(userId, customerName, customerPhone) {
+            document.getElementById("drawer-headline-title").innerText = customerName;
+            document.getElementById("drawer-sub-meta").innerText = `ID: #${userId} • Phone: ${customerPhone || 'N/A'}`;
+            
+            const cartDisplay = document.getElementById("drawer-active-cart-target");
+            const historyDisplay = document.getElementById("drawer-purchase-history-target");
+            
+            cartDisplay.innerHTML = `<div style="font-size:13px; color:#64748b;">Loading user details... 🔍</div>`;
+            historyDisplay.innerHTML = "";
+
+            document.getElementById("admin-user-details-drawer").style.display = "flex";
+
+            try {
+                const response = await fetch(`${API_BASE_ENDPOINT}/admin?type=abandoned_carts&_t=${Date.now()}`);
+                let targetUserCart = null;
+                
+                if (response.ok) {
+                    const rawCartsData = await response.json();
+                    const cartsList = Array.isArray(rawCartsData) ? rawCartsData : Object.values(rawCartsData || {});
+                    targetUserCart = cartsList.find(c => String(c.phone).trim() === String(customerPhone).trim());
+                }
+
+                if (targetUserCart && targetUserCart.items && targetUserCart.items.length > 0) {
+                    let cartHtml = `<div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:14px; padding:14px; display:flex; flex-direction:column; gap:8px;">`;
+                    targetUserCart.items.forEach(item => {
+                        cartHtml += `
+                            <div style="display:flex; justify-content:space-between; font-size:13px; color:#334155; font-weight:600;">
+                                <span>📱 ${item.name} (x${item.quantity || 1})</span>
+                                <span style="color:#0f172a;">₹${item.discountPrice || item.price || '0'}</span>
+                            </div>`;
+                    });
+                    cartHtml += `</div>`;
+                    cartDisplay.innerHTML = cartHtml;
+                } else {
+                    cartDisplay.innerHTML = `<div style="font-size:13px; color:#94a3b8; border:1px dashed #e2e8f0; padding:12px; border-radius:12px; text-align:center;">Cart is empty.</div>`;
+                }
+
+                const targetedOrderMatches = completedHistoryState.filter(ord => 
+                    String(ord.phone).trim() === String(customerPhone).trim() || 
+                    String(ord.contact).trim() === String(customerPhone).trim()
+                );
+
+                if (targetedOrderMatches.length === 0) {
+                    historyDisplay.innerHTML = `<div style="font-size:13px; color:#94a3b8; border:1px dashed #e2e8f0; padding:12px; border-radius:12px; text-align:center;">No past orders found.</div>`;
+                } else {
+                    let historyRowsHtml = "";
+                    targetedOrderMatches.forEach(order => {
+                        historyRowsHtml += `
+                            <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:14px; padding:14px; box-shadow:0 2px 4px rgba(0,0,0,0.01);">
+                                <div style="display:flex; justify-content:between; align-items:center; margin-bottom:8px;">
+                                    <span style="font-size:12px; font-weight:700; color:#2563eb;">#${order.id || 'ORD'}</span>
+                                    <span style="font-size:11px; background:rgba(16,185,129,0.1); color:#10b981; font-weight:800; padding:2px 8px; border-radius:20px; margin-left:auto;">📦 SHIPPED</span>
+                                </div>
+                                <div style="font-size:12px; color:#475569; margin-bottom:6px;">📍 Address: ${order.address || order.location || 'N/A'}</div>
+                                <div style="display:flex; justify-content:space-between; font-size:11px; font-weight:600; color:#64748b; border-top:1px solid #f1f5f9; padding-top:8px;">
+                                    <span>MOP: ${order.mop || 'ONLINE'}</span>
+                                    <span style="font-family:monospace; color:#b45309;">UTR: ${order.utr || 'N/A'}</span>
+                                </div>
+                            </div>`;
+                    });
+                    historyDisplay.innerHTML = historyRowsHtml;
+                }
+
+            } catch (error) {
+                cartDisplay.innerHTML = `<div style="font-size:12px; color:#ef4444;">Failed to sync data.</div>`;
+            }
+        }
+
         window.addEventListener('load', () => {
             pullMasterDatabaseArrays();
             const formElement = document.getElementById("product-upload-form");
             if (formElement) formElement.addEventListener("submit", processNewProduct);
         });
     </script>
-
     <!-- 🛒 NEW SLIDE-OUT PROFILE INSPECTION DRAWER -->
     <div id="admin-user-details-drawer" style="position: fixed; inset: 0; background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(4px); z-index: 999999; display: none; justify-content: flex-end; font-family: system-ui, sans-serif;">
-        <!-- Click outside container space to close panel securely -->
         <div style="position: absolute; inset: 0;" onclick="closeUserDetailsDrawer()"></div>
-        
-        <!-- Main Panel View Sheet Canvas Surface -->
         <div style="position: relative; width: 100%; max-width: 480px; height: 100%; background: #ffffff; padding: 30px 24px; overflow-y: auto; display: flex; flex-direction: column; border-left: 1px solid rgba(15, 23, 42, 0.08); box-shadow: -10px 0 25px rgba(0,0,0,0.05);">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; border-bottom: 2px solid #f1f5f9; padding-bottom: 16px;">
                 <div>
                     <h3 id="drawer-headline-title" style="font-size: 18px; font-weight: 800; color: #0f172a;">Customer Details</h3>
                     <p id="drawer-sub-meta" style="font-size: 12px; color: #64748b; font-weight: 600; margin-top: 4px;"></p>
                 </div>
-                <button type="button" onclick="closeUserDetailsDrawer()" style="background: none; border: none; font-size: 24px; color: #94a3b8; cursor: pointer; line-height: 1;">&times;</button>
+                <button type="button" onclick="closeUserDetailsDrawer()" style="background: none; border: none; font-size: 24px; color: #94a3b8; cursor: pointer;">&times;</button>
             </div>
 
             <div style="display: flex; flex-direction: column; gap: 24px;">
-                <!-- Active Cart Metrics Content Snapshots Section -->
                 <div>
-                    <h4 style="font-size: 12px; font-weight: 800; color: #475569; text-transform: uppercase; margin-bottom: 10px; letter-spacing: 0.5px;">🛒 Current Shopping Cart</h4>
+                    <h4 style="font-size: 12px; font-weight: 800; color: #475569; text-transform: uppercase; margin-bottom: 10px;">🛒 Current Shopping Cart</h4>
                     <div id="drawer-active-cart-target"></div>
                 </div>
-
-                <!-- Order History Archive Records Section -->
                 <div>
-                    <h4 style="font-size: 12px; font-weight: 800; color: #475569; text-transform: uppercase; margin-bottom: 10px; letter-spacing: 0.5px;">📦 Past Order History</h4>
+                    <h4 style="font-size: 12px; font-weight: 800; color: #475569; text-transform: uppercase; margin-bottom: 10px;">📦 Past Order History</h4>
                     <div id="drawer-purchase-history-target" style="display: flex; flex-direction: column; gap: 10px;"></div>
                 </div>
             </div>
