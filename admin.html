@@ -373,14 +373,19 @@
                 }
 
                 // 3. Fetch completed shipped logs safely from history database cluster
-                try {
+                               try {
                     const historyResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=history&_t=${cacheBusterToken}`);
                     if (historyResponse.ok) { 
                         completedHistoryState = await historyResponse.json(); 
                     } else {
                         completedHistoryState = [];
                     }
-                                // 4. FETCH REGISTERED ACCOUNTS SAFELY FROM CLOUD DATA STORE
+                } catch (err) {
+                    console.error("Order history cluster fetch failed...", err);
+                    completedHistoryState = [];
+                }
+
+                // 4. FETCH REGISTERED ACCOUNTS SAFELY FROM CLOUD DATA STORE
                 try {
                     const usersResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=users&_t=${cacheBusterToken}`);
                     const userTableBody = document.getElementById("users-list-target");
@@ -417,7 +422,6 @@
                         }
                     }
                 } catch (err) { console.error("Registered accounts fetch failed...", err); }
-
 
                 // =========================================================================
                 // 📢 DOWNLOAD LIVE ACTIVE SHOPPING BASKETS FROM BACKEND SAFELY
