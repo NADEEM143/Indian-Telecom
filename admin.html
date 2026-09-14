@@ -781,11 +781,11 @@ async function renderAdminInventory() {
                     const usersResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=users&_t=${cacheBusterToken}`);
                     const userTableBody = document.getElementById("users-list-target");
                     
-                    if (usersResponse.ok && userTableBody) {
+                                       if (usersResponse.ok && userTableBody) {
                         const databaseUsersList = await usersResponse.json();
                         userTableBody.innerHTML = ""; 
                         
-                       if (!databaseUsersList || databaseUsersList.length === 0) {
+                        if (!databaseUsersList || databaseUsersList.length === 0) {
                             userTableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#94a3b8; padding:30px; font-weight:700;">No data records found inside cloud store.</td></tr>`;
                         } else {
                             const activeClients = databaseUsersList.filter(u => !u.status || u.status !== 'SUSPENDED');
@@ -802,7 +802,7 @@ async function renderAdminInventory() {
                                             <td style="padding:12px 8px;">
                                                 <a href="javascript:void(0)" 
                                                    onclick="inspectUserDashboardDetails('${u.id}', '${u.name || 'Customer'}', '${u.phone || u.contact || ''}')" 
-                                                   style="font-weight:700; color:#2563eb; text-decoration: none; border-bottom: 1px dashed #2563eb;">
+                                                   style="font-weight:700; color:#2563eb; text-decoration: none; border-bottom: 1px dashed #2563eb; cursor: pointer;">
                                                    #${u.id || 'U'}
                                                 </a>
                                             </td>
