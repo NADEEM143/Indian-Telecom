@@ -171,13 +171,41 @@ export default async function handler(req, res) {
             // =========================================================================
             // =========================================================================
 
-            case 'history':
+                        case 'history':
                 if (req.method === 'GET') {
                     const history = await kv.get('it_order_history') || [];
                     return res.status(200).json(history);
                 }
                 if (req.method === 'POST') {
-                    await kv.set('it_order_history', req.body);
+                    let currentHistory = await kv.get('it_order_history') || [];
+                    let currentOrders = await kv.get('it_orders') || [];
+
+                    if (Array.isArray(req.body)) {
+                        // 🚚 ADMIN BULK TRANSITION PASSTHROUGH ENGINE
+                        // Checks if an arriving record is moving from active queues, then stamps the exact server clock times!
+                        const updatedHistory = req.body.map(historicalOrder => {
+                            const wasActiveOrder = currentOrders.some(o => o.id === historicalOrder.id);
+                            
+                            if (wasActiveOrder && (!historicalOrder.deliveryDate || historicalOrder.deliveryDate === 'Recently')) {
+                                // 🕒 SERVER STANDARD INDIAN CLOCK TIMESTAMPS
+                                historicalOrder.deliveryDate = new Date().toLocaleDateString('en-IN', {day: '2-digit', month: 'short', year: 'numeric'});
+                                historicalOrder.deliveryTime = new Date().toLocaleTimeString('en-IN', {hour: '2-digit', minute: '2-digit', hour12: true});
+                            }
+                            return historicalOrder;
+                        });
+
+                        currentHistory = updatedHistory;
+                    } else if (req.body && typeof req.body === 'object') {
+                        // 📦 SINGLE ORDER CONVERSION PASS
+                        const singleOrder = req.body;
+                        if (!singleOrder.deliveryDate || singleOrder.deliveryDate === 'Recently') {
+                            singleOrder.deliveryDate = new Date().toLocaleDateString('en-IN', {day: '2-digit', month: 'short', year: 'numeric'});
+                            singleOrder.deliveryTime = new Date().toLocaleTimeString('en-IN', {hour: '2-digit', minute: '2-digit', hour12: true});
+                        }
+                        currentHistory.push(singleOrder);
+                    }
+
+                    await kv.set('it_order_history', currentHistory);
                     return res.status(200).json({ success: true });
                 }
                 break;
