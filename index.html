@@ -1741,8 +1741,13 @@ const originalUpdateCartUI = updateCartUI;
                             </div>
                             <div style="position:relative; margin-top:4px;">
                                 <span style="position:absolute; left:-26px; top:4px; background:${currentStatus === 'SHIPPED' ? '#10b981' : '#64748b'}; width:10px; height:10px; border-radius:50%; ${currentStatus === 'SHIPPED' ? 'box-shadow:0 0 8px #10b981;' : ''}"></span>
-                                <h5 style="font-size:13px; font-weight:700; color:white; margin:0;">Dispatched & Out for Delivery</h5>
-                                <p style="font-size:11px; color:#64748b; margin:2px 0 0 0;">${currentStatus === 'SHIPPED' ? `Delivered: ${activeRecord.deliveryDate || 'Recently'} at ${activeRecord.deliveryTime || 'Scheduled'}` : 'Awaiting physical warehouse checks by Md Kamre Alam.'}</p>
+                                <h5 style="font-size:13px; font-weight:700; color:${currentStatus === 'SHIPPED' ? 'white' : '#64748b'}; margin:0;">Dispatched & Delivered</h5>
+<p style="font-size:11px; color:#64748b; margin:2px 0 0 0;">
+    ${currentStatus === 'SHIPPED' 
+        ? `Delivered on: ${activeRecord.deliveryDate} at ${activeRecord.deliveryTime}` 
+        : '⏳ Package is currently in processing. Awaiting warehouse dispatch by Md Kamre Alam.'}
+</p>
+
                             </div>
                         </div>
                     </div>
