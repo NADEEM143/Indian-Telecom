@@ -269,7 +269,7 @@
             const userField = document.getElementById("admin-login-user").value.trim();
             const passField = document.getElementById("admin-login-pass").value.trim();
 
-            if (userField === 'Nadim' && passField === '5555') {
+            if (userField === 'admin' && passField === '5555') {
                 sessionStorage.setItem('IT_ADMIN_AUTHENTICATED', 'true');
                 const authModal = document.getElementById("admin-auth-modal-screen");
                 if (authModal) authModal.style.display = "none";
