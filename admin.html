@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>INDIAN TELECOM - Master Admin Command Center</title>
-        <style>
+    <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         /* 🎨 GLOBAL THEME: Soft sky-blue canvas with dark-slate typography */
         body { font-family: system-ui, -apple-system, sans-serif; background-color: #bde0fe; color: #0f172a; padding: 30px 5%; }
@@ -68,13 +68,12 @@
 </head>
 <body>
 
-    <!-- Beautiful UI notification toast container anchor -->
     <div id="ui-toast-notification" class="custom-toast-container">
         <span class="toast-icon" id="ui-toast-icon">🚀</span>
         <span id="ui-toast-message">Notification Message</span>
     </div>
 
-    <!-- 🔒 NEW: PREMIUM ON-SCREEN ADMIN GATEKEEPER MODAL LAYER -->
+    <!-- 🔒 MASTER ADMINISTRATIVE SECURITY GATEKEEPER TERMINAL LAYER -->
     <div id="admin-auth-modal-screen" style="position: fixed; inset: 0; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(8px); z-index: 999999; display: flex; align-items: center; justify-content: center; font-family: system-ui, sans-serif;">
         <div style="background: #1e293b; border: 1px solid #334155; width: 90%; max-width: 420px; border-radius: 24px; padding: 32px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);">
             <div style="text-align: center; margin-bottom: 24px;">
@@ -104,12 +103,11 @@
         </div>
         <div style="display: flex; align-items: center; gap: 14px;">
             <div class="secure-badge">🛡️ Secure Session</div>
-            <!-- 🚪 NEW: SECURE LOGOUT TERMINAL TRIGGER -->
             <button onclick="executeAdminLogout()" style="background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); padding: 8px 16px; border-radius: 12px; font-weight: 700; font-size: 13px; cursor: pointer; transition: 0.2s;" onmouseover="this.style.background='rgba(239, 68, 68, 0.25)'" onmouseout="this.style.background='rgba(239, 68, 68, 0.15)'">Logout Terminal 🚪</button>
         </div>
     </header>
 
-    <!-- 📢 NEW DYNAMIC MARQUEE OFFER BANNER MESSAGE CONTROLLER CARD -->
+    <!-- DYNAMIC MARQUEE OFFER BANNER MESSAGE CONTROLLER CARD -->
     <div style="max-width: 1400px; margin: 20px auto 0 auto; padding: 0 20px;">
         <section class="admin-card" style="border-top: 4px solid #f59e0b; margin-bottom: -10px;">
             <div class="card-title">🔥 Live Storefront Marquee Offer Announcement Banner</div>
@@ -123,7 +121,7 @@
         </section>
     </div>
     <div class="dashboard-grid">
-                <aside class="admin-card">
+        <aside class="admin-card">
             <div class="card-title">📦 Add New Premium Accessory</div>
             <form id="product-upload-form">
                 <div class="form-group">
@@ -204,53 +202,50 @@
             </section>
         </div>
     </div>
+    <!-- REGISTERED CUSTOMERS MATRIX OVERVIEW LOGS -->
+    <section class="admin-card" style="margin-top: 30px;">
+        <div class="card-title">👥 Registered Store Customer Profiles</div>
+        <div class="data-table-wrapper">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>User Account ID</th>
+                        <th>Client Name</th>
+                        <th>Verified Mobile String</th>
+                        <th>Security Pass Key Reference</th>
+                        <th style="text-align: right; padding-right: 24px;">Workspace Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="users-list-target"></tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- SECURE PANEL AREA 5: HISTORICAL COMPLETED SHIPPED ARCHIVES -->
+    <section class="admin-card" style="margin-top: 30px; border-top: 4px solid #10b981;">
+        <div class="card-title" style="display: flex; justify-content: space-between; align-items: center;">
+            <span>📦 Completed & Shipped Order History</span>
+            <button onclick="developerResetHistoryBucket()" style="background: rgba(239,68,68,0.1); color: #ef4444; border: 1px solid rgba(239,68,68,0.2); font-size: 11px; font-weight: bold; padding: 6px 12px; border-radius: 6px; cursor: pointer;">🗑️ Reset History Database</button>
+        </div>
+
+        <div class="data-table-wrapper">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Customer Details</th>
+                        <th>Destination Address</th>
+                        <th>MOP Method</th>
+                        <th>Verified Bank UTR</th>
+                        <th>Status Badge</th>
+                    </tr>
+                </thead>
+                <tbody id="history-log-target"></tbody>
+            </table>
+        </div>
+    </section>
+
     <!-- SAFELY ENCAPSULATED CONTROLLER JAVASCRIPT BLOCK -->
-                <!-- REGISTERED CUSTOMERS MATRIX OVERVIEW LOGS -->
-          <section class="admin-card" style="margin-top: 30px;">
-                <div class="card-title">👥 Registered Store Customer Profiles</div>
-                <div class="data-table-wrapper">
-                    <table class="admin-table">
-                        <thead>
-                            <tr>
-                                <th>User Account ID</th>
-                                <th>Client Name</th>
-                                <th>Verified Mobile String</th>
-                                <th>Security Pass Key Reference</th>
-                                <!-- 🛠️ NEW WORKSPACE COLUMN ACTION ANCHOR -->
-                                <th style="text-align: right; padding-right: 24px;">Workspace Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="users-list-target"></tbody>
-                    </table>
-                </div>
-            </section>
-
-            <!-- 📦 SECURE PANEL AREA 5: HISTORICAL COMPLETED SHIPPED ARCHIVES -->
-                        <section class="admin-card" style="margin-top: 30px; border-top: 4px solid #10b981;">
-                
-                <div class="card-title" style="display: flex; justify-content: space-between; align-items: center;">
-                    <span>📦 Completed & Shipped Order History</span>
-                    <button onclick="developerResetHistoryBucket()" style="background: rgba(239,68,68,0.1); color: #ef4444; border: 1px solid rgba(239,68,68,0.2); font-size: 11px; font-weight: bold; padding: 6px 12px; border-radius: 6px; cursor: pointer;">🗑️ Reset History Database</button>
-                </div>
-
-                <div class="data-table-wrapper">
-                    <table class="admin-table">
-                        <thead>
-                            <tr>
-                                <th>Order ID</th>
-                                <th>Customer Details</th>
-                                <th>Destination Address</th>
-                                <th>MOP Method</th>
-                                <th>Verified Bank UTR</th>
-                                <th>Status Badge</th>
-                            </tr>
-                        </thead>
-                        <tbody id="history-log-target"></tbody>
-                    </table>
-                </div>
-            </section>
-
-        <!-- SAFELY ENCAPSULATED CONTROLLER JAVASCRIPT BLOCK -->
     <script>
         // =========================================================================
         // 🔒 SECURE ON-SCREEN ADMINISTRATIVE SECURITY CONTROLLER
@@ -285,16 +280,15 @@
         function executeAdminLogout() {
             if (!confirm("Are you sure you want to securely disconnect and close this administrative management terminal?")) return;
             sessionStorage.removeItem('IT_ADMIN_AUTHENTICATED');
-            window.location.href = 'index.html'; // Clear credentials and return safely to index storefront page
+            window.location.href = 'index.html'; 
         }
 
         const API_BASE_ENDPOINT = '/api';
         let liveInventoryState = [];
         let liveOrdersState = [];
-        let completedHistoryState = []; // <-- 🟢 FIXED: Safe array container initialization for order logs history
+        let completedHistoryState = []; 
         let temporaryImageBase64 = "";
         let liveMarqueeOfferMessageStr = "";
-
         // =========================================================================
         // 🚀 CUSTOM NOTIFICATION ENGINE (REPLACES BROWSER ALERT POPUPS)
         // =========================================================================
@@ -330,7 +324,8 @@
                 });
             } catch (e) { return null; }
         }
-                   async function pullMasterDatabaseArrays() {
+
+        async function pullMasterDatabaseArrays() {
             try {
                 // 🟢 FIXED: Unique millisecond stamp completely bypasses browser/Vercel cache limits
                 const cacheBusterToken = Date.now();
@@ -371,9 +366,8 @@
                     console.error("Active orders queue fetch failed...", err);
                     liveOrdersState = [];
                 }
-
                 // 3. Fetch completed shipped logs safely from history database cluster
-                               try {
+                try {
                     const historyResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=history&_t=${cacheBusterToken}`);
                     if (historyResponse.ok) { 
                         completedHistoryState = await historyResponse.json(); 
@@ -443,7 +437,6 @@
                 console.error("Cloud Master State Sync Error:", err.message);
             }
         }
-
         // =========================================================================
         // 👥 CUSTOMER COMPLIANCE AND PROFILE EDIT ENGINE MODULES
         // =========================================================================
@@ -554,49 +547,36 @@
                     asset: item.asset // <-- Attaches the photo data globally
                 }));
                 
-                               await fetch(`${API_BASE_ENDPOINT}/admin?type=products`, {
+                await fetch(`${API_BASE_ENDPOINT}/admin?type=products`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(fullInventoryWithImages)
                 });
             } catch (err) { console.error("Cloud data writing exception:", err); }
         }
-
         // =========================================================================
         // ⚡️ GLOBAL FIXED COMPRESSOR ENGINE: INTERCEPTS LARGE DEVICE FILES INSTANTLY
-        // =========================================================================
-        // =========================================================================
-        // 🛡️ STRICT ADMINISTRATIVE SIZE GUARD INTERCEPTOR (MAX PAYLOAD SCALE: 65KB)
-        // =========================================================================
-                // =========================================================================
-        // 🛡️ STRICT ADMINISTRATIVE SIZE GUARD INTERCEPTOR (MAX PAYLOAD SCALE: 65KB)
         // =========================================================================
         function generateImagePreview(inputElement) {
             const preview = document.getElementById("upload-preview");
             
             // 🟢 FIXED: Safe array reference ensures we catch the selected image data signature
             if (inputElement.files && inputElement.files[0]) {
-                const targetFileBytes = inputElement.files[0].size; // 🟢 FIXED: Added [0] index to read raw size property!
+                const targetFileBytes = inputElement.files[0].size; 
                 const fileWeightInKB = targetFileBytes / 1024;
 
                 // 🛑 CRITICAL SIZE THRESHOLD LOCK: Strict rejection rule triggers if file crosses 65KB threshold
                 if (fileWeightInKB > 65) {
-                    // 1. Fire your custom slide-up notification layout alert with personalized elite branding words
                     showNotification("CRITICAL FILE ERROR: This image payload is too heavy! Kindly upload a lighter file under 65 KB to protect cloud bandwidth.", "⚠️");
-                    
-                    // 2. Clear out the un-optimized file selection from your system form parameters immediately
                     inputElement.value = ""; 
-                    
-                    // 3. Keep your UI layout clean by hiding old ghost pictures previews maps 
                     if (preview) {
                         preview.src = "";
                         preview.style.display = "none";
                     }
-                    temporaryImageBase64 = ""; // Reset background global string
-                    return; // Block function chain execution instantly
+                    temporaryImageBase64 = ""; 
+                    return; 
                 }
 
-                // 🟢 SAFE TRACK: If the asset passes the check (is under 65KB), process and map it to your store natively
                 showNotification("Image parameters checked! Encapsulating asset... ⏳", "📸");
                 
                 const fileReaderEngine = new FileReader();
@@ -607,7 +587,6 @@
                     imageElementBuffer.src = e.target.result;
                     
                     imageElementBuffer.onload = function() {
-                        // Establish strict canvas bounding thresholds
                         const maximumPixelConstraint = 800;
                         let renderWidth = imageElementBuffer.width;
                         let renderHeight = imageElementBuffer.height;
@@ -624,7 +603,6 @@
                             }
                         }
 
-                        // Build off-screen canvas workspace
                         const offscreenCanvas = document.createElement('canvas');
                         offscreenCanvas.width = renderWidth;
                         offscreenCanvas.height = renderHeight;
@@ -632,10 +610,8 @@
                         const canvasRender2D = offscreenCanvas.getContext('2d');
                         canvasRender2D.drawImage(imageElementBuffer, 0, 0, renderWidth, renderHeight);
 
-                        // Extract safe, validated Base64 matrix
                         temporaryImageBase64 = offscreenCanvas.toDataURL('image/jpeg', 0.7);
                         
-                        // Update layout previews container securely on your panel view
                         if (preview) {
                             preview.src = temporaryImageBase64;
                             preview.style.display = "block";
@@ -646,53 +622,48 @@
             }
         }
 
-        // GLOBAL TEMPORARY MEMORY TRACKER KEY FOR DYNAMIC EDITING STATE POINTERS
-let activeEditingProductIndex = null;
+        let activeEditingProductIndex = null;
 
-// 🟢 FIXED: High-contrast light theme text styles ensure products read beautifully
-async function renderAdminInventory() {
-    const targetTableBody = document.getElementById("inventory-list-target");
-    if (!targetTableBody) return;
-    
-    if (liveInventoryState.length === 0) {
-        targetTableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#475569; padding:30px;">No items inside database inventory.</td></tr>`;
-        return;
-    }
-    let compiledRows = "";
-    for (let i = 0; i < liveInventoryState.length; i++) {
-        const item = liveInventoryState[i];
-        
-        // Reads the base64 image data straight from the cloud server array item, with local device lookups as a fallback
-        const cloudAssetImage = item.asset || await getImageLocally(item.id);
-        
-        compiledRows += `
-            <tr>
-                <td>
-                    <div class="row-item-meta">
-                        <div class="row-thumb">
-                            ${cloudAssetImage ? `<img src="${cloudAssetImage}" style="width:100%;height:100%;object-fit:cover;border-radius:8px;">` : '📱'}
-                        </div>
-                        <div style="font-weight: 700; color:#0f172a;">${item.name}</div>
-                    </div>
-                </td>
-                <td style="color:#475569;">${item.category}</td>
-                <td style="color:#0f172a;"><strong>₹${item.discountPrice}</strong> <span style="font-size:12px; color:#64748b; text-decoration:line-through; margin-left:5px; font-weight:bold;">₹${item.price}</span></td>
-                <td>
-                    <label class="toggle-switch">
-                        <input type="checkbox" ${item.isLive ? 'checked' : ''} onchange="toggleProductVisibility(${i})">
-                        <span class="slider"></span>
-                    </label>
-                </td>
-                <td>
-                    <button class="action-icon-btn" style="color: #2563eb; background: rgba(37,99,235,0.08); margin-right: 5px; font-weight: bold;" onclick="loadProductIntoEditorForm(${i})">📝 Edit</button>
-                    <button class="action-icon-btn" onclick="deleteInventoryItem(${i})">🗑️ Remove</button>
-                </td>
-            </tr>
-        `;
-    }
-    targetTableBody.innerHTML = compiledRows;
-}
-
+        async function renderAdminInventory() {
+            const targetTableBody = document.getElementById("inventory-list-target");
+            if (!targetTableBody) return;
+            
+            if (liveInventoryState.length === 0) {
+                targetTableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#475569; padding:30px;">No items inside database inventory.</td></tr>`;
+                return;
+            }
+            let compiledRows = "";
+            for (let i = 0; i < liveInventoryState.length; i++) {
+                const item = liveInventoryState[i];
+                const cloudAssetImage = item.asset || await getImageLocally(item.id);
+                
+                compiledRows += `
+                    <tr>
+                        <td>
+                            <div class="row-item-meta">
+                                <div class="row-thumb">
+                                    ${cloudAssetImage ? `<img src="${cloudAssetImage}" style="width:100%;height:100%;object-fit:cover;border-radius:8px;">` : '📱'}
+                                </div>
+                                <div style="font-weight: 700; color:#0f172a;">${item.name}</div>
+                            </div>
+                        </td>
+                        <td style="color:#475569;">${item.category}</td>
+                        <td style="color:#0f172a;"><strong>₹${item.discountPrice}</strong> <span style="font-size:12px; color:#64748b; text-decoration:line-through; margin-left:5px; font-weight:bold;">₹${item.price}</span></td>
+                        <td>
+                            <label class="toggle-switch">
+                                <input type="checkbox" ${item.isLive ? 'checked' : ''} onchange="toggleProductVisibility(${i})">
+                                <span class="slider"></span>
+                            </label>
+                        </td>
+                        <td>
+                            <button class="action-icon-btn" style="color: #2563eb; background: rgba(37,99,235,0.08); margin-right: 5px; font-weight: bold;" onclick="loadProductIntoEditorForm(${i})">📝 Edit</button>
+                            <button class="action-icon-btn" onclick="deleteInventoryItem(${i})">🗑️ Remove</button>
+                        </td>
+                    </tr>
+                `;
+            }
+            targetTableBody.innerHTML = compiledRows;
+        }
         // INLINE CATALOG EXTRACT ENGINE MAPPING DATA INTO ACTIVE PANEL INPUT FIELDS
         function loadProductIntoEditorForm(index) {
             activeEditingProductIndex = index;
@@ -706,13 +677,13 @@ async function renderAdminInventory() {
             const submitBtn = document.querySelector("#product-upload-form .submit-btn");
             if (submitBtn) {
                 submitBtn.innerText = "💾 Save Dynamic Changes";
-                submitBtn.style.background = "#10b981"; // Shift theme profile safely to green
+                submitBtn.style.background = "#10b981"; 
             }
             
             document.getElementById("product-upload-form").scrollIntoView({ behavior: 'smooth' });
         }
 
-               // 🟢 FIXED: Ultra-clear typography colors matching the light admin dashboard surfaces
+        // Ultra-clear typography colors matching the light admin dashboard surfaces
         function renderAdminOrders() {
             const targetTableBody = document.getElementById("orders-log-target");
             if (!targetTableBody) return;
@@ -737,138 +708,7 @@ async function renderAdminInventory() {
             `).join('');
         }
 
-                // 🟢 ARCHIVAL LOGGER MAPPING ENGINE DRAWING CELLS UNTO SCREEN VIEWS
-               async function pullMasterDatabaseArrays() {
-            try {
-                // 🟢 CACHE BUSTER: Destroys browser and network cache blocks completely for real-time streaming
-                const cacheBusterToken = Date.now();
-
-                // 1. Fetch live product catalog structures safely
-                try {
-                    const productResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=products&_t=${cacheBusterToken}`);
-                    if (productResponse.ok) { 
-                        liveInventoryState = await productResponse.json(); 
-                    } else {
-                        liveInventoryState = [];
-                    }
-                } catch (err) { 
-                    console.error("Products streaming failure, fallback enabled:", err); 
-                    liveInventoryState = [];
-                }
-
-                // 2. Fetch active checkout order records queue safely
-                try {
-                    const orderResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=orders&_t=${cacheBusterToken}`);
-                    if (orderResponse.ok) { 
-                        liveOrdersState = await orderResponse.json(); 
-                    } else {
-                        liveOrdersState = [];
-                    }
-                } catch (err) {
-                    console.error("Orders streaming failure:", err);
-                    liveOrdersState = [];
-                }
-
-                // 3. 🟢 FIXED: Downloads history logs array safely from history database cluster
-                try {
-                    const historyResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=history&_t=${cacheBusterToken}`);
-                    if (historyResponse.ok) { 
-                        const historicalServerPayload = await historyResponse.json();
-                        completedHistoryState = Array.isArray(historicalServerPayload) ? historicalServerPayload : [];
-                    } else {
-                        completedHistoryState = [];
-                    }
-                } catch (err) {
-                    console.error("History loading failed:", err);
-                    completedHistoryState = [];
-                }
-
-                // 4. Fetch registered client credentials accounts safely
-                try {
-                    const usersResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=users&_t=${cacheBusterToken}`);
-                    const userTableBody = document.getElementById("users-list-target");
-                    
-                                       if (usersResponse.ok && userTableBody) {
-                        const databaseUsersList = await usersResponse.json();
-                        userTableBody.innerHTML = ""; 
-                        
-                        if (!databaseUsersList || databaseUsersList.length === 0) {
-                            userTableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#94a3b8; padding:30px; font-weight:700;">No data records found inside cloud store.</td></tr>`;
-                        } else {
-                            const activeClients = databaseUsersList.filter(u => !u.status || u.status !== 'SUSPENDED');
-                            const suspendedClients = databaseUsersList.filter(u => u.status === 'SUSPENDED');
-
-                            // 🟢 FIXED: High-contrast light theme text styles ensure customer parameters read beautifully
-                            userTableBody.innerHTML = activeClients.length === 0 ? 
-                                `<tr><td colspan="5" style="text-align:center; color:#475569; padding:30px;">No active customer profiles found.</td></tr>` :
-                                activeClients.map((u) => {
-                                    const masterIdx = databaseUsersList.findIndex(masterUser => masterUser.id === u.id);
-                                    return `
-                                        <tr>
-                                            <!-- 🔗 UPDATED: ACCOUNT ID IS NOW A CLICKABLE LINK ANCHOR BUTTON -->
-                                            <td style="padding:12px 8px;">
-                                                <a href="javascript:void(0)" 
-                                                   onclick="inspectUserDashboardDetails('${u.id}', '${u.name || 'Customer'}', '${u.phone || u.contact || ''}')" 
-                                                   style="font-weight:700; color:#2563eb; text-decoration: none; border-bottom: 1px dashed #2563eb; cursor: pointer;">
-                                                   #${u.id || 'U'}
-                                                </a>
-                                            </td>
-                                            <td style="color:#0f172a; font-weight:bold; padding:12px 8px;">${u.name || 'N/A'}</td>
-                                            <td style="color:#334155; padding:12px 8px; font-weight: 500;">${u.phone || u.contact || 'N/A'}</td>
-                                            <td style="font-family:monospace; color:#475569; padding:12px 8px; font-weight: 600;">${u.password || 'N/A'}</td>
-                                            <td style="text-align: right; padding:12px 8px; white-space: nowrap;">
-                                                <button class="action-icon-btn" style="color: #b45309; background: rgba(245,158,11,0.08); margin-right: 5px; font-weight: bold;" onclick="triggerInlineUserEdit(${masterIdx})">📝 Edit</button>
-                                                <button class="action-icon-btn" style="color: #ef4444; background: rgba(239,68,68,0.08); font-weight: bold;" onclick="suspendCustomerAccount(${masterIdx})">🚫 Delete</button>
-                                            </td>
-                                        </tr>
-                                    `;
-                                }).join('');
-
-                            const suspendedTableBody = document.getElementById("suspended-users-list-target");
-                            if (suspendedTableBody) {
-                                suspendedTableBody.innerHTML = suspendedClients.length === 0 ?
-                                    `<tr><td colspan="5" style="text-align:center; color:#64748b; padding:20px;">No permanently suspended account histories logged.</td></tr>` :
-                                    suspendedClients.map((u) => {
-                                        const masterIdx = databaseUsersList.findIndex(masterUser => masterUser.id === u.id);
-                                        return `
-                                            <tr style="background: rgba(239,68,68,0.02);">
-                                                <td style="font-weight:700; color:#64748b; padding:12px 8px;">#${u.id || 'U'}</td>
-                                                <td style="color:#94a3b8; text-decoration: line-through; padding:12px 8px;">${u.name || 'N/A'}</td>
-                                                <td style="color:#64748b; padding:12px 8px;">${u.phone || u.contact || 'N/A'}</td>
-                                                <td style="font-family:monospace; color:#4b5563; padding:12px 8px;">${u.password || 'N/A'}</td>
-                                                <td style="text-align: right; padding:12px 8px; white-space: nowrap;">
-                                                    <button class="action-icon-btn" style="color: #10b981; background: rgba(16,185,129,0.1); font-weight: bold;" onclick="reactivateCustomerAccount(${masterIdx})">🔄 Reactivate</button>
-                                                </td>
-                                            </tr>
-                                        `;
-                                    }).join('');
-                            }
-                        }
-                    }
-                } catch (err) { console.error("Customer accounts table interface painting skipped:", err); }
-
-                // 📢 DOWNLOAD LIVE ACTIVE SHOPPING BASKETS FROM BACKEND Safely
-                try {
-                    const runtimeBusterToken = typeof cacheBusterToken !== 'undefined' ? cacheBusterToken : Date.now();
-                    const cartsResponse = await fetch(`${API_BASE_ENDPOINT}/admin?type=abandoned_carts&_t=${runtimeBusterToken}`);
-                    if (cartsResponse.ok) {
-                        const serverCartsPayload = await cartsResponse.json();
-                        renderLiveCustomerCarts(serverCartsPayload);
-                    }
-                } catch (err) { console.error("Active customer cart tracking matrix update failed:", err); }
-
-                // ⚡️ ALWAYS FORCE RENDER RENDERING LIFECYCLE: Keep tables responsive and buttons clickable even if requests error out
-                if (typeof renderAdminInventory === 'function') await renderAdminInventory();
-                if (typeof renderAdminOrders === 'function') renderAdminOrders();
-                if (typeof renderAdminHistoryLog === 'function') renderAdminHistoryLog();
-                
-            } catch (err) {
-                console.error("Cloud Master State Sync Error:", err.message);
-            }
-        }
-
-               // 🟢 FINAL FIX: Safe-fallback mapping logic ensures text properties render flawlessly
-               // 🟢 FIXED: High-contrast light theme text styles ensure archived history logs read beautifully
+        // High-contrast theme text styles ensure archived history logs read beautifully
         function renderAdminHistoryLog() {
             const targetTableBody = document.getElementById("history-log-target");
             if (!targetTableBody) return;
@@ -877,6 +717,7 @@ async function renderAdminInventory() {
                 targetTableBody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#475569; padding:30px;">No historical shipped logs captured yet.</td></tr>`;
                 return;
             }
+
             targetTableBody.innerHTML = completedHistoryState.map(order => {
                 const orderId = order.id || 'ORD';
                 const clientName = order.name || 'N/A';
@@ -900,252 +741,7 @@ async function renderAdminInventory() {
                 `;
             }).join('');
         }
-        // 🟢 MODERN ORDER SHIP CONTROLLER REDIRECTING PARAMETERS INTERNALLY
-                   // 🟢 MODERN ORDER SHIP CONTROLLER REDIRECTING PARAMETERS INTERNALLY
-        async function fulfillOrder(index) {
-            if (!confirm("Are you sure you want to mark this package as shipped and archive it permanently?")) return;
-            
-            const shippedOrderInfo = liveOrdersState[index];
-            if (!shippedOrderInfo) return alert("Order data reference missing!");
-            
-            const trueCustomerPhone = shippedOrderInfo.phone || shippedOrderInfo.contact || "";
-            const trueCustomerAddress = shippedOrderInfo.address || shippedOrderInfo.location || "N/A";
-            
-            const cleanArchivePayload = {
-                id: shippedOrderInfo.id || 'ORD',
-                name: shippedOrderInfo.name || 'N/A',
-                contact: String(trueCustomerPhone).trim(),
-                location: String(trueCustomerAddress).trim(),
-                mop: shippedOrderInfo.mop || 'N/A',
-                utr: shippedOrderInfo.utr || 'N/A'
-            };
-            
-            completedHistoryState.push(cleanArchivePayload);
-            liveOrdersState.splice(index, 1);
-            
-            try {
-                // 1. Update active waiting dashboard orders records list
-                await fetch(`${API_BASE_ENDPOINT}/admin?type=orders`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(liveOrdersState)
-                });
-                
-                // 2. Save your remapped, filter-safe order history directly inside your database records bucket
-                await fetch(`${API_BASE_ENDPOINT}/admin?type=history`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(completedHistoryState)
-                });
-                
-                alert(`SUCCESS: Order #${shippedOrderInfo.id} safely archived into permanent history database registries!`);
-                renderAdminOrders();
-                renderAdminHistoryLog();
-            } catch (e) { 
-                console.error("Historical cluster syncing execution crash error:", e); 
-            }
-        }
-
-        // =========================================================================
-        // 📢 NEW: MASTER MARQUEE OFFER CONTROLLER METHOD PIPELINES
-        // =========================================================================
-        async function pushNewMarqueeOfferMessage() {
-            const inputFieldVal = document.getElementById("live-banner-message-field").value.trim();
-            if (!inputFieldVal) return alert("Operation Denied: Input validation announcement strings cannot be empty.");
-            
-            if (!confirm(`Are you sure you want to push this new live message announcement to your store? \n\n"${inputFieldVal}"`)) return;
-
-            try {
-                const savePayload = { message: inputFieldVal };
-                
-                // 🟢 FIXED: Clean path targeting prevents route sandboxing crashes
-                            await fetch(`${API_BASE_ENDPOINT}/admin?type=banner_msg`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(savePayload)
-                });
-
-                // 🟢 FIXED: Smooth on-screen slide toast replaces the blocking browser alert box!
-                showNotification("SUCCESS: Your brand-new storefront marquee offer banner announcement has been published live globally!", "📢");
-                pullMasterDatabaseArrays();
-            } catch (err) {
-                // 🟢 FIXED: Error tracking also prints smoothly via on-screen toast alerts!
-                showNotification("Server announcement sync exception: " + err.message, "⚠️");
-            }
-        }
-
-        // 🟢 PASTE THE FORCE FLUSH RESET FUNCTION MODULE DIRECTLY HERE:
-        // =========================================================================
-        // 🛠️ DEVELOPER UTILITY: FORCE FLUSH CORRUPTED DATABASE RECORDS
-        // =========================================================================
-        async function developerResetHistoryBucket() {
-            if (!confirm("WARNING: This will completely wipe out old history logs from your Vercel cloud server to resolve data rendering conflicts. Proceed?")) return;
-            try {
-                await fetch(`${API_BASE_ENDPOINT}/admin?type=history`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify([]) // Sends a clean empty array payload to overwrite corrupted entries
-                });
-                alert("SUCCESS: History repository bucket flushed cleanly! Your system is ready for fresh data cycles.");
-                completedHistoryState = [];
-                renderAdminHistoryLog();
-            } catch (err) { alert("Flush Exception: " + err.message); }
-        }
-
-        // LOCAL DEVICE STORAGE CONTROLLER - OPEN MEDIA DATABASE ENGINE
-        function openIndexedDB() {
-            return new Promise((resolve, reject) => {
-                const request = indexedDB.open("IndianTelecomMediaDB", 1);
-                request.onupgradeneeded = (e) => {
-                    const db = e.target.result;
-                    if (!db.objectStoreNames.contains("product_images")) {
-                        db.createObjectStore("product_images", { keyPath: "id" });
-                    }
-                };
-                request.onsuccess = (e) => resolve(e.target.result);
-                request.onerror = (e) => reject(e.target.error);
-            });
-        }
-
-                              async function saveImageLocally(id, base64Data) {
-            try {
-                const db = await openIndexedDB();
-                const tx = db.transaction("product_images", "readwrite");
-                tx.objectStore("product_images").put({ id: id, data: base64Data });
-                return new Promise((res) => tx.oncomplete = () => res(true));
-            } catch (err) { console.error("Local Image Cache Write Error", err); }
-        }
-
-                       async function processNewProduct(event) {
-            event.preventDefault();
-
-            // 🛑 STRICT HARD FIREWALL: Validate raw selected file size first
-            const fileInput = document.getElementById("prod-file");
-            if (fileInput && fileInput.files && fileInput.files[0]) {
-                const targetFileBytes = fileInput.files[0].size;
-                const fileWeightInKB = targetFileBytes / 1024;
-
-                if (fileWeightInKB > 65) {
-                    showNotification("CRITICAL FILE ERROR: Upload blocked! Image exceeds 65 KB threshold.", "🛑");
-                    alert(
-                        "❌ UPLOAD BLOCKED [FILE TOO LARGE]\n\n" +
-                        `Operation Denied: The original image size (${fileWeightInKB.toFixed(1)} KB) is over the 65 KB safety limit.\n\n` +
-                        "Please choose a lighter image file."
-                    );
-                    
-                    // Flush bad inputs completely
-                    fileInput.value = "";
-                    const preview = document.getElementById("upload-preview");
-                    if (preview) {
-                        preview.src = "";
-                        preview.style.display = "none";
-                    }
-                    temporaryImageBase64 = "";
-                    return; // ⛔ HARD ABORT
-                }
-            }
-
-            // 🛑 INTERNAL DATA VALIDATION: Double check if the underlying base64 string payload size exceeds 65KB limits
-            if (temporaryImageBase64) {
-                // Approximate base64 text footprint weight to actual bytes metric
-                const base64PayloadSizeKB = (temporaryImageBase64.length * (3 / 4)) / 1024;
-                if (base64PayloadSizeKB > 65) {
-                    showNotification("CRITICAL DATA ERROR: Processed asset payload is too heavy!", "🛑");
-                    alert(
-                        "❌ UPLOAD BLOCKED [PAYLOAD CONSTRAINT]\n\n" +
-                        `Operation Denied: Even after canvas scaling processing, the target image payload is ${base64PayloadSizeKB.toFixed(1)} KB.\n\n` +
-                        "Please upload a smaller or lower-resolution photo source."
-                    );
-                    
-                    if (fileInput) fileInput.value = "";
-                    const preview = document.getElementById("upload-preview");
-                    if (preview) {
-                        preview.src = "";
-                        preview.style.display = "none";
-                    }
-                    temporaryImageBase64 = "";
-                    return; // ⛔ HARD ABORT
-                }
-            }
-
-            const name = document.getElementById("prod-name").value;
-            const cat = document.getElementById("prod-cat").value;
-            const price = parseInt(document.getElementById("prod-price").value);
-            const discount = parseInt(document.getElementById("prod-disc").value);
-
-            // DETECT INTERCEPT OPERATIONAL UPDATE PIPELINES VS FRESH INSERTS
-            if (activeEditingProductIndex !== null) {
-                const targetedItem = liveInventoryState[activeEditingProductIndex];
-                
-                targetedItem.name = name;
-                targetedItem.category = cat;
-                targetedItem.price = price;
-                targetedItem.discountPrice = discount;
-                
-                if (temporaryImageBase64) {
-                    targetedItem.asset = temporaryImageBase64;
-                    await saveImageLocally(targetedItem.id, temporaryImageBase64);
-                }
-
-                await pushInventoryStateToCloud();
-                activeEditingProductIndex = null;
-                
-                const submitBtn = document.querySelector("#product-upload-form .submit-btn");
-                if (submitBtn) {
-                    submitBtn.innerText = "Publish to Live Storefront";
-                    submitBtn.style.background = "#3b82f6";
-                }
-                
-                showNotification(`SUCCESS: "${name}" configurations updated!`, "📝");
-                alert(`✨ CONFIGURATION SAVED: "${name}" variations updated live seamlessly!`);
-            } else {
-                // Ensure a new product has an image before proceeding
-                if (!temporaryImageBase64) {
-                    alert("⚠️ ATTENTION: Please upload a product thumbnail image under 65 KB before publishing.");
-                    return;
-                }
-
-                const generatedId = "p_" + Date.now();
-                await saveImageLocally(generatedId, temporaryImageBase64);
-
-                                const newProductItem = {
-                    id: generatedId,
-                    name: name,
-                    category: cat,
-                    price: price,
-                    discountPrice: discount,
-                    isLive: true,
-                    asset: temporaryImageBase64 || null
-                };
-
-                liveInventoryState.push(newProductItem);
-                await pushInventoryStateToCloud();
-                
-                showNotification(`PUBLISHED: "${name}" is live!`, "✅");
-                alert(`REJECTED: "${name}" uploaded image size is too heavy! Please select a lighter image less than 65kb`);
-            }
-
-            await renderAdminInventory();
-            document.getElementById("product-upload-form").reset();
-            const previewBox = document.getElementById("upload-preview");
-            if (previewBox) previewBox.style.display = "none";
-            temporaryImageBase64 = "";
-        }
-
-        async function toggleProductVisibility(index) {
-            liveInventoryState[index].isLive = !liveInventoryState[index].isLive;
-            await pushInventoryStateToCloud();
-        }
-
-              async function deleteInventoryItem(index) {
-            if (confirm("Remove this accessory from active storefront?")) {
-                liveInventoryState.splice(index, 1);
-                await pushInventoryStateToCloud();
-                await renderAdminInventory();
-            }
-        }
-
-        // 🟢 FIXED: Modern fulfillment handler archives orders to permanent histories instead of erasing them
+        // MODERN ORDER SHIP CONTROLLER REDIRECTING PARAMETERS INTERNALLY
         async function fulfillOrder(index) {
             if (!confirm("Are you sure you want to mark this package as shipped and archive it permanently?")) return;
             
@@ -1177,7 +773,7 @@ async function renderAdminInventory() {
                     body: JSON.stringify(liveOrdersState)
                 });
                 
-                // 2. Stream and append the order directly inside permanent cloud historical tables
+                // 2. Save remapped history rows directly inside history registries
                 await fetch(`${API_BASE_ENDPOINT}/admin?type=history`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -1193,91 +789,182 @@ async function renderAdminInventory() {
             }
         }
 
-                // =========================================================================
-        // ⚡️ GLOBAL FIXED COMPRESSOR ENGINE: INTERCEPTS LARGE DEVICE FILES INSTANTLY
-        // =========================================================================
-               // =========================================================================
-        // 🛡️ STRICT ADMINISTRATIVE SIZE GUARD INTERCEPTOR (MAX PAYLOAD SCALE: 65KB)
-        // =========================================================================
-        function generateImagePreview(inputElement) {
-            const preview = document.getElementById("upload-preview");
+        // MASTER MARQUEE OFFER CONTROLLER METHOD PIPELINES
+        async function pushNewMarqueeOfferMessage() {
+            const inputFieldVal = document.getElementById("live-banner-message-field").value.trim();
+            if (!inputFieldVal) return alert("Operation Denied: Input validation announcement strings cannot be empty.");
             
-            // 🟢 FIXED: Safe array reference ensures we catch the selected image data signature
-            if (inputElement.files && inputElement.files[0]) {
-                const targetFileBytes = inputElement.files[0].size; // 🟢 FIXED: Added [0] index to read raw size property!
+            if (!confirm(`Are you sure you want to push this new live message announcement to your store? \n\n"${inputFieldVal}"`)) return;
+
+            try {
+                const savePayload = { message: inputFieldVal };
+                
+                await fetch(`${API_BASE_ENDPOINT}/admin?type=banner_msg`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(savePayload)
+                });
+
+                showNotification("SUCCESS: Your brand-new storefront marquee offer banner announcement has been published live globally!", "📢");
+                pullMasterDatabaseArrays();
+            } catch (err) {
+                showNotification("Server announcement sync exception: " + err.message, "⚠️");
+            }
+        }
+
+        // DEVELOPER UTILITY: FORCE FLUSH CORRUPTED DATABASE RECORDS
+        async function developerResetHistoryBucket() {
+            if (!confirm("WARNING: This will completely wipe out old history logs from your Vercel cloud server to resolve data rendering conflicts. Proceed?")) return;
+            try {
+                await fetch(`${API_BASE_ENDPOINT}/admin?type=history`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify([]) 
+                });
+                alert("SUCCESS: History repository bucket flushed cleanly! Your system is ready for fresh data cycles.");
+                completedHistoryState = [];
+                renderAdminHistoryLog();
+            } catch (err) { alert("Flush Exception: " + err.message); }
+        }
+
+        // LOCAL DEVICE STORAGE CONTROLLER - OPEN MEDIA DATABASE ENGINE
+        function openIndexedDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open("IndianTelecomMediaDB", 1);
+                request.onupgradeneeded = (e) => {
+                    const db = e.target.result;
+                    if (!db.objectStoreNames.contains("product_images")) {
+                        db.createObjectStore("product_images", { keyPath: "id" });
+                    }
+                };
+                request.onsuccess = (e) => resolve(e.target.result);
+                request.onerror = (e) => reject(e.target.error);
+            });
+        }
+
+        async function saveImageLocally(id, base64Data) {
+            try {
+                const db = await openIndexedDB();
+                const tx = db.transaction("product_images", "readwrite");
+                tx.objectStore("product_images").put({ id: id, data: base64Data });
+                return new Promise((res) => tx.oncomplete = () => res(true));
+            } catch (err) { console.error("Local Image Cache Write Error", err); }
+        }
+        async function processNewProduct(event) {
+            event.preventDefault();
+            const fileInput = document.getElementById("prod-file");
+            if (fileInput && fileInput.files && fileInput.files[0]) {
+                const targetFileBytes = fileInput.files[0].size;
                 const fileWeightInKB = targetFileBytes / 1024;
 
-                // 🛑 CRITICAL SIZE THRESHOLD LOCK: Strict rejection rule triggers if file crosses 65KB threshold
                 if (fileWeightInKB > 65) {
-                    // 1. Fire your custom slide-up notification layout alert with personalized elite branding words
-                    showNotification("CRITICAL FILE ERROR: This image payload is too heavy! Kindly upload a lighter file under 65 KB to protect cloud bandwidth.", "⚠️");
-                    
-                    // 2. Clear out the un-optimized file selection from your system form parameters immediately
-                    inputElement.value = ""; 
-                    
-                    // 3. Keep your UI layout clean by hiding old ghost pictures previews maps 
+                    showNotification("CRITICAL FILE ERROR: Upload blocked! Image exceeds 65 KB threshold.", "🛑");
+                    alert(
+                        "❌ UPLOAD BLOCKED [FILE TOO LARGE]\n\n" +
+                        `Operation Denied: The original image size (${fileWeightInKB.toFixed(1)} KB) is over the 65 KB safety limit.\n\n` +
+                        "Please choose a lighter image file."
+                    );
+                    fileInput.value = "";
+                    const preview = document.getElementById("upload-preview");
                     if (preview) {
                         preview.src = "";
                         preview.style.display = "none";
                     }
-                    temporaryImageBase64 = ""; // Reset background global string
-                    return; // Block function chain execution instantly
+                    temporaryImageBase64 = "";
+                    return; 
+                }
+            }
+
+            if (temporaryImageBase64) {
+                const base64PayloadSizeKB = (temporaryImageBase64.length * (3 / 4)) / 1024;
+                if (base64PayloadSizeKB > 65) {
+                    showNotification("CRITICAL DATA ERROR: Processed asset payload is too heavy!", "🛑");
+                    alert(
+                        "❌ UPLOAD BLOCKED [PAYLOAD CONSTRAINT]\n\n" +
+                        `Operation Denied: Even after canvas scaling processing, the target image payload is ${base64PayloadSizeKB.toFixed(1)} KB.\n\n` +
+                        "Please upload a smaller or lower-resolution photo source."
+                    );
+                    if (fileInput) fileInput.value = "";
+                    const preview = document.getElementById("upload-preview");
+                    if (preview) {
+                        preview.src = "";
+                        preview.style.display = "none";
+                    }
+                    temporaryImageBase64 = "";
+                    return; 
+                }
+            }
+
+            const name = document.getElementById("prod-name").value;
+            const cat = document.getElementById("prod-cat").value;
+            const price = parseInt(document.getElementById("prod-price").value);
+            const discount = parseInt(document.getElementById("prod-disc").value);
+
+            if (activeEditingProductIndex !== null) {
+                const targetedItem = liveInventoryState[activeEditingProductIndex];
+                targetedItem.name = name;
+                targetedItem.category = cat;
+                targetedItem.price = price;
+                targetedItem.discountPrice = discount;
+                
+                if (temporaryImageBase64) {
+                    targetedItem.asset = temporaryImageBase64;
+                    await saveImageLocally(targetedItem.id, temporaryImageBase64);
                 }
 
-                // 🟢 SAFE TRACK: If the asset passes the check (is under 65KB), process and map it to your store natively
-                showNotification("Image parameters checked! Encapsulating asset... ⏳", "📸");
+                await pushInventoryStateToCloud();
+                activeEditingProductIndex = null;
                 
-                const fileReaderEngine = new FileReader();
-                fileReaderEngine.readAsDataURL(inputElement.files[0]);
-                
-                fileReaderEngine.onload = function (e) {
-                    const imageElementBuffer = new Image();
-                    imageElementBuffer.src = e.target.result;
-                    
-                    imageElementBuffer.onload = function() {
-                        // Establish strict canvas bounding thresholds
-                        const maximumPixelConstraint = 800;
-                        let renderWidth = imageElementBuffer.width;
-                        let renderHeight = imageElementBuffer.height;
+                const submitBtn = document.querySelector("#product-upload-form .submit-btn");
+                if (submitBtn) {
+                    submitBtn.innerText = "Publish to Live Storefront";
+                    submitBtn.style.background = "#3b82f6";
+                }
+                showNotification(`SUCCESS: "${name}" configurations updated!`, "📝");
+            } else {
+                if (!temporaryImageBase64) {
+                    alert("⚠️ ATTENTION: Please upload a product thumbnail image under 65 KB before publishing.");
+                    return;
+                }
 
-                        if (renderWidth > renderHeight) {
-                            if (renderWidth > maximumPixelConstraint) {
-                                renderHeight *= maximumPixelConstraint / renderWidth;
-                                renderWidth = maximumPixelConstraint;
-                            }
-                        } else {
-                            if (renderHeight > maximumPixelConstraint) {
-                                renderWidth *= maximumPixelConstraint / renderHeight;
-                                renderHeight = maximumPixelConstraint;
-                            }
-                        }
+                const generatedId = "p_" + Date.now();
+                await saveImageLocally(generatedId, temporaryImageBase64);
 
-                        // Build off-screen canvas workspace
-                        const offscreenCanvas = document.createElement('canvas');
-                        offscreenCanvas.width = renderWidth;
-                        offscreenCanvas.height = renderHeight;
-                        
-                        const canvasRender2D = offscreenCanvas.getContext('2d');
-                        canvasRender2D.drawImage(imageElementBuffer, 0, 0, renderWidth, renderHeight);
-
-                        // Extract safe, validated Base64 matrix
-                        temporaryImageBase64 = offscreenCanvas.toDataURL('image/jpeg', 0.7);
-                        
-                        // Update layout previews container securely on your panel view
-                        if (preview) {
-                            preview.src = temporaryImageBase64;
-                            preview.style.display = "block";
-                        }
-                        showNotification("Image asset verified and locked! Payload optimized. ✅", "✨");
-                    };
+                const newProductItem = {
+                    id: generatedId,
+                    name: name,
+                    category: cat,
+                    price: price,
+                    discountPrice: discount,
+                    isLive: true,
+                    asset: temporaryImageBase64 || null
                 };
+
+                liveInventoryState.push(newProductItem);
+                await pushInventoryStateToCloud();
+                showNotification(`PUBLISHED: "${name}" is live!`, "✅");
+            }
+
+            await renderAdminInventory();
+            document.getElementById("product-upload-form").reset();
+            const previewBox = document.getElementById("upload-preview");
+            if (previewBox) previewBox.style.display = "none";
+            temporaryImageBase64 = "";
+        }
+
+        async function toggleProductVisibility(index) {
+            liveInventoryState[index].isLive = !liveInventoryState[index].isLive;
+            await pushInventoryStateToCloud();
+        }
+
+        async function deleteInventoryItem(index) {
+            if (confirm("Remove this accessory from active storefront?")) {
+                liveInventoryState.splice(index, 1);
+                await pushInventoryStateToCloud();
+                await renderAdminInventory();
             }
         }
 
-
-        // =========================================================================
-        // 🛒 LIVE CUSTOMER ACTIVE BASKETS MONITOR RENDERING ENGINE
-        // =========================================================================
         function renderLiveCustomerCarts(cartsDataMap) {
             const tableBody = document.getElementById("admin-abandoned-carts-target");
             if (!tableBody) return;
@@ -1297,16 +984,16 @@ async function renderAdminInventory() {
                         <td style="padding: 12px 8px;">
                             <div style="font-weight:700; color:#ffffff;">${cart.customerName || 'Store Buyer'}</div>
                             <div style="font-size:12px; color:#64748b;">${cart.phone || 'N/A'}</div>
-                                                <td style="padding: 12px 8px;"><span style="background:rgba(168,85,247,0.1); color:#a855f7; font-weight:bold; padding:2px 8px; border-radius:4px; font-size:12px;">${cart.items.length} Items Selected</span></td>
+                        </td>
+                        <td style="padding: 12px 8px;"><span style="background:rgba(168,85,247,0.1); color:#a855f7; font-weight:bold; padding:2px 8px; border-radius:4px; font-size:12px;">${cart.items.length} Items Selected</span></td>
                         <td style="padding: 12px 8px; color:#cbd5e1; max-width:300px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${summaryString}">${summaryString}</td>
                         <td style="padding: 12px 8px; text-align:right; font-family:monospace; color:#64748b;">${cart.updatedAt || 'Live'}</td>
                     </tr>
                 `;
             }).join('');
         }
-
         // =========================================================================
-        // 🔍 ADDED LINK CONTROLS: RUNS DRAWER SEARCH LOGIC ON CLICK
+        // 🔍 PROFILE INSPECTION CORES: TRIGGERS SIDE DRAWER INJECTION 
         // =========================================================================
         function closeUserDetailsDrawer() {
             document.getElementById("admin-user-details-drawer").style.display = "none";
@@ -1374,10 +1061,7 @@ async function renderAdminInventory() {
                     });
                     historyDisplay.innerHTML = historyRowsHtml;
                 }
-
-            } catch (error) {
-                cartDisplay.innerHTML = `<div style="font-size:12px; color:#ef4444;">Failed to sync data.</div>`;
-            }
+            } catch (error) { cartDisplay.innerHTML = `<div style="font-size:12px; color:#ef4444;">Failed to sync data.</div>`; }
         }
 
         window.addEventListener('load', () => {
@@ -1410,7 +1094,6 @@ async function renderAdminInventory() {
             </div>
         </div>
     </div>
-
     <!-- 🔒 HTML SEGMENT: PREMIUM ON-SCREEN CLIENT EDIT MODAL CARD LAYOUT -->
     <div id="admin-user-edit-modal" style="position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); z-index: 999999; display: none; align-items: center; justify-content: center; font-family: system-ui, sans-serif;">
         <div style="background: #ffffff; border: 1px solid rgba(15, 23, 42, 0.08); width: 90%; max-width: 440px; border-radius: 24px; padding: 28px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);">
