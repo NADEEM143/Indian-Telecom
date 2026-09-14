@@ -17,6 +17,10 @@
       "destination": "/api/admin.js" 
     },
     { 
+      "source": "/admin", 
+      "destination": "/admin.html" 
+    },
+    { 
       "source": "/master-admin-console", 
       "destination": "/admin.html" 
     },
