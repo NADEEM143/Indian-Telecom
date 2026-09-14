@@ -785,7 +785,7 @@ async function renderAdminInventory() {
                         const databaseUsersList = await usersResponse.json();
                         userTableBody.innerHTML = ""; 
                         
-                        if (!databaseUsersList || databaseUsersList.length === 0) {
+                       if (!databaseUsersList || databaseUsersList.length === 0) {
                             userTableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#94a3b8; padding:30px; font-weight:700;">No data records found inside cloud store.</td></tr>`;
                         } else {
                             const activeClients = databaseUsersList.filter(u => !u.status || u.status !== 'SUSPENDED');
@@ -798,7 +798,14 @@ async function renderAdminInventory() {
                                     const masterIdx = databaseUsersList.findIndex(masterUser => masterUser.id === u.id);
                                     return `
                                         <tr>
-                                            <td style="font-weight:700; color:#2563eb; padding:12px 8px;">#${u.id || 'U'}</td>
+                                            <!-- 🔗 UPDATED: ACCOUNT ID IS NOW A CLICKABLE LINK ANCHOR BUTTON -->
+                                            <td style="padding:12px 8px;">
+                                                <a href="javascript:void(0)" 
+                                                   onclick="inspectUserDashboardDetails('${u.id}', '${u.name || 'Customer'}', '${u.phone || u.contact || ''}')" 
+                                                   style="font-weight:700; color:#2563eb; text-decoration: none; border-bottom: 1px dashed #2563eb;">
+                                                   #${u.id || 'U'}
+                                                </a>
+                                            </td>
                                             <td style="color:#0f172a; font-weight:bold; padding:12px 8px;">${u.name || 'N/A'}</td>
                                             <td style="color:#334155; padding:12px 8px; font-weight: 500;">${u.phone || u.contact || 'N/A'}</td>
                                             <td style="font-family:monospace; color:#475569; padding:12px 8px; font-weight: 600;">${u.password || 'N/A'}</td>
@@ -863,7 +870,6 @@ async function renderAdminInventory() {
                 targetTableBody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#475569; padding:30px;">No historical shipped logs captured yet.</td></tr>`;
                 return;
             }
-
             targetTableBody.innerHTML = completedHistoryState.map(order => {
                 const orderId = order.id || 'ORD';
                 const clientName = order.name || 'N/A';
@@ -1301,6 +1307,37 @@ async function renderAdminInventory() {
             if (formElement) formElement.addEventListener("submit", processNewProduct);
         });
     </script>
+
+    <!-- 🛒 NEW SLIDE-OUT PROFILE INSPECTION DRAWER -->
+    <div id="admin-user-details-drawer" style="position: fixed; inset: 0; background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(4px); z-index: 999999; display: none; justify-content: flex-end; font-family: system-ui, sans-serif;">
+        <!-- Click outside container space to close panel securely -->
+        <div style="position: absolute; inset: 0;" onclick="closeUserDetailsDrawer()"></div>
+        
+        <!-- Main Panel View Sheet Canvas Surface -->
+        <div style="position: relative; width: 100%; max-width: 480px; height: 100%; background: #ffffff; padding: 30px 24px; overflow-y: auto; display: flex; flex-direction: column; border-left: 1px solid rgba(15, 23, 42, 0.08); box-shadow: -10px 0 25px rgba(0,0,0,0.05);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; border-bottom: 2px solid #f1f5f9; padding-bottom: 16px;">
+                <div>
+                    <h3 id="drawer-headline-title" style="font-size: 18px; font-weight: 800; color: #0f172a;">Customer Details</h3>
+                    <p id="drawer-sub-meta" style="font-size: 12px; color: #64748b; font-weight: 600; margin-top: 4px;"></p>
+                </div>
+                <button type="button" onclick="closeUserDetailsDrawer()" style="background: none; border: none; font-size: 24px; color: #94a3b8; cursor: pointer; line-height: 1;">&times;</button>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 24px;">
+                <!-- Active Cart Metrics Content Snapshots Section -->
+                <div>
+                    <h4 style="font-size: 12px; font-weight: 800; color: #475569; text-transform: uppercase; margin-bottom: 10px; letter-spacing: 0.5px;">🛒 Current Shopping Cart</h4>
+                    <div id="drawer-active-cart-target"></div>
+                </div>
+
+                <!-- Order History Archive Records Section -->
+                <div>
+                    <h4 style="font-size: 12px; font-weight: 800; color: #475569; text-transform: uppercase; margin-bottom: 10px; letter-spacing: 0.5px;">📦 Past Order History</h4>
+                    <div id="drawer-purchase-history-target" style="display: flex; flex-direction: column; gap: 10px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- 🔒 HTML SEGMENT: PREMIUM ON-SCREEN CLIENT EDIT MODAL CARD LAYOUT -->
     <div id="admin-user-edit-modal" style="position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); z-index: 999999; display: none; align-items: center; justify-content: center; font-family: system-ui, sans-serif;">
